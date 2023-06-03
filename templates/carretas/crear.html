@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/carretas/nuevo" method="POST">
+            <div class="form-group">
+                <label for="carre_chapa">Chapa Carreta:</label>
+                <input type="text" class="form-control" id="carre_chapa" name="carre_chapa">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

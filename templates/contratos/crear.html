@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/contratos/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="contra_fech">Fecha</label>
+                <input type="text" class="form-control" id="contra_fech" name="contra_fech">
+                <label for="chofe_nom">Nombre</label>
+                <input type="text" class="form-control" id="chofe_nom" name="chofe_nom">
+                <label for="chofe_ape">Apellido</label>
+                <input type="text" class="form-control" id="chofe_ape" name="chofe_ape">
+                <label for="chofe_ciu">Ciudad</label>
+                <input type="text" class="form-control" id="chofe_ciu" name="chofe_ciu">
+                <label for="chofe_tel">Teléfono</label>
+                <input type="text" class="form-control" id="chofe_tel" name="chofe_tel">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

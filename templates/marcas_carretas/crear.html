@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/marcas_carretas/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="marca_carre_desc">Marca Carreta</label>
+                <input type="text" class="form-control" id="marca_carre_desc" name="marca_carre_desc">
+                
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

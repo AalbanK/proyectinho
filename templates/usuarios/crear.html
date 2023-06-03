@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/usuarios/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="usu_descri">Nombre Usuario</label>
+                <input type="text" class="form-control" id="usu_descri" name="usu_descri">
+                <label for="usu_pass">Contraseña Usuario</label>
+                <input type="text" class="form-control" id="usu_pass" name="usu_pass">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

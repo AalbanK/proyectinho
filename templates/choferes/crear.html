@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/choferes/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="chofe_ci">C.I.</label>
+                <input type="text" class="form-control" id="chofe_ci" name="chofe_ci">
+                <label for="chofe_nom">Nombre</label>
+                <input type="text" class="form-control" id="chofe_nom" name="chofe_nom">
+                <label for="chofe_ape">Apellido</label>
+                <input type="text" class="form-control" id="chofe_ape" name="chofe_ape">
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idDepartamento">Departamento:</label>
+                    </div>
+                    <select class="custom-select" id="idDepartamento" name="idDepartamento">
+                        {% for Depa in Depas_lista %}
+                        <option value="{{Depa.id_departamento}}">{{Depa.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="input-group mt-3 mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="idCiudad">Ciudad:</label>
+                        </div>
+                        <select class="custom-select" id="idCiudad" name="idCiudad">
+                            {% for city in Citys_lista %}
+                            <option value="{{city.id_departamento}}">{{city.descripcion}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <label for="chofe_tel">Teléfono:</label>
+                <input type="text" class="form-control" id="chofe_tel" name="chofe_tel">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

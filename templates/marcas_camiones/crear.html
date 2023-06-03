@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/marcas_camiones/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="marca_cami_desc">Marca Camion</label>
+                <input type="text" class="form-control" id="marca_cami_desc" name="marca_cami_desc">
+                
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

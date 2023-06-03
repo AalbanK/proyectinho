@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/cuentas/nuevo" method="POST">
+            <div class="form-group">
+                <label for="condi_cali">Condicion de Calidad: </label>
+                <input type="text" class="form-control" id="condi_cali" name="condi_cali">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

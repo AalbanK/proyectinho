@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/departamentos/" method="POST">
+            <div class="form-group">
+              <label for="descDepartamento">Nombre del Departamento</label>
+              <input type="text" class="form-control" id="descDepartamento" name="descDepartamento" >
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

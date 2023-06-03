@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div>
+    <form action="/productos/nuevo" method="POST">
+        <div class="form-group">
+            <label for="descProducto">Nombre Producto: </label>
+            <input type="text" class="form-control" id="descProducto" name="descProducto" >
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="idIVA">IVA %: </label>
+            </div>
+            <select class="custom-select" id="idIVA" name="idIVA">
+                {% for Iva in Ivas_lista %}
+                <option value="{{Iva.id_IVA}}">{{Iva.porcentaje}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="stkProducto">Stock: </label>
+            <input type="text" class="form-control" id="stkProducto" name="stkProducto" >
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
+{% endblock content %}

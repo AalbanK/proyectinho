@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/roles/nuevo" method="POST">
+            <div class="form-group">
+                <label for="descri_rol">Rol Nuevo: </label>
+                <input type="text" class="form-control" id="descri_rol" name="descri_rol">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

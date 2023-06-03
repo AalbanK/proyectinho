@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/proveedores/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="prove_descri">Nombre Proveedor</label>
+                <input type="text" class="form-control" id="prove_descri" name="prove_descri">
+                <label for="prove_ruc">RUC</label>
+                <input type="text" class="form-control" id="prove_ruc" name="prove_ruc">
+                <label for="ciudad">Ciudad</label>
+                <input type="text" class="form-control" id="ciudad" name="prove_ciu">
+                <label for="prove_dir">Dirección</label>
+                <input type="text" class="form-control" id="prove_dir" name="prove_dir">
+                <label for="prove_mail">Correo</label>
+                <input type="text" class="form-control" id="prove_mail" name="prove_mail">
+                <label for="prove_tel">Teléfono</label>
+                <input type="text" class="form-control" id="prove_tel" name="prove_tel">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

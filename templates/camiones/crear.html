@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/camiones/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="cam_descri">Chapa Camion</label>
+                <input type="text" class="form-control" id="cam_chapa" name="cam_chapa">
+                <div class="input-group mt-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="id_carr">Chapa:</label>
+                    </div>
+                    <select class="custom-select" id="id_carr" name="id_carr">
+                        {% for carre in Carre_lista %}
+                        <option value="{{Carr.id_carreta}}">{{Carr.chapa}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="input-group mt-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idChofer">Chofer:</label>
+                    </div>
+                    <select class="custom-select" id="idChofer" name="idChofer">
+                        {% for Chofe in Chofes_lista %}
+                        <option value="{{Chofe.id_departamento}}">{{Chofe.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

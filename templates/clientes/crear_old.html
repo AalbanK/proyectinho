@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/clientes/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="clie_descri">Nombre Cliente</label>
+                <input type="text" class="form-control" id="clie_descri" name="clie_descri">
+                <label for="clie_ruc">RUC</label>
+                <input type="text" class="form-control" id="clie_ruc" name="clie_ruc">
+                <label for="ciudad">Ciudad</label>
+                <input type="text" class="form-control" id="clie_ciu" name="clie_ciu">
+                <label for="clie_dir">Dirección</label>
+                <input type="text" class="form-control" id="clie_dir" name="clie_dir">
+                <label for="clie_mail">Correo</label>
+                <input type="text" class="form-control" id="clie_mail" name="clie_mail">
+                <label for="clie_tel">Teléfono</label>
+                <input type="text" class="form-control" id="clie_tel" name="clie_tel">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}

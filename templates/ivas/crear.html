@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/ivas/nuevo/" method="POST">
+            <div class="form-group">
+                <label for="iva_porc">Porcentaje IVA</label>
+                <input type="text" class="form-control" id="iva_porc" name="iva_porc">
+                
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+          </form>
+    </div>
+{% endblock content %}
