@@ -164,8 +164,8 @@ class Producto(Base):
     __tablename__="producto"
     idproducto=Column(Integer, primary_key=True, index=True)
     descripcion=Column(String(45), unique=True)
+    idIVA=Column(Integer, ForeignKey("iva.idIVA"))
     stock=Column(Integer)
-    id_IVA=Column(Integer, ForeignKey("iva.idIVA"))
 
 class Remision(Base):
     __tablename__="remision"

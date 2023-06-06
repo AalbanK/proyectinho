@@ -32,8 +32,8 @@ async def create_producto(request: Request, db: Session = Depends(get_database_s
     return templates.TemplateResponse("productos/crear.html", {"request": request, "Ivas_lista":ivas})
 
 @router.post("/nuevo")
-async def create_producto(db: Session = Depends(get_database_session), descProducto = Form(...), stkProducto = Form(...), idIVA=Form(...)):
-    producto = Producto(producto_desc=descProducto, producto_stock=stkProducto, id_IVA=idIVA)
+async def create_producto(db: Session = Depends(get_database_session), descProducto = Form(...), idIVA=Form(...), stkProducto = Form(...)):
+    producto = Producto(descripcion=descProducto, idIVA=idIVA, stock=stkProducto)
     db.add(producto)
     db.commit()
     db.refresh(producto)
