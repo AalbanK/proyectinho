@@ -4,7 +4,7 @@ from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from models import Contrato, Departamento
+from models import Contrato, Producto, Ciudad, Proveedor, Cliente
 from fastapi.staticfiles import StaticFiles
 
 from  db.misc import get_database_session
@@ -26,12 +26,17 @@ async def read_contrato(request: Request, db: Session = Depends(get_database_ses
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_contrato(request: Request, db: Session = Depends(get_database_session)):
-    depas=db.query(Departamento).all()
-    return templates.TemplateResponse("contratos/crear.html", {"request": request, "Depas_lista":depas})
+    produs=db.query(Producto).all()
+    cius=db.query(Ciudad).all()
+    proves=db.query(Proveedor).all()
+    clies=db.query(Cliente).all()
+    return templates.TemplateResponse("contratos/crear.html", {"request": request, "Produs_lista":produs,"Cius_lista":cius,
+                                                                "Proves_lista":proves, "Clies_lista":clies})
 
 @router.post("/nuevo")
-async def create_contrato(db: Session = Depends(get_database_session), descContrato = Form(...), idDepartamento=Form(...)):
-    contrato = Contrato(descripcion=descContrato, id_departamento=idDepartamento)
+async def create_contrato(db: Session = Depends(get_database_session), descContrato = Form(...), idProducto=Form(...), idCiudad=Form(...),
+                          idProveedor=Form(...), cuenta_Proveedor = Form(...), idCliente=Form(...), cuenta_Cliente = Form(...)):
+    contrato = Contrato(descripcion=descContrato, idproducto=idProducto, idciudad=idCiudad, idProveedor=idProveedor, idCliente=idCliente)
     db.add(contrato)
     db.commit()
     db.refresh(contrato)

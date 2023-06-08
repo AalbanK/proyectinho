@@ -142,14 +142,18 @@ class Ciudad(Base):
 class Contrato(Base):
     __tablename__= "contrato" #Nombre de la tabla en la Base de Datos
     idcontrato = Column(Integer, primary_key=True, index=True)
-    contratofecha = Column(DateTime(timezone=True), server_default=func.now())
-    idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
+    nro = Column(Integer)
+    fecha = Column(DateTime(timezone=True), server_default=func.now())
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
-    contratocant = Column(Integer)
-    contratoprecio = Column(Integer)
-    idmoneda = Column(Integer, ForeignKey("moneda.idmoneda"))
+    cantidad = Column(Integer)
+    precio_compra = Column(Integer)
+    origen = Column(Integer, ForeignKey("ciudad.idciudad"))
+    idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
+    cuenta_proveedor = Column(String(45))
+    precio_venta = Column(Integer)
+    destino = Column(Integer, ForeignKey("ciudad.idciudad"))
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
-    contratocuenta = (String(45))
+    cuenta_cliente = Column(String(45))
 
 
 class Cuenta(Base):
