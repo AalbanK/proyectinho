@@ -3,26 +3,26 @@
     <div>
         <form action="/clientes/nuevo/" method="POST">
             <div class="form-group">
-                <label for="clie_descri">Nombre Cliente</label>
-                <input type="text" class="form-control" id="clie_descri" name="clie_descri">
-                <label for="clie_ruc">RUC</label>
-                <input type="text" class="form-control" id="clie_ruc" name="clie_ruc">
+                <label for="descripcion">Nombre Cliente</label>
+                <input type="text" class="form-control" id="descripcion" name="descripcion">
+                <label for="ruc">RUC</label>
+                <input type="text" class="form-control" id="ruc" name="ruc">
                 <div class="form-group">
                     <label for="id_departamento">Departamento</label>
-                    <select id="id_departamento" name="id_departamento" class="custom-select custom-dropdown custom-form-input">
+                    <select id="id_departamento" name="idDepartamento" class="custom-select custom-dropdown custom-form-input">
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="id_ciudad">Ciudad</label>
-                    <select id="id_ciudad" name="id_ciudad" class="custom-select custom-dropdown custom-form-input">
+                    <select id="id_ciudad" name="idCiudad" class="custom-select custom-dropdown custom-form-input">
                     </select>
                 </div>
-                <label for="clie_dir">Dirección</label>
-                <input type="text" class="form-control" id="clie_dir" name="clie_dir">
-                <label for="clie_mail">Correo</label>
-                <input type="text" class="form-control" id="clie_mail" name="clie_mail">
-                <label for="clie_tel">Teléfono</label>
-                <input type="text" class="form-control" id="clie_tel" name="clie_tel">
+                <label for="direccion">Dirección</label>
+                <input type="text" class="form-control" id="direccion" name="direccion">
+                <label for="mail">Correo</label>
+                <input type="text" class="form-control" id="mail" name="mail">
+                <label for="telefono">Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono">
             </div>
             <button type="submit" class="btn btn-primary">Guardar</button>
           </form>
@@ -49,7 +49,7 @@ fetchCargarDepartamentos = () => {
         .then((response) => response.json())
         .then((deptos) => {
             for (let depto of deptos) {
-                agregarOpcion(selectDepto, depto.id_departamento, depto.descripcion)
+                agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
             }
         })
         .catch(error => {
@@ -77,13 +77,17 @@ fetchCargarDepartamentos = () => {
             jsonCiudades = {};
         });
         const selectCiudad = document.querySelector("#id_ciudad");
+
         selectDepto.addEventListener('change', function (event) {
+
             let idDepto = event.target.value;
-            if (idDepto) {
+
+            if (idDepto && idDepto != "undefined") {
                 selectCiudad.length = 0; // vaciar antes de volver a cargar!
+
                 jsonCiudades.map(function (ciu) {
-                    if (ciu.id_departamento == idDepto) {
-                        agregarOpcion(selectCiudad, ciu.id_ciudad, `${ciu.descripcion}`);
+                    if (ciu.iddepartamento == idDepto) {
+                        agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
                     }
                 });
             }

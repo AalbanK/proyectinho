@@ -28,8 +28,8 @@ async def create_banco(request: Request, db: Session = Depends(get_database_sess
     return templates.TemplateResponse("bancos/crear.html", {"request": request})
 
 @router.post("/nuevo")
-async def create_banco(db: Session = Depends(get_database_session), desc_banco = Form(...)):
-    banco = Banco(descripcion=desc_banco)
+async def create_banco(db: Session = Depends(get_database_session), descripcion = Form(...)):
+    banco = Banco(descripcion=descripcion)
     db.add(banco)
     db.commit()
     db.refresh(banco)

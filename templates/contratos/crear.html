@@ -1,20 +1,186 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/contratos/nuevo/" method="POST">
-            <div class="form-group">
-                <label for="contra_fech">Fecha</label>
-                <input type="text" class="form-control" id="contra_fech" name="contra_fech">
-                <label for="chofe_nom">Nombre</label>
-                <input type="text" class="form-control" id="chofe_nom" name="chofe_nom">
-                <label for="chofe_ape">Apellido</label>
-                <input type="text" class="form-control" id="chofe_ape" name="chofe_ape">
-                <label for="chofe_ciu">Ciudad</label>
-                <input type="text" class="form-control" id="chofe_ciu" name="chofe_ciu">
-                <label for="chofe_tel">Teléfono</label>
-                <input type="text" class="form-control" id="chofe_tel" name="chofe_tel">
+<div>
+    <form action="/contratos/nuevo" method="POST">
+        <div class="form-group">
+            <label for="contratoFecha">Fecha de Contrato</label>
+            <input type="date" class="form-control" id="contratoFecha" name="contratoFecha">
+        </div>
+
+        <div class="form-group a-ocultar" id="esProveedor">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="idProveedor">Proveedor:</label>
+                </div>
+                <select class="custom-select" id="idProveedor" name="idProveedor">
+                    <option value="0" selected>Elegir...</option>
+                    {% for Proveedor in Proveedores_lista %}
+                    <option value="{{Proveedor.idproveedor}}">{{Proveedor.descripcion}}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </form>
-    </div>
+        </div>
+
+        <div class="form-group a-ocultar" id="esCliente">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="idCliente">Cliente:</label>
+                </div>
+                <select class="custom-select" id="idCliente" name="idCliente">
+                    <option value="0" selected>Elegir...</option>
+                    {% for Cliente in Clientes_lista %}
+                    <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="idProducto">Producto:</label>
+                </div>
+                <select class="custom-select" id="idProducto" name="idProducto">
+                    {% for Producto in Productos_lista %}
+                    <option value="{{Producto.idproducto}}">{{Producto.producto_desc}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <label for="contratoCantidad">Cantidad del Producto (en kilos):</label>
+                <input type="number" class="form-control" id="contratoCantidad" name="contratoCantidad" min="0">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label for="contratoPrecio">Monto del Contrato:</label>
+                <input type="number" class="form-control" id="contratoPrecio" name="contratoPrecio" min="1">
+            </div>
+            <div class="form-group col-6">
+                <label for="" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="nroCuenta">N° de Cuenta:</label>
+                    </div>
+                    <select class="custom-select" id="nroCuenta" name="nro">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
+
 {% endblock content %}
+
+{% block script %}
+
+<script type="text/javascript">
+    // para ocultar y mostrar el de cliente o proveedor dependiendo de lo que se seleccionó
+    toggleClienteProveedor = (elemento) => {
+        $("#idCliente").val(0);
+        $("#idProveedor").val(0);
+    }
+
+    limpiarCuenta = (campo) => {
+        campo.length = 0; // vaciar antes de volver a cargar!
+        agregarOpcion(campo, null, `Primero seleccione un cliente o proveedor.`);
+        campo.setAttribute("disabled", "disabled"); //se deshabilita el campo ya que no tiene opciones
+    }
+
+    let jsonCuentas = null;
+    agregarOpcion = (elemento, valor, texto) => {
+        let nuevaOpcion = document.createElement("option");
+        nuevaOpcion.value = valor;
+        nuevaOpcion.text = texto;
+        elemento.add(nuevaOpcion);
+    }
+
+    async function obtenerCuentas(tipo, id) { //tipo: proveedor, cliente
+        const response = await fetch(`/cuentas/${tipo}/${id}`);
+        if (!response.ok) {
+            const message = `Ocurrió un error al intentar obtener las cuentas del ${tipo}: ${response.status}`;
+            throw new Error(message);
+        }
+        const cuentas = await response.json();
+        return cuentas;
+    }
+
+    //----------
+    $(document).ready(function () {
+        const selectCuenta = document.querySelector("#nroCuenta");
+
+        toggleClienteProveedor($('[name=gridRadios]:checked').val());
+        limpiarCuenta(selectCuenta);
+
+        $("[name=gridRadios]").click(function () {
+            toggleClienteProveedor($(this).val());
+            limpiarCuenta(selectCuenta);
+        });
+
+        const selectProveedor = document.querySelector("#idProveedor");
+        const selectCliente = document.querySelector("#idCliente");
+        const selectMoneda = document.querySelector("#idMoneda");
+        selectCliente.addEventListener('change', async function (event) {
+            let idCliente = event.target.value;
+            if (idCliente && idCliente != 0) {
+                await obtenerCuentas('cliente', idCliente)
+                    .then(cuentas => { jsonCuentas = cuentas })
+                    .catch(error => {
+                        console.error(error);
+                        jsonCuentas = {};
+                    });
+
+                selectCuenta.length = 0; // vaciar antes de volver a cargar!
+                if (jsonCuentas.length == 0) {
+                    agregarOpcion(selectCuenta, null, `El cliente no dispone de cuentas actualmente.`);
+                    selectCuenta.setAttribute("disabled", "disabled"); //se deshabilita el campo ya que no tiene opciones
+                }
+                else {
+                    selectCuenta.removeAttribute("disabled"); // se rehabilita el campo
+                    jsonCuentas.map(function (cuenta) {
+                        agregarOpcion(selectCuenta, cuenta.numero_cuenta, `${cuenta.numero_cuenta}`);
+                    });
+                }
+            }
+            else {
+                selectCuenta.setAttribute("disabled", "disabled"); //se deshabilita el campo ya que no tiene opciones
+                selectCuenta.value = 0; // en jquery es $(elemento).val(0)
+            }
+
+        });
+        selectProveedor.addEventListener('change', async function (event) {
+            let idProveedor = event.target.value;
+            if (idProveedor && idProveedor != 0) {
+                await obtenerCuentas('proveedor', idProveedor)
+                    .then(cuentas => { jsonCuentas = cuentas })
+                    .catch(error => {
+                        console.error(error);
+                        jsonCuentas = {};
+                    });
+
+                selectCuenta.length = 0; // vaciar antes de volver a cargar!
+                if (jsonCuentas.length == 0) {
+                    agregarOpcion(selectCuenta, null, `El proveedor no dispone de cuentas actualmente.`);
+                    selectCuenta.setAttribute("disabled", "disabled"); //se deshabilita el campo ya que no tiene opciones
+                }
+                else {
+                    selectCuenta.removeAttribute("disabled"); // se rehabilita el campo
+                    jsonCuentas.map(function (cuenta) {
+                        agregarOpcion(selectCuenta, cuenta.numero_cuenta, `${cuenta.numero_cuenta}`);
+                    });
+                }
+            }
+            else {
+                selectCuenta.setAttribute("disabled", "disabled"); //se deshabilita el campo ya que no tiene opciones
+                selectCuenta.value = 0; // en jquery es $(elemento).val(0)
+            }
+        });
+    });
+</script>
+{% endblock script %}

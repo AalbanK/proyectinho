@@ -35,7 +35,7 @@ async def create_ciudad(request: Request, db: Session = Depends(get_database_ses
 
 @router.post("/nuevo")
 async def create_ciudad(db: Session = Depends(get_database_session), descCiudad = Form(...), idDepartamento=Form(...)):
-    ciudad = Ciudad(descripcion=descCiudad, id_departamento=idDepartamento)
+    ciudad = Ciudad(descripcion=descCiudad, iddepartamento=idDepartamento)
     db.add(ciudad)
     db.commit()
     db.refresh(ciudad)

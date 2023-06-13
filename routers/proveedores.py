@@ -30,8 +30,8 @@ async def create_proveedor(request: Request, db: Session = Depends(get_database_
     return templates.TemplateResponse("proveedores/crear.html", {"request": request, "Depas_lista":depas})
 
 @router.post("/nuevo")
-async def create_proveedor(db: Session = Depends(get_database_session), descProveedor = Form(...), idDepartamento=Form(...)):
-    proveedor = Proveedor(descripcion=descProveedor, id_departamento=idDepartamento)
+async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), idDepartamento=Form(...), idCiudad=Form(...), ruc = Form(...), mail = Form(...), direccion = Form(...), telefono = Form(...)):
+    proveedor = Proveedor(descripcion=descripcion, idciudad = idCiudad, ruc=ruc, mail=mail, direccion=direccion, telefono=telefono)
     db.add(proveedor)
     db.commit()
     db.refresh(proveedor)

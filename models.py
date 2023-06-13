@@ -19,7 +19,7 @@ class Auditoria(Base):
 class Banco(Base):
     __tablename__ = "banco" #Nombre de la tabla en la Base de Datos
     idbanco = Column(Integer, primary_key=True, index=True)
-    bancodesc = Column(String(45), unique=True)
+    descripcion = Column(String(45), unique=True)
     # altausuario = Column(Integer)
     # altafecha = Column(DateTime(), server_default=func.now(), default=func.now())
 
@@ -27,12 +27,12 @@ class Banco(Base):
 class Cliente(Base):
     __tablename__ = "cliente" #Nombre de la tabla en la Base de Datos
     idcliente = Column(Integer, primary_key=True, index=True)
-    clientedesc = Column(String(45), unique=True)
-    clienteruc = Column(String(15), unique=True)
-    idciudad = Column(Integer, ForeignKey("ciudad.idciudad"))
-    clientedir = Column(String(45))
-    clientemail = Column(String(45))
-    clientetel = Column(String(45))
+    descripcion = Column(String(45), unique=True)
+    ruc = Column(String(15), unique=True)
+    idciudad = Column(Integer, ForeignKey("ciudad.id_ciudad"))
+    direccion = Column(String(45))
+    mail = Column(String(45))
+    telefono = Column(String(45))
 
 
 class Departamento(Base):
@@ -71,12 +71,12 @@ class Moneda(Base):
 class Proveedor(Base):
     __tablename__ = "proveedor" #Nombre de la tabla en la Base de Datos
     idproveedor = Column(Integer, primary_key=True, index=True)
-    proveedordesc = Column(String(45), unique=True)
-    proveedorruc = Column(String(15), unique=True)
+    descripcion = Column(String(45), unique=True)
+    ruc = Column(String(15), unique=True)
     idciudad = Column(Integer, ForeignKey("ciudad.idciudad"))
-    proveedordir = Column(String(45))
-    proveedormail = Column(String(45))
-    proveedortel = Column(String(45))
+    direccion = Column(String(45))
+    mail = Column(String(45))
+    telefono = Column(String(45))
 
 
 class Rol(Base):
@@ -162,6 +162,7 @@ class Cuenta(Base):
     idbanco = Column(Integer, ForeignKey("banco.idbanco"))
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
+    nro = Column(String(45))
 
 
 class Producto(Base):
