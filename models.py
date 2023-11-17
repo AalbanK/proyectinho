@@ -29,7 +29,7 @@ class Cliente(Base):
     idcliente = Column(Integer, primary_key=True, index=True)
     descripcion = Column(String(45), unique=True)
     ruc = Column(String(15), unique=True)
-    idciudad = Column(Integer, ForeignKey("ciudad.id_ciudad"))
+    idciudad = Column(Integer, ForeignKey("ciudad.idciudad"))
     direccion = Column(String(45))
     mail = Column(String(45))
     telefono = Column(String(45))

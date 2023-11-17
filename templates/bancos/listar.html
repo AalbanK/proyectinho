@@ -8,6 +8,15 @@
             <th scope="col">Acciones</th>
       </tr>
     </thead>
+    <tbody>
+        {% for banco in bancos %}
+        <tr>
+              <td>{{ banco.idbanco}}</td>
+              <td>{{ banco.descripcion}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+
 </table>
 
 <div class="modal fade" id="eliminarModal">
@@ -30,6 +39,8 @@
 
 {% endblock content %}
 {% block script %}
+<script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
 
@@ -70,17 +81,17 @@
     $(document).ready(function(){
         columnas = [
                 {
-                    data: 'id_banco',
+                    data: 'idbanco',
                 },
                 {
-                    data: 'banco_desc',
+                    data: 'descripcion',
                 },
                 {
                     data: null,
                     orderable: false, 
                     searchable: false,
                     render: function ( data, type, row, meta ) {
-                        return botonesEditarYEliminar(data.id_banco);
+                        return botonesEditarYEliminar(data.idbanco);
                     }
                 },
             ];
@@ -206,4 +217,3 @@ let alertError = ` <div class="alert alert-danger aviso" role="alert">
     });
 </script>
 {% endblock script %}
-

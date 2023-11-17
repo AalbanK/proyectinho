@@ -6,6 +6,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from models import Banco
 from fastapi.staticfiles import StaticFiles
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 
 from  db.misc import get_database_session
 
@@ -35,3 +37,8 @@ async def create_banco(db: Session = Depends(get_database_session), descripcion 
     db.refresh(banco)
     response = RedirectResponse('/', status_code=303)
     return response
+
+@router.get("/todos")
+async def listar_bancos(request: Request, db: Session = Depends(get_database_session)):
+    bancos = db.query(Banco).all()
+    return JSONResponse(jsonable_encoder(bancos))
