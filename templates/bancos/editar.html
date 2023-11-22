@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/bancos/update/" method="POST">
+        <div class="form-group">
+            <label for="idbanco">ID del Banco</label>
+            <input type="text" class="form-control" id="idbanco" name="idbanco" value="{{ Banco.idbanco}}">
+        </div>
+            <div class="form-group">
+                <label for="descripcion">Nombre Banco</label>
+                <input type="text" class="form-control" id="descripcion" name="descripcion" value="{{ Banco.descripcion }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>    
+{% endblock content %}
