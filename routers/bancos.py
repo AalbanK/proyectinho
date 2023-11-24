@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+import statistics
+from fastapi import APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
@@ -8,6 +9,7 @@ from models import Banco
 from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse, Response
+from starlette import status
 
 from  db.misc import get_database_session
 
@@ -64,9 +66,26 @@ def editar(db: Session = Depends(get_database_session), idbanco = Form(...), des
      response = RedirectResponse('/bancos/', status_code=303)
      return response
 
-@router.get("/borrar/{id}",response_class=HTMLResponse)
+'''@router.get("/borrar/{id}",response_class=HTMLResponse)
 def eliminar(id : int, db: Session = Depends(get_database_session)):
      db.query(Banco).filter(Banco.idbanco == id).delete()
      db.commit()
      response = RedirectResponse('/bancos/', status_code=303)
      return response
+'''
+@router.get("/ver/{id}",response_class=JSONResponse)
+def ver(id:int, response:Response,
+            request:Request,db: Session = Depends(get_database_session)):
+    banco = db.query(Banco).get(id)
+    if(banco is None):
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(banco))
+    
+@router.get("/borrar/{id}",response_class=JSONResponse) #dependencies=[Depends(auth.verificar_si_usuario_es_superusuario)'''])
+def eliminar(id : int, db: Session = Depends(get_database_session)):
+    db.query(Banco).filter(Banco.idbanco == id).delete()
+    db.commit()
+    response = RedirectResponse('/bancos/', status_code=303)
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro eliminado correctamente.")
+    return response

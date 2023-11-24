@@ -98,8 +98,9 @@
         tablaDT = inicializarDataTable($tabla, '/bancos/todos', columnas, urlEspanholDT)
 
         $tabla.on('click', '.btn-danger.eliminar', function(e) {
-            let id = $(e.target).data('id');
-            $modal.data('id', id).modal('show');
+            let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de whatever
+            console.log (id)
+            $modal.data('id', id).modal('show');/5
         });
 
         agregarAlert = (accion, motivo) => {
@@ -197,7 +198,6 @@ let alertError = ` <div class="alert alert-danger aviso" role="alert">
                     }
                     else {
                         actualizarBotones('eliminar')
-                        console.log($modal.data('id'))
                         $("#confirmarEliminar").off('click').on('click', {id: $modal.data('id')}, eliminarFila);
                     }
                 },

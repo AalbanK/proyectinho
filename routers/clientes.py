@@ -1,10 +1,12 @@
-from fastapi import APIRouter
+import statistics
+from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
-from models import Cliente, Departamento, Ciudad
+from fastapi.responses import HTMLResponse, JSONResponse
+from models import Banco, Cliente, Departamento, Ciudad
 from fastapi.staticfiles import StaticFiles
 
 from  db.misc import get_database_session
@@ -49,6 +51,7 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
      clie= db.query(Cliente).get(id)
      depto = db.query(Departamento).all()
      return templates.TemplateResponse("editar_cliente.html", {"request": request, "Cliente": clie, "Departamentos_lista": depto})
+
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idclie = Form(...), color = Form(...), modelo = Form(...), anho = Form(...), idmarca = Form(...)):
      clie= db.query(Cliente).get(idclie)
@@ -68,3 +71,4 @@ def eliminar(id : int, db: Session = Depends(get_database_session)):
      db.commit()
      response = RedirectResponse('/clientes/', status_code=303)
      return response
+
