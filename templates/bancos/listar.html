@@ -99,8 +99,7 @@
 
         $tabla.on('click', '.btn-danger.eliminar', function(e) {
             let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de whatever
-            console.log (id)
-            $modal.data('id', id).modal('show');/5
+            $modal.data('id', id).modal('show');
         });
 
         agregarAlert = (accion, motivo) => {
