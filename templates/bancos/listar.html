@@ -1,25 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-<table id="bancos" class="table table-striped">
-    <thead>
-      <tr>
+<table id="bancos" class="table table-striped"> <!--table-striped es para colorear las filas de la tabla-->
+    <thead> <!--cabecera de la tabla-->
+        <tr>
             <th scope="col">ID</th>
             <th scope="col">Descripción</th>
             <th scope="col">Acciones</th>
-      </tr>
+        </tr>
     </thead>
     <tbody>
-        {% for banco in bancos %}
-        <tr>
-              <td>{{ banco.idbanco}}</td>
-              <td>{{ banco.descripcion}}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
+        <!--aqui se cargan los datos de datatable-->
+    </tbody>
 
 </table>
 
-<div class="modal fade" id="eliminarModal">
+<div class="modal fade" id="eliminarModal"> <!--ultimo modal mostrado al intentar eliminar un registro-->
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -39,29 +34,26 @@
 
 {% endblock content %}
 {% block script %}
-<script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+<script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script> <!--carga los jquery de datatable-->
+<script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script> <!--carga los estilos de datatable-->
 
 <script type="text/javascript">
 
     let $tabla = $("#bancos");
     let $modal = $('#eliminarModal');
-    let botonesEliminar =  `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">No, Cancelar</button>
+    let botonesEliminar = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">No, Cancelar</button>
                     <button id="confirmarEliminar" class="btn btn-danger" type="button">Sí, Eliminar</button>`;
     let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">Ok</button>`;
 
     let alertOK = `<div class="alert alert-success aviso" role="alert">
-                    <button type="button" class="close close-alert" 
-                        data-dismiss="alert" aria-hidden="true">
-                        ×
-                    </button> Registro eliminado exitosamente.
+                    Registro eliminado exitosamente.
                 </div>`;
     let botonesEditarYEliminar = (id) => {
         return `<a href="/bancos/editar/${id}" class="btn btn-warning editar">Editar</a>
                 <button type="button" class="btn btn-danger eliminar" data-id="${id}"> Eliminar </button>`;
     }
 
-    let urlEspanholDT =  '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
+    let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
 
     let tablaDT = null;
 
@@ -78,35 +70,35 @@
         });
     }
 
-    $(document).ready(function(){
+    $(document).ready(function () {
         columnas = [
-                {
-                    data: 'idbanco',
-                },
-                {
-                    data: 'descripcion',
-                },
-                {
-                    data: null,
-                    orderable: false, 
-                    searchable: false,
-                    render: function ( data, type, row, meta ) {
-                        return botonesEditarYEliminar(data.idbanco);
-                    }
-                },
-            ];
+            {
+                data: 'idbanco',
+            },
+            {
+                data: 'descripcion',
+            },
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                render: function (data, type, row, meta) {
+                    return botonesEditarYEliminar(data.idbanco);
+                }
+            },
+        ];
         tablaDT = inicializarDataTable($tabla, '/bancos/todos', columnas, urlEspanholDT)
 
-        $tabla.on('click', '.btn-danger.eliminar', function(e) {
+        $tabla.on('click', '.btn-danger.eliminar', function (e) {
             let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de whatever
             $modal.data('id', id).modal('show');
         });
 
         agregarAlert = (accion, motivo) => {
-            switch(accion){
+            switch (accion) {
                 case 'error': {
                     let texto = null;
-                    switch(motivo){
+                    switch (motivo) {
                         case 'verif': {
                             texto = 'Ocurrió un error al verificar si existe el registro seleccionado.';
                             break;
@@ -115,11 +107,11 @@
                             texto = 'Ocurrió un error al verificar si el registro fue eliminado correctamente. Verifique si los datos mostrados posteriormente son consistentes.';
                             break;
                         }
-                    default: {
+                        default: {
                             texto = 'Ha ocurrido un error desconocido. Verifique si los datos mostrados posteriormente son correctos.';
                         }
                     }
-let alertError = ` <div class="alert alert-danger aviso" role="alert">
+                    let alertError = ` <div class="alert alert-danger aviso" role="alert">
                         <button type="button" class="close close-alert" 
                             data-dismiss="alert" aria-hidden="true">
                             ×
@@ -139,7 +131,7 @@ let alertError = ` <div class="alert alert-danger aviso" role="alert">
 
         actualizarBotones = (accion) => {
             $modal.find('#eliminarUsuario').children().remove();
-            switch(accion){
+            switch (accion) {
                 case 'error': {
                     $modal.find('#eliminarUsuario').append(botonesOK);
                     break;
@@ -159,24 +151,24 @@ let alertError = ` <div class="alert alert-danger aviso" role="alert">
                 url: url,
                 method: 'GET',
                 dataType: 'json',
-                success: function( data, status, xhr ) {
-                    if(data.status_code == 200){
+                success: function (data, status, xhr) {
+                    if (data.status_code == 200) {
                         agregarAlert('ok');
                         actualizarBotones('ok')
-                        tablaDT.ajax.reload( null, false ); //recarga la tabla
+                        tablaDT.ajax.reload(null, false); //recarga la tabla
                     }
-                    else if(data.status_code == 404){
+                    else if (data.status_code == 404) {
                         agregarAlert('error')
-                        actualizarBotones('error')        
+                        actualizarBotones('error')
                     }
                     else {
                         agregarAlert('ok');
                         actualizarBotones('ok')
-                        tablaDT.ajax.reload( null, false ); //recarga la tabla
+                        tablaDT.ajax.reload(null, false); //recarga la tabla
                         $modal.modal('hide');
                     }
                 },
-                error: function(e) {
+                error: function (e) {
                     agregarAlert('error', 'elim')
                     actualizarBotones('error')
                     console.log(e)
@@ -190,17 +182,17 @@ let alertError = ` <div class="alert alert-danger aviso" role="alert">
                 url: `/bancos/ver/${$modal.data('id')}`,
                 method: 'GET',
                 dataType: 'json',
-                success: function( data, status, xhr ) {
-                    if(data.status_code == 404){
+                success: function (data, status, xhr) {
+                    if (data.status_code == 404) {
                         agregarAlert('error', 'verif')
                         actualizarBotones('error')
                     }
                     else {
                         actualizarBotones('eliminar')
-                        $("#confirmarEliminar").off('click').on('click', {id: $modal.data('id')}, eliminarFila);
+                        $("#confirmarEliminar").off('click').on('click', { id: $modal.data('id') }, eliminarFila);
                     }
                 },
-                error: function(e) {
+                error: function (e) {
                     agregarAlert('error')
                     actualizarBotones('error')
                     console.log(e)

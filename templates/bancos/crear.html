@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div>
-        <form action="/bancos/nuevo/" method="POST">
+        <form action="/bancos/nuevo/" method="POST"> <!--action es la direccion del ROUTER y el metodo post para insertar el registro-->
             <div class="form-group">
                 <label for="banc_descri">Nombre Banco</label>
                 <input type="text" class="form-control" id="banc_descri" name="descripcion">
