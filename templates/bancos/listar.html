@@ -25,13 +25,11 @@
                 <h5> ¿Está seguro/a de eliminar este registro? </h5>
             </div>
             <div class="modal-footer">
-                <form id="eliminarUsuario">
-                </form>
+                <form id="eliminarBanco"></form>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock content %}
 {% block script %}
 <script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script> <!--carga los jquery de datatable-->
@@ -130,17 +128,17 @@
         }
 
         actualizarBotones = (accion) => {
-            $modal.find('#eliminarUsuario').children().remove();
+            $modal.find('#eliminarBanco').children().remove();
             switch (accion) {
                 case 'error': {
-                    $modal.find('#eliminarUsuario').append(botonesOK);
+                    $modal.find('#eliminarBanco').append(botonesOK);
                     break;
                 }
                 case 'eliminar': {
-                    $modal.find('#eliminarUsuario').append(botonesEliminar);
+                    $modal.find('#eliminarBanco').append(botonesEliminar);
                     break;
                 }
-                default: $modal.find('#eliminarUsuario').append(botonesOK);
+                default: $modal.find('#eliminarBanco').append(botonesOK);
             }
         }
 
@@ -203,7 +201,7 @@
         $modal.on('hidden.bs.modal', function (e) {
             $modal.removeData('id');
             $modal.find('.aviso').remove();
-            $modal.find('#eliminarUsuario').children().remove()
+            $modal.find('#eliminarBanco').children().remove()
         });
     });
 </script>

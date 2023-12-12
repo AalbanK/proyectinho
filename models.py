@@ -52,13 +52,13 @@ class IVA(Base):
 
 class Marca_camion(Base):
     __tablename__ = "marca_camion" #Nombre de la tabla en la Base de Datos
-    idmarcacamion = Column(Integer, primary_key=True, index=True)
+    idmarca_camion = Column(Integer, primary_key=True, index=True)
     descripcion = Column(String(45), unique=True)
 
 
 class Marca_carreta(Base):
     __tablename__ = "marca_carreta" #Nombre de la tabla en la Base de Datos
-    idmarcacarreta = Column(Integer, primary_key=True, index=True)
+    idmarca_carreta = Column(Integer, primary_key=True, index=True)
     descripcion = Column(String(45), unique=True)
     
 
