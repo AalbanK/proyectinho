@@ -1,12 +1,22 @@
 {% extends 'base.html' %}
 {% block content %}
     <div>
-        <form action="/carretas/nuevo" method="POST">
+        <form action="/carretas/nuevo/" method="POST">
             <div class="form-group">
-                <label for="carre_chapa">Chapa Carreta:</label>
-                <input type="text" class="form-control" id="carre_chapa" name="carre_chapa">
+                <label for="chapaCarreta">Chapa Carreta</label>
+                <input type="text" class="form-control" id="chapaCarreta" name="chapaCarreta">
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="idmarca_carreta">Marca: </label>
+                </div>
+                <select class="custom-select" id="idmarca_carreta" name="idmarca_carreta">
+                    {% for Marca in Marcas_lista %}
+                    <option value="{{Marca.idmarca_carreta}}">{{Marca.descripcion}}</option>
+                    {% endfor %}
+                </select>
             </div>
             <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
+          </form>
     </div>
 {% endblock content %}

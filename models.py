@@ -91,16 +91,14 @@ class Rol(Base):
 class Camion(Base):
     __tablename__ = "camion" #Nombre de la tabla en la Base de Datos
     idcamion = Column(Integer, primary_key=True, index=True)
-    chapa = Column(String(45), unique=True)
-    idmarcacamion = Column(Integer, ForeignKey("marca_camion.idmarca_camion"))
-    idcarreta = Column(Integer, ForeignKey("carreta.idcarreta"))
-    #idchofer = Column(Integer, ForeignKey("choferes.idchofer"))
+    camion_chapa = Column(String(45), unique=True)
+    idmarca_camion = Column(Integer, ForeignKey("marca_camion.idmarca_camion"))
 
 
 class Carreta(Base):
     __tablename__ = "carreta" #Nombre de la tabla en la Base de Datos
-    id_carreta = Column(Integer, primary_key=True, index=True)
-    chapa = Column(String(45), unique=True)
+    idcarreta = Column(Integer, primary_key=True, index=True)
+    carreta_chapa = Column(String(45), unique=True)
     idmarca_carreta = Column(Integer, ForeignKey("marca_camion.idmarca_camion"))
 
 
