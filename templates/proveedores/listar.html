@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+<table id="proveedor" class="table table-striped">
+    <thead>
+      <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">RUC</th>
+            <th scope="col">Ciudad</th>
+            <th scope="col">Direccion</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Contacto</th>
+            <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for proveedor in proveedores %}
+      <tr>
+            <td>{{ proveedor.idproveedor}}</td>
+            <td>{{ proveedor.descripcion}}</td>
+            <td>{{ proveedor.ruc}}</td>
+            <td>{{ proveedor.descripcion_ciudad}}</td>
+            <td>{{ proveedor.direccion}}</td>
+            <td>{{ proveedor.mail}}</td>
+            <td>{{ proveedor.telefono}}</td>
+            <td><a href="/proveedores/editar/{{- proveedor.idproveedor -}}" class="btn btn-warning editar">Editar</a>
+                <button type="button" class="btn btn-danger eliminar" data-id="{{- proveedor.idproveedor -}}"> Eliminar </button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+</table>
+
+<div class="modal fade" id="eliminarModal">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h4 class="modal-title">Eliminar Registro</h4>
+              <a href="#" class="close" data-dismiss="modal">&times;</a>
+          </div>
+          <div class="modal-body">
+              <h5> ¿Está seguro/a de eliminar este registro? </h5>
+          </div>
+          <div class="modal-footer">
+              <form id="eliminarUsuario">
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% endblock content %}
+{% block script %}
+<script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#proveedor").DataTable();
+    });
+</script>
+{% endblock script %}

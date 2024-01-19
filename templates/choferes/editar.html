@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/choferes/update/" method="POST">
+        <div class="form-group">
+            <label for="idchofer">ID Chofer</label>
+            <input type="text" class="form-control" id="idchofer" name="idchofer" value="{{Chofer.idchofer}}"readonly>
+        </div>
+        <div class="form-group">
+            <label for="ci">C.I.</label>
+            <input type="text" class="form-control" id="ci" name="ci" value="{{ Chofer.ci}}">
+            <label for="Nombre">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ Chofer.nombre}}">
+            <label for="Apellido">Nombre</label>
+            <input type="text" class="form-control" id="apellido" name="apellido" value="{{ Chofer.apellido}}">
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <label for="id_departamento">Departamento</label>
+                <select class="custom-select" id="idDepartamento" name="idDepartamento">
+                    {% for Depa in Departamentos_lista %}
+                    <option value="{{Depa.iddepartamento}}" {{'selected' if Depa.iddepartamento==ref_depto.iddepartamento }}>{{Depa.descripcion}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="id_ciudad">Ciudad</label>
+                <select id="id_ciudad" name="idCiudad" class="custom-select custom-dropdown custom-form-input">
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" name="telefono" value="{{ Chofer.telefono}}">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>    
+{% endblock content %}
+{% block script %}
+<script>
+
+let jsonCiudades = null;
+let selectDepto = null;
+
+agregarOpcion = (elemento, valor, texto) => {
+    let nuevaOpcion = document.createElement("option");
+    nuevaOpcion.value = valor;
+    nuevaOpcion.text = texto;
+    elemento.add(nuevaOpcion);
+}
+
+fetchCargarDepartamentos = () => {
+    selectDepto = document.querySelector("#id_departamento");
+    selectDepto.length = 0; //para vaciar el select, por si acaso
+    agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
+        fetch('/departamentos/todos')
+        .then((response) => response.json())
+        .then((deptos) => {
+            for (let depto of deptos) {
+                agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
+            }
+        })
+        .catch(error => {
+            console.error(error)
+            agregarOpcion(selectDepto, 0, 'Sin Datos');
+        });
+    };
+
+    async function obtenerCiudades() {
+        const response = await fetch('/ciudades/todos');
+        if (!response.ok) {
+            const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
+            throw new Error(message);
+        }
+        const ciudades = await response.json();
+        return ciudades;
+    }
+
+    window.addEventListener('DOMContentLoaded', fetchCargarDepartamentos);
+    window.addEventListener('DOMContentLoaded', async () => {
+        await obtenerCiudades()
+        .then(ciudades => {jsonCiudades = ciudades })
+        .catch(error => {
+            console.error(error);
+            jsonCiudades = {};
+        });
+        const selectCiudad = document.querySelector("#id_ciudad");
+
+        selectDepto.addEventListener('change', function (event) {
+
+            let idDepto = event.target.value;
+
+            if (idDepto && idDepto != "undefined") {
+                selectCiudad.length = 0; // vaciar antes de volver a cargar!
+
+                jsonCiudades.map(function (ciu) {
+                    if (ciu.iddepartamento == idDepto) {
+                        agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
+                    }
+                });
+            }
+    });
+});
+</script>
+{% endblock script %}

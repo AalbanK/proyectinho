@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/depositos/update/" method="POST">
+        <div class="form-group">
+            <label for="iddeposito">ID del Deposito</label>
+            <input type="text" class="form-control" id="iddeposito" name="iddeposito" value="{{ Deposito.iddeposito}}"readonly>
+        </div>
+            <div class="form-group">
+                <label for="descripcion">Nombre Deposito</label>
+                <input type="text" class="form-control" id="descripcion" name="descripcion" value="{{ Deposito.descripcion }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>    
+{% endblock content %}

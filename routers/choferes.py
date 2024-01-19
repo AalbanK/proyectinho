@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -19,10 +19,18 @@ router = APIRouter(
     tags=["choferes"]
 )
 
+# @router.get("/")
+# async def read_chofer(request: Request, db: Session = Depends(get_database_session)):
+#     records = db.query(Chofer, Departamento, Ciudad).join(Ciudad, Departamento).all()
+#     return templates.TemplateResponse("choferes/listar.html", {"request": request, "data": records})
+
 @router.get("/")
 async def read_chofer(request: Request, db: Session = Depends(get_database_session)):
-    records = db.query(Chofer, Departamento, Ciudad).join(Ciudad, Departamento).all()
-    return templates.TemplateResponse("choferes/listar.html", {"request": request, "data": records})
+    #records = db.query(Chofer).all()
+    ciud = db.query(Chofer.idchofer, Chofer.ci, Chofer.nombre,Ciudad.descripcion.label('descripcion_ciudad'),Chofer.telefono).join(Ciudad, Chofer.idciudad == Ciudad.idciudad).all()
+    print(ciud)
+    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": ciud})
+
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_chofer(request: Request, db: Session = Depends(get_database_session)):
@@ -31,15 +39,13 @@ async def create_chofer(request: Request, db: Session = Depends(get_database_ses
     return templates.TemplateResponse("choferes/crear.html", {"request": request, "Depas_lista":depas, "Citys_lista":city})
 
 @router.post("/nuevo")
-async def create_chofer(db: Session = Depends(get_database_session), chofe_ci = Form(...), chofe_nom=Form(...), chofe_ape=Form(...), chofe_ciu=Form(...), chofe_tel=Form(...)):
-    chofer = Chofer(chofer_ci=chofe_ci, chofer_nombre=chofe_nom,chofer_apellido=chofe_ape,id_ciudad=chofe_ciu,chofer_tel=chofe_tel)
+async def create_chofer(db: Session = Depends(get_database_session), chofe_ci = Form(...), chofe_nom=Form(...), chofe_ape=Form(...), idCiudad=Form(...), chofe_tel=Form(...)):
+    chofer = Chofer(ci=chofe_ci, nombre=chofe_nom, apellido=chofe_ape, idciudad=idCiudad, telefono=chofe_tel)
     db.add(chofer)
     db.commit()
     db.refresh(chofer)
     response = RedirectResponse('/', status_code=303)
     return response
-
-#-----------------------------------------------------------------------------------------------------
 
 @router.get("/{id}",response_class=HTMLResponse)
 def ver(id:int, response:Response,
@@ -50,9 +56,10 @@ def ver(id:int, response:Response,
 
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
-    clie= db.query(Chofer).get(id)
-    city = db.query(Ciudad).all()
-    return templates.TemplateResponse("editar_cliente.html", {"request": request, "Chofer": clie, "Ciudads_lista": city})
+    chof= db.query(Chofer).get(id)
+    depto = db.query(Departamento).all()
+    refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(chof.idciudad))
+    return templates.TemplateResponse("choferes/editar.html", {"request": request, "Chofer": chof, "Departamentos_lista": depto, "ref_depto":refdepto})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idclie = Form(...), color = Form(...), modelo = Form(...), anho = Form(...), idmarca = Form(...)):

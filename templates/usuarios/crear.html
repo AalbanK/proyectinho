@@ -3,10 +3,23 @@
     <div>
         <form action="/usuarios/nuevo/" method="POST">
             <div class="form-group">
-                <label for="usu_descri">Nombre Usuario</label>
-                <input type="text" class="form-control" id="usu_descri" name="usu_descri">
-                <label for="usu_pass">Contraseña Usuario</label>
-                <input type="text" class="form-control" id="usu_pass" name="usu_pass">
+                <label for="usu_descri">Nombre Real</label>
+                <input type="text" class="form-control" id="nam" name="nam">
+                <label for="usu_pass">Usuario</label>
+                <input type="text" class="form-control" id="user" name="user">
+                <label for="usu_pass">Contraseña</label>
+                <input type="text" class="form-control" id="pasw" name="pasw">
+                <div class="form-group">
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idrol">Rol:</label>
+                    </div>
+                    <select class="custom-select" id="idrol" name="idrol">
+                        {% for Rol in Roles_lista %}
+                        <option value="{{Rol.idrol}}">{{Rol.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Guardar</button>
         </form>

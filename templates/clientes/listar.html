@@ -19,11 +19,12 @@
             <td>{{ cliente.idcliente}}</td>
             <td>{{ cliente.descripcion}}</td>
             <td>{{ cliente.ruc}}</td>
-            <td>{{ cliente.idciudad}}</td>
+            <td>{{ cliente.descripcion_ciudad}}</td>
             <td>{{ cliente.direccion}}</td>
             <td>{{ cliente.mail}}</td>
             <td>{{ cliente.telefono}}</td>
-            <td>{{ cliente.telefono}}</td>
+            <td><a href="/clientes/editar/{{- cliente.idcliente -}}" class="btn btn-warning editar">Editar</a>
+                <button type="button" class="btn btn-danger eliminar" data-id="{{- cliente.idcliente -}}"> Eliminar </button></td>
       </tr>
       {% endfor %}
     </tbody>
