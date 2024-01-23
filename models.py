@@ -53,8 +53,11 @@ class Deposito(Base):
     __tablename__ = "deposito" #Nombre de la tabla en la Base de Datos
     iddeposito = Column(Integer, primary_key=True, index=True)
     descripcion = Column(String(45))
+    # campo Hijo = relationship("NombreDelModeloHijo", back_populates="NombreDeLaVariableEnElOtroModelo")
+    deposito_y_producto = relationship("Deposito_y_producto", back_populates="deposito")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+
 
 class IVA(Base):
     __tablename__ = "iva" #Nombre de la tabla en la Base de Datos
@@ -208,10 +211,10 @@ class Producto(Base):
     idproducto=Column(Integer, primary_key=True, index=True)
     descripcion=Column(String(45), unique=True)
     idIVA=Column(Integer, ForeignKey("iva.idIVA"))
-    stock=Column(Integer)
     # campo Hijo = relationship("NombreDelModeloHijo", back_populates="NombreDeLaVariableEnElOtroModelo")
     productocompra = relationship("Factura_compra_detalle", back_populates="producto") #
-    productoventa = relationship("Factura_venta_detalle", back_populates="producto")
+    productoventa = relationship("Factura_venta_detalle", back_populates="producto")    
+    deposito_y_producto = relationship("Deposito_y_producto", back_populates="producto")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
 
@@ -265,8 +268,7 @@ class Factura_compra_detalle(Base):
     subtotaliva = Column(Integer)
     subtotal = Column(Integer)
     alta_usuario = Column(Integer)
-    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
-    
+    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())  
 
 class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
@@ -286,7 +288,7 @@ class Factura_venta_cabecera(Base):
 
 class Factura_venta_detalle(Base):
     __tablename__ = "factura_venta_detalle"
-    iddetalle_venta = Column(Integer, primary_key=True, index=True) #realmente no recuerdo ahora mismo cómo se hace este ya que es FK y PK
+    iddetalle_venta = Column(Integer, primary_key=True, index=True)
     idfactura_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"))
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productoventa")
@@ -296,5 +298,13 @@ class Factura_venta_detalle(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     
-   
-
+class Deposito_y_producto(Base):
+    __tablename__ = "deposito_y_producto"
+    iddeposito  = Column(Integer, ForeignKey("deposito.iddeposito"), primary_key=True ) #debe ser relación cruzada "Mapper[Deposito_y_producto(deposito_y_producto)] could not assemble any primary key columns for mapped table 'deposito_y_producto'"
+    deposito = relationship("Deposito", back_populates="deposito_y_producto")
+    idproducto  = Column(Integer, ForeignKey("producto.idproducto"), primary_key=True )
+    producto = relationship("Producto", back_populates="deposito_y_producto")
+    cantidad = Column(Integer)
+    alta_usuario = Column(Integer)
+    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    

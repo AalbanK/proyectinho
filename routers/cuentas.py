@@ -23,7 +23,7 @@ router = APIRouter(
 
 @router.get("/")
 async def read_cuenta(request: Request, db: Session = Depends(get_database_session)):
-    records = db.query(cuenta).all()
+    records = db.query(Cuenta).all()
     return templates.TemplateResponse("cuentas/listar.html", {"request": request, "data": records})
 
 @router.get("/nuevo", response_class=HTMLResponse)

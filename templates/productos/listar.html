@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<table id="producto" class="table table-striped">
+    <thead>
+      <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Descripcion</th>
+            <th scope="col">% IVA</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for producto in productos %}
+      <tr>
+            <td>{{ producto.idproducto}}</td>
+            <td>{{ producto.descripcion}}</td>
+            <td>{{ producto.idIVA}}</td>
+            <td><a href="/productos/editar/{{- producto.idproducto -}}" class="btn btn-warning editar">Editar</a>
+                <button type="button" class="btn btn-danger eliminar" data-id="{{- producto.idproducto -}}"> Eliminar </button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+</table>
+
+<div class="modal fade" id="eliminarModal">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h4 class="modal-title">Eliminar Registro</h4>
+              <a href="#" class="close" data-dismiss="modal">&times;</a>
+          </div>
+          <div class="modal-body">
+              <h5> ¿Está seguro/a de eliminar este registro? </h5>
+          </div>
+          <div class="modal-footer">
+              <form id="eliminarUsuario">
+              </form>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% endblock content %}
+{% block script %}
+<script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#producto").DataTable();
+    });
+</script>
+{% endblock script %}

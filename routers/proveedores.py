@@ -55,8 +55,8 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
     return templates.TemplateResponse("proveedores/editar.html", {"request": request, "Proveedor": prove, "Departamentos_lista": depto, "ref_depto":refdepto})
 
 @router.post("/update",response_class=HTMLResponse)
-def editar(db: Session = Depends(get_database_session), idprove = Form(...), descripcion = Form(...), ruc = Form(...), idciudad = Form(...), direccion = Form(...), mail = Form(), telefono = Form()):
-        prove= db.query(Proveedor).get(idprove)
+def editar(db: Session = Depends(get_database_session), idproveedor = Form(...), descripcion = Form(...), ruc = Form(...), idciudad = Form(...), direccion = Form(...), mail = Form(), telefono = Form()):
+        prove= db.query(Proveedor).get(idproveedor)
         prove.descripcion=descripcion
         prove.ruc=ruc
         prove.idciudad=idciudad
@@ -71,7 +71,7 @@ def editar(db: Session = Depends(get_database_session), idprove = Form(...), des
 
 @router.get("/borrar/{id}",response_class=HTMLResponse)
 def eliminar(id : int, db: Session = Depends(get_database_session)):
-    db.query(Proveedor).filter(Proveedor.idprove == id).delete()
+    db.query(Proveedor).filter(Proveedor.idproveedor == id).delete()
     db.commit()
     response = RedirectResponse('/proveedores/', status_code=303)
     return response

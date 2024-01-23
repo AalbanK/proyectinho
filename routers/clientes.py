@@ -27,7 +27,7 @@ async def read_cliente(request: Request, db: Session = Depends(get_database_sess
     #records = db.query(Cliente).all()
     ciud = db.query(Cliente.idcliente, Cliente.descripcion, Cliente.ruc,Ciudad.descripcion.label('descripcion_ciudad'),Cliente.direccion, Cliente.mail, Cliente.telefono).join(Ciudad, Cliente.idciudad == Ciudad.idciudad).all()
     print(ciud)
-    return templates.TemplateResponse("clientes/listar.html", {"request": request, "clientes": ciud})
+    return templates.TemplateResponse("clientes/listar.html", {"request": request, "clientes": ciud, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_cliente(request: Request, db: Session = Depends(get_database_session)):
@@ -85,4 +85,3 @@ def eliminar(id : int, db: Session = Depends(get_database_session)):
      db.commit()
      response = RedirectResponse('/clientes/', status_code=303)
      return response
-

@@ -9,7 +9,7 @@ from models import *
 
 from db.database import SessionLocal, engine
 import models
-from routers import (auth,bancos,camiones,carretas,choferes,ciudades,clientes,contratos,departamentos,ivas,marcas_camiones,marcas_carretas,productos,proveedores,roles,usuarios,cuentas#,remisiones,
+from routers import (auth,bancos,camiones,carretas,choferes,ciudades,clientes,contratos,departamentos,depositos,ivas,marcas_camiones,marcas_carretas,productos,proveedores,roles,usuarios,cuentas#,remisiones,
 )
 
 app = FastAPI() 
@@ -33,6 +33,7 @@ def get_database_session():
         db.close()
 
 app.include_router(auth.router)
+app.include_router(depositos.router)
 app.include_router(ciudades.router)
 app.include_router(choferes.router)
 app.include_router(departamentos.router)
