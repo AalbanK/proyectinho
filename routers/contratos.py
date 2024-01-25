@@ -22,7 +22,7 @@ router = APIRouter(
 @router.get("/")
 async def read_contrato(request: Request, db: Session = Depends(get_database_session)):
     records = db.query(Contrato).all()
-    return templates.TemplateResponse("contratos/listar.html", {"request": request, "data": records})
+    return templates.TemplateResponse("contratos/listar.html", {"request": request, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_contrato(request: Request, db: Session = Depends(get_database_session)):

@@ -24,7 +24,7 @@ router = APIRouter(
 @router.get("/")
 async def read_producto(request: Request, db: Session = Depends(get_database_session)):
     records=db.query(Producto, IVA).join(IVA).all()
-    return templates.TemplateResponse("productos/listar.html", {"request": request, "data": records})
+    return templates.TemplateResponse("productos/listar.html", {"request": request, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_producto(request: Request, db: Session = Depends(get_database_session)):

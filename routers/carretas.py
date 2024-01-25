@@ -23,7 +23,7 @@ router=APIRouter(
 @router.get("/")
 async def read_carreta(request:Request,db:Session=Depends(get_database_session)):
     records=db.query(Carreta).join(Marca_carreta).all()
-    return templates.TemplateResponse("carretas/listar.html", {"request":request})
+    return templates.TemplateResponse("carretas/listar.html", {"request":request, "datatables": True})
 
 @router.get("/nuevo",response_class=HTMLResponse)
 async def create_carreta(request:Request,db:Session=Depends(get_database_session)):

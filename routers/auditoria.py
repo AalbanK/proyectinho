@@ -24,7 +24,7 @@ router = APIRouter(
 @router.get("/")
 async def read_auditoria(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario)):
     usuarios = db.query(Usuario).all()
-    return templates.TemplateResponse("auditorias/listar.html", {"request": request, "datatables": True, "Usuarios_lista": usuarios})
+    return templates.TemplateResponse("auditorias/listar.html", {"request": request, "datatables": True, "Usuarios_lista": usuarios, "datatables": True})
 
 @router.get("/todos")
 async def listar_auditoria(request: Request, db: Session = Depends(get_database_session)):

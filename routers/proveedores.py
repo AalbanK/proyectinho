@@ -24,7 +24,7 @@ router = APIRouter(
 async def read_proveedor(request: Request, db: Session = Depends(get_database_session)):
     #records = db.query(Proveedor).all()
     ciud = db.query(Proveedor.idproveedor, Proveedor.descripcion, Proveedor.ruc,Ciudad.descripcion.label('descripcion_ciudad'),Proveedor.direccion, Proveedor.mail, Proveedor.telefono).join(Ciudad, Proveedor.idciudad == Ciudad.idciudad).all()
-    return templates.TemplateResponse("proveedores/listar.html", {"request": request, "proveedores": ciud})
+    return templates.TemplateResponse("proveedores/listar.html", {"request": request, "proveedores": ciud, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_proveedor(request: Request, db: Session = Depends(get_database_session)):

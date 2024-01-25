@@ -20,7 +20,7 @@ router = APIRouter(
 )
 @router.get("/")
 async def read_rol(request: Request, db: Session = Depends(get_database_session)):
-    return templates.TemplateResponse("roles/listar.html", {"request": request})
+    return templates.TemplateResponse("roles/listar.html", {"request": request, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_rol(request: Request, db: Session = Depends(get_database_session)):

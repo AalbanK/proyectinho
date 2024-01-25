@@ -29,7 +29,7 @@ async def read_chofer(request: Request, db: Session = Depends(get_database_sessi
     #records = db.query(Chofer).all()
     ciud = db.query(Chofer.idchofer, Chofer.ci, Chofer.nombre,Ciudad.descripcion.label('descripcion_ciudad'),Chofer.telefono).join(Ciudad, Chofer.idciudad == Ciudad.idciudad).all()
     print(ciud)
-    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": ciud})
+    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": ciud, "datatables": True})
 
 
 @router.get("/nuevo", response_class=HTMLResponse)

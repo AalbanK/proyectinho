@@ -26,7 +26,7 @@ router = APIRouter(
 async def read_ciudad(request: Request, db: Session = Depends(get_database_session)):
     #records = db.query(Ciudad).all()
     records=db.query(Ciudad, Departamento).join(Departamento).all()
-    return templates.TemplateResponse("ciudades/listar.html", {"request": request, "data": records})
+    return templates.TemplateResponse("ciudades/listar.html", {"request": request, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_ciudad(request: Request, db: Session = Depends(get_database_session)):

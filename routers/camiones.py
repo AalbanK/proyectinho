@@ -22,7 +22,7 @@ router = APIRouter(
 @router.get("/")
 async def read_camion(request: Request, db: Session = Depends(get_database_session)):
     records=db.query(Camion).join(Marca_camion).all()
-    return templates.TemplateResponse("camiones/listar.html", {"request": request, "data": records})
+    return templates.TemplateResponse("camiones/listar.html", {"request": request, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_camion(request: Request, db: Session = Depends(get_database_session)):

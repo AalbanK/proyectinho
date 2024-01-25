@@ -21,7 +21,7 @@ router = APIRouter(
 
 @router.get("/")
 async def read_marca_camion(request: Request, db: Session = Depends(get_database_session)):
-    return templates.TemplateResponse("ivas/listar.html", {"request": request})
+    return templates.TemplateResponse("ivas/listar.html", {"request": request, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_iva(request: Request, db: Session = Depends(get_database_session)):

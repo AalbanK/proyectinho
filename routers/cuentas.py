@@ -24,7 +24,7 @@ router = APIRouter(
 @router.get("/")
 async def read_cuenta(request: Request, db: Session = Depends(get_database_session)):
     records = db.query(Cuenta).all()
-    return templates.TemplateResponse("cuentas/listar.html", {"request": request, "data": records})
+    return templates.TemplateResponse("cuentas/listar.html", {"request": request, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_cuenta(request: Request, db: Session = Depends(get_database_session)):
