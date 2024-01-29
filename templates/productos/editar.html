@@ -7,114 +7,19 @@
                 <label for="descripcion">Nombre Producto</label>
                 <input type="text" class="form-control" id="descripcion" name="descripcion" value="{{Producto.descripcion}}">
                 <div class="form-group">
-                    <label for="idiva">% IVA</label>
-                    <select id="idiva" name="idiva" class="custom-select custom-dropdown custom-form-input">
-                    </select>
+                    <div class="input-group mt-3 mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="idiva"> % IVA </label>
+                        </div>
+                        <select class="custom-select" id="idiva" name="idiva" required>
+                            {% for Iva in Ivas_lista %}
+                            <option value="{{Iva.idIVA}}" {{ "selected" if Iva.idIVA == Producto.idIVA}}>{{Iva.porcentaje}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Guardar</button>
           </form>
     </div>
 {% endblock content %}
-{% block script %}
-<script>
-
-let jsonCiudades = null;
-let selectDepto = null;
-let ciuDepto = null;
-
-agregarOpcion = (elemento, valor, texto) => {
-    let nuevaOpcion = document.createElement("option");
-    nuevaOpcion.value = valor;
-    nuevaOpcion.text = texto;
-    elemento.add(nuevaOpcion);
-}
-
-fetchCargarDepartamentos = () => {
-    selectDepto = document.querySelector("#iddepartamento");
-    selectDepto.length = 0; //para vaciar el select, por si acaso
-    agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
-    fetch('/departamentos/todos')
-    .then((response) => response.json())
-    .then((deptos) => {
-        for (let depto of deptos) {
-            agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
-        }
-    })
-    .catch(error => {
-        console.error(error)
-        agregarOpcion(selectDepto, 0, 'Sin Datos');
-    });
-};
-
-async function obtenerCiudades() {
-    const response = await fetch('/ciudades/todos');
-    if (!response.ok) {
-        const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
-        throw new Error(message);
-    }
-    const ciudades = await response.json();
-    return ciudades;
-}
-
-async function obtenerCiudadDeptoCli() {
-    const response = await fetch('/productos/{{Producto.idproducto}}/iddepto');
-    if (!response.ok) {
-        const message = `Ocurrió un error al intentar obtener el id departamento del producto: ${response.status}`;
-        throw new Error(message);
-    }
-    const deptoproducto = await response.json();
-    return deptoproducto;
-}
-
-
-window.addEventListener('DOMContentLoaded', fetchCargarDepartamentos);
-window.addEventListener('DOMContentLoaded', async () => {
-    await obtenerCiudades()
-    .then(ciudades => {jsonCiudades = ciudades })
-    .catch(error => {
-        console.error(error);
-        jsonCiudades = {};
-    });
-    const selectCiudad = document.querySelector("#idciudad");
-    selectDepto.addEventListener('change', function (event) {
-        let idDepto = event.target.value;
-        if (idDepto) {
-            selectCiudad.length = 0; // vaciar antes de volver a cargar!
-            jsonCiudades.map(function (ciu) {
-                if (ciu.iddepartamento == idDepto) {
-                    agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
-                }
-            });
-        }
-    });
-
-     await obtenerCiudadDeptoCli()
-    .then(deptocli => {ciudepto = deptocli })
-    .catch(error => {
-        console.error(error);
-        ciudepto = {};
-    });
-
-    if(ciudepto){
-        let options = selectDepto.getElementsByTagName('option');
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value == ciudepto.iddepto) {
-                options[i].selected = true;
-                selectDepto.dispatchEvent(new Event("change")); //para disparar el evento de cambio
-                break;
-            }
-        }
-
-        options = selectCiudad.getElementsByTagName('option');
-        idciu = {{Producto.idciudad}}
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].value == idciu) {
-                options[i].selected = true;
-                break;
-            }
-        }
-    }
-});
-</script>
-{% endblock script %}

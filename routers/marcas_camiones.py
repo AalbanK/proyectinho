@@ -51,8 +51,8 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
      return templates.TemplateResponse("marcas_camiones/editar.html", {"request": request, "Marca_camion": marcacam})  #devuelve el .html de editar
 
 @router.post("/update",response_class=HTMLResponse)
-def editar(db: Session = Depends(get_database_session), idbanco = Form(...), descripcion = Form(...)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
-     marcacam= db.query(Marca_camion).get(idbanco) #obtiene el registro del modelo Marca_camion por su id
+def editar(db: Session = Depends(get_database_session), idmarca_camion = Form(...), descripcion = Form(...)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
+     marcacam= db.query(Marca_camion).get(idmarca_camion) #obtiene el registro del modelo Marca_camion por su id
      marcacam.descripcion=descripcion # cambia el valor actual de descripcion del objeto marcacam por lo que recibe en el parametro 'descripcion'
      db.add(marcacam) #agrega el objeto marcacam a la base de datos
      db.commit() #confirma los cambios

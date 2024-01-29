@@ -2,7 +2,7 @@ import statistics
 from fastapi import APIRouter, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, load_only
 from fastapi import Depends, FastAPI
 from fastapi.templating import Jinja2Templates
 from models import Usuario, Rol
@@ -23,7 +23,7 @@ router = APIRouter(
 
 @router.get("/")
 async def read_rol(request: Request, db: Session = Depends(get_database_session)):
-    return templates.TemplateResponse("usuarios/listar.html", {"request": request})
+    return templates.TemplateResponse("usuarios/listar.html", {"request": request, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_usuario(request: Request, db: Session = Depends(get_database_session)):
@@ -47,18 +47,20 @@ async def listar_usuarios(request: Request, db: Session = Depends(get_database_s
 #            al usar {x} se pasa como parametro lo que esta dentro de las llaves (en este caso x)
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)): 
-     usu= db.query(Usuario).get(id) #obtiene el registro del modelo Usuario por su id
-     return templates.TemplateResponse("usuarios/editar.html", {"request": request, "Usuario": usu})  #devuelve el .html de editar
+    usu= db.query(Usuario).get(id) #obtiene el registro del modelo Usuario por su id
+    roles= db.query(Rol).all()
+    return templates.TemplateResponse("usuarios/editar.html", {"request": request, "Usuario": usu, "Roles":roles})  #devuelve el .html de editar
+
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idusuario = Form(...), name = Form(...), username = Form(...), password = Form(...), idrol = Form(...),): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
-     usu= db.query(Usuario).get(idusuario) #obtiene el registro del modelo Usuario por su id
-     usu.name= name # cambia el valor actual de descripcion del objeto usu por lo que recibe en el parametro 'descripcion'
-     db.add(usu) #agrega el objeto usu a la base de datos
-     db.commit() #confirma los cambios
-     db.refresh(usu) #actualiza el objeto usu
-     response = RedirectResponse('/usuarios/', status_code=303)
-     return response
+    usu= db.query(Usuario).get(idusuario) #obtiene el registro del modelo Usuario por su id
+    usu.name= name # cambia el valor actual de descripcion del objeto usu por lo que recibe en el parametro 'descripcion'
+    db.add(usu) #agrega el objeto usu a la base de datos
+    db.commit() #confirma los cambios
+    db.refresh(usu) #actualiza el objeto usu
+    response = RedirectResponse('/usuarios/', status_code=303)
+    return response
 
 @router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session)): #se definen los parametros para la funcion
@@ -74,4 +76,3 @@ def eliminar(id : int, db: Session = Depends(get_database_session)):#se definen 
     db.commit()#confirma los cambios
     response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro eliminado correctamente.") #retorna el codigo http 200
     return response
-

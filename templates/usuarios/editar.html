@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/usuarios/editar/" method="POST">
+            <div class="form-group">
+                <label for="usu_descri">Nombre Real</label>
+                <input type="text" class="form-control" id="nam" name="nam" value="{{Usuario.name}}" required>
+                <label for="usu_pass">Usuario</label>
+                <input type="text" class="form-control" id="user" name="user" value="{{Usuario.username}}" required>
+                <label for="usu_pass">Contraseña</label>
+                <input type="password" class="form-control" id="pasw" name="pasw" value="{{Usuario.password}}" required>
+                <div class="form-group">
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idrol">Rol:</label>
+                    </div>
+                    <select class="custom-select" id="idrol" name="idrol" required>
+                        {% for Rol in Roles %}
+                        <option value="{{Rol.idrol}}" {{ "selected" if Rol.idrol == Usuario.idrol}}>{{Rol.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

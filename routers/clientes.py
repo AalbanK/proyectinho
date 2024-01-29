@@ -25,9 +25,8 @@ router = APIRouter(
 @router.get("/")
 async def read_cliente(request: Request, db: Session = Depends(get_database_session)):
     #records = db.query(Cliente).all()
-    ciud = db.query(Cliente.idcliente, Cliente.descripcion, Cliente.ruc,Ciudad.descripcion.label('descripcion_ciudad'),Cliente.direccion, Cliente.mail, Cliente.telefono).join(Ciudad, Cliente.idciudad == Ciudad.idciudad).all()
-    print(ciud)
-    return templates.TemplateResponse("clientes/listar.html", {"request": request, "clientes": ciud, "datatables": True})
+    cli = db.query(Cliente.idcliente, Cliente.descripcion, Cliente.ruc,Ciudad.descripcion.label('descripcion_ciudad'),Cliente.direccion, Cliente.mail, Cliente.telefono).join(Ciudad, Cliente.idciudad == Ciudad.idciudad).all()
+    return templates.TemplateResponse("clientes/listar.html", {"request": request, "clientes": cli, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_cliente(request: Request, db: Session = Depends(get_database_session)):
@@ -49,13 +48,13 @@ def ver(id:int, response:Response,
     depto = db.query(Departamento).get(int(clie.idDepto))
     return templates.TemplateResponse("clientes/listar.html", {"request": request, "Cliente": clie, "Departamento": depto})
 
-# @router.get("/{id}/iddepto",response_class=HTMLResponse)
-# def obtener_iddepto_cliente(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
-#     clie= db.query(Cliente).get(id)
-#     refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(clie.idciudad))
-#     refdepto = refdepto.__dict__.get('iddepartamento')
-#     respuesta = {'iddepto': refdepto}
-#     return JSONResponse(content=jsonable_encoder(respuesta))
+@router.get("/{id}/iddepto",response_class=HTMLResponse)
+def obtener_iddepto_cliente(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
+    clie= db.query(Cliente).get(id)
+    refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(clie.idciudad))
+    refdepto = refdepto.__dict__.get('iddepartamento')
+    respuesta = {'iddepto': refdepto}
+    return JSONResponse(content=jsonable_encoder(respuesta))
 
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
