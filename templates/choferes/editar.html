@@ -13,23 +13,16 @@
             <input type="text" class="form-control" id="nombre" name="nombre" value="{{ Chofer.nombre}}">
             <label for="Apellido">Nombre</label>
             <input type="text" class="form-control" id="apellido" name="apellido" value="{{ Chofer.apellido}}">
-        </div>
-        <div class="form-group">
             <div class="form-group">
                 <label for="id_departamento">Departamento</label>
-                <select class="custom-select" id="idDepartamento" name="idDepartamento">
-                    {% for Depa in Departamentos_lista %}
-                    <option value="{{Depa.iddepartamento}}" {{'selected' if Depa.iddepartamento==ref_depto.iddepartamento }}>{{Depa.descripcion}}</option>
-                    {% endfor %}
+                <select class="custom-select" id="iddepartamento" name="iddepartamento">
                 </select>
             </div>
             <div class="form-group">
-                <label for="id_ciudad">Ciudad</label>
-                <select id="id_ciudad" name="idCiudad" class="custom-select custom-dropdown custom-form-input">
+                <label for="idciudad">Ciudad</label>
+                <select id="idciudad" name="idciudad" class="custom-select custom-dropdown custom-form-input">
                 </select>
             </div>
-        </div>
-        <div class="form-group">
             <label for="telefono">Teléfono</label>
             <input type="text" class="form-control" id="telefono" name="telefono" value="{{ Chofer.telefono}}">
         </div>
@@ -42,6 +35,7 @@
 
 let jsonCiudades = null;
 let selectDepto = null;
+let ciuDepto = null;
 
 agregarOpcion = (elemento, valor, texto) => {
     let nuevaOpcion = document.createElement("option");
@@ -51,56 +45,90 @@ agregarOpcion = (elemento, valor, texto) => {
 }
 
 fetchCargarDepartamentos = () => {
-    selectDepto = document.querySelector("#id_departamento");
+    selectDepto = document.querySelector("#iddepartamento");
     selectDepto.length = 0; //para vaciar el select, por si acaso
     agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
-        fetch('/departamentos/todos')
-        .then((response) => response.json())
-        .then((deptos) => {
-            for (let depto of deptos) {
-                agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
-            }
-        })
-        .catch(error => {
-            console.error(error)
-            agregarOpcion(selectDepto, 0, 'Sin Datos');
-        });
-    };
-
-    async function obtenerCiudades() {
-        const response = await fetch('/ciudades/todos');
-        if (!response.ok) {
-            const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
-            throw new Error(message);
+    fetch('/departamentos/todos')
+    .then((response) => response.json())
+    .then((deptos) => {
+        for (let depto of deptos) {
+            agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
         }
-        const ciudades = await response.json();
-        return ciudades;
-    }
-
-    window.addEventListener('DOMContentLoaded', fetchCargarDepartamentos);
-    window.addEventListener('DOMContentLoaded', async () => {
-        await obtenerCiudades()
-        .then(ciudades => {jsonCiudades = ciudades })
-        .catch(error => {
-            console.error(error);
-            jsonCiudades = {};
-        });
-        const selectCiudad = document.querySelector("#id_ciudad");
-
-        selectDepto.addEventListener('change', function (event) {
-
-            let idDepto = event.target.value;
-
-            if (idDepto && idDepto != "undefined") {
-                selectCiudad.length = 0; // vaciar antes de volver a cargar!
-
-                jsonCiudades.map(function (ciu) {
-                    if (ciu.iddepartamento == idDepto) {
-                        agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
-                    }
-                });
-            }
+    })
+    .catch(error => {
+        console.error(error)
+        agregarOpcion(selectDepto, 0, 'Sin Datos');
     });
+};
+
+async function obtenerCiudades() {
+    const response = await fetch('/ciudades/todos');
+    if (!response.ok) {
+        const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
+        throw new Error(message);
+    }
+    const ciudades = await response.json();
+    return ciudades;
+}
+
+async function obtenerCiudadDeptoCho() {
+    const response = await fetch('/choferes/{{Chofer.idchofer}}/iddepto');
+    if (!response.ok) {
+        const message = `Ocurrió un error al intentar obtener el id departamento del cliente: ${response.status}`;
+        throw new Error(message);
+    }
+    const deptocliente = await response.json();
+    return deptocliente;
+}
+
+
+window.addEventListener('DOMContentLoaded', fetchCargarDepartamentos);
+window.addEventListener('DOMContentLoaded', async () => {
+    await obtenerCiudades()
+    .then(ciudades => {jsonCiudades = ciudades })
+    .catch(error => {
+        console.error(error);
+        jsonCiudades = {};
+    });
+    const selectCiudad = document.querySelector("#idciudad");
+    selectDepto.addEventListener('change', function (event) {
+        let idDepto = event.target.value;
+        if (idDepto) {
+            selectCiudad.length = 0; // vaciar antes de volver a cargar!
+            jsonCiudades.map(function (ciu) {
+                if (ciu.iddepartamento == idDepto) {
+                    agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
+                }
+            });
+        }
+    });
+
+     await obtenerCiudadDeptoCho()
+    .then(deptocho => {ciudepto = deptocho })
+    .catch(error => {
+        console.error(error);
+        ciudepto = {};
+    });
+
+    if(ciudepto){
+        let options = selectDepto.getElementsByTagName('option');
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value == ciudepto.iddepto) {
+                options[i].selected = true;
+                selectDepto.dispatchEvent(new Event("change")); //para disparar el evento de cambio
+                break;
+            }
+        }
+
+        options = selectCiudad.getElementsByTagName('option');
+        idciu = {{Chofer.idciudad}}
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value == idciu) {
+                options[i].selected = true;
+                break;
+            }
+        }
+    }
 });
 </script>
 {% endblock script %}

@@ -42,7 +42,9 @@ async def create_usuario(db: Session = Depends(get_database_session), nam = Form
 @router.get("/todos") #aca la funcion convierte la lista de usuarios en un json que luego se usa en datatable
 async def listar_usuarios(request: Request, db: Session = Depends(get_database_session)): 
     usuarios = db.query(Usuario).all() #guarda en el objeto 'usuarios' todos los usuarios usando sql alchemy
-    return JSONResponse(jsonable_encoder(usuarios)) #devuele el objeto 'usuarios' en formato json
+    usu = db.query(Usuario.idusuario, Usuario.name, Usuario.username, Rol.descripcion.label('descripcion_rol')).join(Rol, Usuario.idrol == Rol.idrol).all()
+    respuesta = [dict(r._mapping) for r in usu]
+    return JSONResponse(jsonable_encoder(respuesta)) #devuele el objeto 'usuarios' en formato json
 
 #            al usar {x} se pasa como parametro lo que esta dentro de las llaves (en este caso x)
 @router.get("/editar/{id}",response_class=HTMLResponse)
@@ -55,7 +57,10 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idusuario = Form(...), name = Form(...), username = Form(...), password = Form(...), idrol = Form(...),): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
     usu= db.query(Usuario).get(idusuario) #obtiene el registro del modelo Usuario por su id
-    usu.name= name # cambia el valor actual de descripcion del objeto usu por lo que recibe en el parametro 'descripcion'
+    usu.name = name # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
+    usu.username = username
+    usu.password = password
+    usu.idrol = idrol
     db.add(usu) #agrega el objeto usu a la base de datos
     db.commit() #confirma los cambios
     db.refresh(usu) #actualiza el objeto usu

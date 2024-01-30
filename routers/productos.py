@@ -65,11 +65,11 @@ def editar(db: Session = Depends(get_database_session), idproducto = Form(...), 
 
 @router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session)): #se definen los parametros para la funcion
-    usuario = db.query(Producto).get(id) #obtiene el registro del modelo Usuario por su id
-    if(usuario is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+    producto = db.query(Producto).get(id) #obtiene el registro del modelo Producto por su id
+    if(producto is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
         return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
     else:
-        return JSONResponse(jsonable_encoder(usuario)) #en caso de que exista el registro, lo devuelve en formato json
+        return JSONResponse(jsonable_encoder(producto)) #en caso de que exista el registro, lo devuelve en formato json
     
 @router.get("/borrar/{id}",response_class=JSONResponse) #####dependencies=[Depends(auth.verificar_si_usuario_es_superusuario)'''])
 def eliminar(id : int, db: Session = Depends(get_database_session)):#se definen los parametros para la funcion

@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from models import Cliente, Departamento, Ciudad
 from fastapi.staticfiles import StaticFiles
+from starlette import status
 
 from  db.misc import get_database_session
 
@@ -33,7 +34,7 @@ async def create_cliente(request: Request, db: Session = Depends(get_database_se
     return templates.TemplateResponse("clientes/crear.html", {"request": request})
 
 @router.post("/nuevo")
-async def create_cliente(db: Session = Depends(get_database_session), descripcion = Form(...), idDepartamento=Form(...), idCiudad=Form(...), ruc = Form(...), mail = Form(...), direccion = Form(...), telefono = Form(...)):
+async def create_cliente(db: Session = Depends(get_database_session), descripcion = Form(...), idCiudad=Form(...), ruc = Form(...), mail = Form(...), direccion = Form(...), telefono = Form(...)):
     cliente = Cliente(descripcion=descripcion, idciudad = idCiudad, ruc=ruc, mail=mail, direccion=direccion, telefono=telefono)
     db.add(cliente)
     db.commit()
@@ -78,9 +79,17 @@ def editar(db: Session = Depends(get_database_session), idcliente = Form(...), d
      response = RedirectResponse('/clientes/', status_code=303)
      return response
 
-@router.get("/borrar/{id}",response_class=HTMLResponse)
+@router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session)): #se definen los parametros para la funcion
+    cliente = db.query(Cliente).get(id) #obtiene el registro del modelo Cliente por su id
+    if(cliente is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(cliente)) #en caso de que exista el registro, lo devuelve en formato json
+    
+@router.get("/borrar/{id}",response_class=JSONResponse)
 def eliminar(id : int, db: Session = Depends(get_database_session)):
-     db.query(Cliente).filter(Cliente.idclie == id).delete()
-     db.commit()
-     response = RedirectResponse('/clientes/', status_code=303)
-     return response
+    db.query(Cliente).filter(Cliente.idcliente == id).delete()
+    db.commit()
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro eliminado correctamente.") #retorna el codigo http 200
+    return response
