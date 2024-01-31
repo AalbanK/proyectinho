@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/camiones/update/" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="idcamion" value="{{Camion.idcamion}}">
+                <label for="camion_chapa">Chapa</label>
+                <input type="text" class="form-control" id="camion_chapa" name="camion_chapa" value="{{Camion.camion_chapa}}" required>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idmarca_camion">Marca Camión:</label>
+                    </div>
+                    <select class="custom-select" id="idmarca_camion" name="idmarca_camion" required>
+                        {% for Marca_camion in Marcas_lista %}
+                        <option value="{{Marca_camion.idmarca_camion}}" {{ "selected" if Marca_camion.idmarca_camion == Camion.idmarca_camion}}>{{Marca_camion.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+import statistics
+from fastapi import APIRouter, HTTPException
 from fastapi.encoders import jsonable_encoder
+from sqlalchemy import select
 from sqlalchemy.orm import Session, load_only
 from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
@@ -7,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from models import Chofer, Departamento, Ciudad
 from fastapi.staticfiles import StaticFiles
+from starlette import status
 
 from  db.misc import get_database_session
 
@@ -20,17 +23,11 @@ router = APIRouter(
     tags=["choferes"]
 )
 
-# @router.get("/")
-# async def read_chofer(request: Request, db: Session = Depends(get_database_session)):
-#     records = db.query(Chofer, Departamento, Ciudad).join(Ciudad, Departamento).all()
-#     return templates.TemplateResponse("choferes/listar.html", {"request": request, "data": records})
-
 @router.get("/")
 async def read_chofer(request: Request, db: Session = Depends(get_database_session)):
     #records = db.query(Chofer).all()
-    chofe = db.query(Chofer.idchofer, Chofer.ci, Chofer.nombre, Chofer.apellido, Ciudad.descripcion.label('descripcion_ciudad'), Chofer.telefono).join(Ciudad, Chofer.idciudad == Ciudad.idciudad).all()
-    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": chofe, "datatables": True})
-
+    ciud = db.query(Chofer.idchofer, Chofer.ci, Chofer.nombre, Chofer.apellido, Ciudad.descripcion.label('descripcion_ciudad'), Chofer.telefono).join(Ciudad, Chofer.idciudad == Ciudad.idciudad).all()
+    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": ciud, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_chofer(request: Request, db: Session = Depends(get_database_session)):
@@ -50,24 +47,24 @@ async def create_chofer(db: Session = Depends(get_database_session), chofe_ci = 
 @router.get("/{id}",response_class=HTMLResponse)
 def ver(id:int, response:Response,
             request:Request,db: Session = Depends(get_database_session)):
-    clie = db.query(Chofer).get(id)
-    city = db.query(Ciudad).get(int(clie.idDepto))
-    return templates.TemplateResponse("clientes/listar.html", {"request": request, "Chofer": clie, "Ciudad": city})
+    chofe = db.query(Chofer).get(id)
+    depto = db.query(Departamento).get(int(chofe.idDepto))
+    return templates.TemplateResponse("clientes/listar.html", {"request": request, "Chofer": chofe, "Departamento": depto})
 
-@router.get("/{id}/iddepto",response_class=HTMLResponse)
-def obtener_iddepto_cliente(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
-    clie= db.query(Chofer).get(id)
-    refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(clie.idciudad))
+@router.get("/{id}/iddepto",response_class=JSONResponse)
+def obtener_iddepto_chofer(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
+    chofe= db.query(Chofer).get(id)
+    refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(chofe.idciudad))
     refdepto = refdepto.__dict__.get('iddepartamento')
     respuesta = {'iddepto': refdepto}
     return JSONResponse(content=jsonable_encoder(respuesta))
 
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
-    chof= db.query(Chofer).get(id)
+    chofe= db.query(Chofer).get(id)
     depto = db.query(Departamento).all()
-    refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(chof.idciudad))
-    return templates.TemplateResponse("choferes/editar.html", {"request": request, "Chofer": chof, "Departamentos_lista": depto, "ref_depto":refdepto})
+    refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(chofe.idciudad))
+    return templates.TemplateResponse("choferes/editar.html", {"request": request, "Chofer": chofe, "Departamentos_lista": depto, "ref_depto":refdepto})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idchofer = Form(...), ci = Form(...), nombre = Form(...), apellido = Form(...), idciudad = Form(...), telefono = Form(...)):
@@ -84,9 +81,17 @@ def editar(db: Session = Depends(get_database_session), idchofer = Form(...), ci
     response = RedirectResponse('/choferes/', status_code=303)
     return response
 
-@router.get("/borrar/{id}",response_class=HTMLResponse)
+@router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session)): #se definen los parametros para la funcion
+    chofer = db.query(Chofer).get(id) #obtiene el registro del modelo Cliente por su id
+    if(chofer is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(chofer)) #en caso de que exista el registro, lo devuelve en formato json
+
+@router.get("/borrar/{id}",response_class=JSONResponse)
 def eliminar(id : int, db: Session = Depends(get_database_session)):
-    db.query(Chofer).filter(Chofer.idclie == id).delete()
+    db.query(Chofer).filter(Chofer.idchofer == id).delete()
     db.commit()
-    response = RedirectResponse('/clientes/', status_code=303)
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro eliminado correctamente.") #retorna el codigo http 200
     return response

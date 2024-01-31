@@ -22,7 +22,7 @@
             <td>{{ chofer.descripcion_ciudad}}</td>
             <td>{{ chofer.telefono}}</td>
             <td><a href="/choferes/editar/{{- chofer.idchofer -}}" class="btn btn-warning editar">Editar</a>
-                <button type="button" class="btn btn-danger eliminar" data-id="{{- chofer.idchofer -}}"> Eliminar </button></td>
+                <button type="button" class="btn btn-danger eliminar" data-toggle="modal" data-target="#eliminarModal" data-id="{{- chofer.idchofer -}}"> Eliminar </button></td>
       </tr>
       {% endfor %}
     </tbody>
@@ -40,7 +40,7 @@
               <h5> ¿Está seguro/a de eliminar este registro? </h5>
           </div>
           <div class="modal-footer">
-              <form id="eliminarUsuario">
+              <form id="eliminarChofer">
               </form>
           </div>
       </div>
@@ -53,8 +53,130 @@
 <script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
+
+    let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
+    let $tabla = $("#chofer");
+    let $modal = $('#eliminarModal');
+    let botonesEliminar = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">No, Cancelar</button>
+                    <button id="confirmarEliminar" class="btn btn-danger" type="button">Sí, Eliminar</button>`;
+    let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">Ok</button>`;
+
+    let alertOK = `<div class="alert alert-success aviso" role="alert">
+                    Registro eliminado exitosamente. Actualice la página para ver los cambios.
+                </div>`;
+
+    $tabla.on('click', '.btn-danger.eliminar', function (e) {
+        let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de whatever
+        $modal.data('id', id).modal('show');
+    });
+
     $(document).ready(function(){
         $("#chofer").DataTable();
+
+        $modal.on('shown.bs.modal', function (e) {
+            // verificar si existe el id (por si tocan el html en el dom)
+            $.ajax({
+                url: `/choferes/ver/${$modal.data('id')}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 404) {
+                        agregarAlert('error', 'verif')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        actualizarBotones('eliminar')
+                        $("#confirmarEliminar").off('click').on('click', { id: $modal.data('id') }, eliminarFila);
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        });
+
+        agregarAlert = (accion, motivo) => {
+            switch (accion) {
+                case 'error': {
+                    let texto = null;
+                    switch (motivo) {
+                        case 'verif': {
+                            texto = 'Ocurrió un error al verificar si existe el registro seleccionado.';
+                            break;
+                        }
+                        case 'elim': {
+                            texto = 'Ocurrió un error al verificar si el registro fue eliminado correctamente. Verifique si los datos mostrados posteriormente son consistentes.';
+                            break;
+                        }
+                        default: {
+                            texto = 'Ha ocurrido un error desconocido. Verifique si los datos mostrados posteriormente son correctos.';
+                        }
+                    }
+                    let alertError = ` <div class="alert alert-danger aviso" role="alert">
+                        <button type="button" class="close close-alert" 
+                            data-dismiss="alert" aria-hidden="true">
+                            ×
+                        </button> ${texto}
+                    </div>`;
+
+                    $('.modal-body').append(alertError);
+                    break;
+                }
+                case 'ok': {
+                    $('.modal-body').append(alertOK);
+                    break;
+                }
+                default: break;
+            }
+        }
+
+        actualizarBotones = (accion) => {
+            $modal.find('#eliminarChofer').children().remove();
+            switch (accion) {
+                case 'error': {
+                    $modal.find('#eliminarChofer').append(botonesOK);
+                    break;
+                }
+                case 'eliminar': {
+                    $modal.find('#eliminarChofer').append(botonesEliminar);
+                    break;
+                }
+                default: $modal.find('#eliminarChofer').append(botonesOK);
+            }
+        }
+
+        eliminarFila = (e) => {
+            let idEliminar = e.data.id;
+            url = `/choferes/borrar/${idEliminar}`;
+            $.ajax({
+                url: url,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 200) {
+                        agregarAlert('ok');
+                        actualizarBotones('ok')
+                    }
+                    else if (data.status_code == 404) {
+                        agregarAlert('error')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        agregarAlert('ok');
+                        actualizarBotones('ok')
+                        $modal.modal('hide');
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error', 'elim')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        }
+
     });
 </script>
 {% endblock script %}

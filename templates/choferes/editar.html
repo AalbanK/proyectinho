@@ -4,7 +4,7 @@
         <form action="/choferes/update/" method="POST">
         <div class="form-group">
             <label for="idchofer">ID Chofer</label>
-            <input type="text" class="form-control" id="idchofer" name="idchofer" value="{{Chofer.idchofer}}"readonly>
+            <input type="text" class="form-control" id="idchofer" name="idchofer" value="{{Chofer.idchofer}}" readonly>
         </div>
         <div class="form-group">
             <label for="ci">C.I.</label>
@@ -15,7 +15,7 @@
             <input type="text" class="form-control" id="apellido" name="apellido" value="{{ Chofer.apellido}}">
             <div class="form-group">
                 <label for="id_departamento">Departamento</label>
-                <select class="custom-select" id="iddepartamento" name="iddepartamento">
+                <select id="iddepartamento" name="iddepartamento" class="custom-select custom-dropdown custom-form-input">
                 </select>
             </div>
             <div class="form-group">
@@ -80,7 +80,6 @@ async function obtenerCiudadDeptoCho() {
     const deptocliente = await response.json();
     return deptocliente;
 }
-
 
 window.addEventListener('DOMContentLoaded', fetchCargarDepartamentos);
 window.addEventListener('DOMContentLoaded', async () => {

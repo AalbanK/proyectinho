@@ -53,7 +53,6 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
     roles= db.query(Rol).all()
     return templates.TemplateResponse("usuarios/editar.html", {"request": request, "Usuario": usu, "Roles":roles})  #devuelve el .html de editar
 
-
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idusuario = Form(...), name = Form(...), username = Form(...), password = Form(...), idrol = Form(...),): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
     usu= db.query(Usuario).get(idusuario) #obtiene el registro del modelo Usuario por su id

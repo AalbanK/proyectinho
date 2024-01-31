@@ -9,25 +9,15 @@
                 <input type="text" class="form-control" id="chofe_nom" name="chofe_nom">
                 <label for="chofe_ape">Apellido</label>
                 <input type="text" class="form-control" id="chofe_ape" name="chofe_ape">
-                <div class="input-group mt-3 mb-3">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="idDepartamento">Departamento:</label>
-                    </div>
-                    <select class="custom-select" id="idDepartamento" name="idDepartamento">
-                        {% for Depa in Depas_lista %}
-                        <option value="{{Depa.id_departamento}}">{{Depa.descripcion}}</option>
-                        {% endfor %}
+                <div class="form-group">
+                    <label for="id_departamento">Departamento</label>
+                    <select id="id_departamento" name="idDepartamento" class="custom-select custom-dropdown custom-form-input">
                     </select>
-                    <div class="input-group mt-3 mb-3">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="idCiudad">Ciudad:</label>
-                        </div>
-                        <select class="custom-select" id="idCiudad" name="idCiudad">
-                            {% for city in Citys_lista %}
-                            <option value="{{city.idciudad}}">{{city.descripcion}}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="id_ciudad">Ciudad</label>
+                    <select id="id_ciudad" name="idCiudad" class="custom-select custom-dropdown custom-form-input">
+                    </select>
                 </div>
                 <label for="chofe_tel">Teléfono:</label>
                 <input type="text" class="form-control" id="chofe_tel" name="chofe_tel">
@@ -36,3 +26,8 @@
           </form>
     </div>
 {% endblock content %}
+{% block script %}
+
+<script src="{{url_for('static', path='/js/cargar-depto-ciudad.js')}}"></script>
+
+{% endblock script %}
