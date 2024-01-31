@@ -106,13 +106,13 @@ def ver_proveedor(id_proveedor:int, id_moneda: int, response:Response,
 
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
-    clie= db.query(cuenta).get(id)
+    clie= db.query(Cuenta).get(id)
     depto = db.query(Departamento).all()
     return templates.TemplateResponse("editar_cuenta.html", {"request": request, "cuenta": clie, "Departamentos_lista": depto})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idclie = Form(...), color = Form(...), modelo = Form(...), anho = Form(...), idmarca = Form(...)):
-    clie= db.query(cuenta).get(idclie)
+    clie= db.query(Cuenta).get(idclie)
     clie.color=color
     clie.modelo=modelo
     clie.anho=anho
@@ -125,7 +125,7 @@ def editar(db: Session = Depends(get_database_session), idclie = Form(...), colo
 
 @router.get("/borrar/{id}",response_class=HTMLResponse)
 def eliminar(id : int, db: Session = Depends(get_database_session)):
-    db.query(cuenta).filter(cuenta.idclie == id).delete()
+    db.query(Cuenta).filter(Cuenta.idclie == id).delete()
     db.commit()
     response = RedirectResponse('/cuentas/', status_code=303)
     return response 
