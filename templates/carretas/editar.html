@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/carretas/update/" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="idcarreta" value="{{Carreta.idcarreta}}">
+                <label for="carreta_chapa">Chapa</label>
+                <input type="text" class="form-control" id="carreta_chapa" name="carreta_chapa" value="{{Carreta.carreta_chapa}}" required>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idmarca_carreta">Marca Camión:</label>
+                    </div>
+                    <select class="custom-select" id="idmarca_carreta" name="idmarca_carreta" required>
+                        {% for Marca_carreta in Marcas_lista %}
+                        <option value="{{Marca_carreta.idmarca_carreta}}" {{ "selected" if Marca_carreta.idmarca_carreta == Carreta.idmarca_carreta}}>{{Marca_carreta.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

@@ -46,8 +46,7 @@ async def create_camion(db: Session = Depends(get_database_session), chapaCamion
     return response
 
 @router.get("/todos") #aca la funcion convierte la lista de usuarios en un json que luego se usa en datatable
-async def listar_camiones(request: Request, db: Session = Depends(get_database_session)): 
-    camiones = db.query(Camion).all() #guarda en el objeto 'usuarios' todos los usuarios usando sql alchemy
+async def listar_camiones(request: Request, db: Session = Depends(get_database_session)):
     cami = db.query(Camion.idcamion, Camion.camion_chapa, Marca_camion.descripcion.label('descripcion_marca_camion')).join(Marca_camion, Camion.idmarca_camion == Marca_camion.idmarca_camion).all()
     respuesta = [dict(r._mapping) for r in cami]
     return JSONResponse(jsonable_encoder(respuesta)) #devuele el objeto 'usuarios' en formato json
@@ -61,7 +60,7 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idcamion = Form(...), camion_chapa = Form(...), idmarca_camion= Form(...),): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
-    cami= db.query(Camion).get(idcamion) #obtiene el registro del modelo Usuario por su id
+    cami= db.query(Camion).get(idcamion) #obtiene el registro del modelo Camion por su id
     cami.camion_chapa = camion_chapa # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
     cami.idmarca_camion = idmarca_camion
     db.add(cami) #agrega el objeto usu a la base de datos
