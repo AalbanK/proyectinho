@@ -136,15 +136,16 @@ async def get_usuario_actual(token: str = Depends(reuseable_oauth), db: Session=
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = db.query(Usuario).filter(Usuario.username == token_data.sub).first()    
-    
+    user = db.query(Usuario).filter(Usuario.username == token_data.sub).first()
+    print(user.__dict__)
+
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No se encontró el usuario.",
         )
-    
     return usuario.Usuario(**user.__dict__)
+
 
 
 

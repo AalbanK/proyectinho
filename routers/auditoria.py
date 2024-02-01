@@ -40,7 +40,7 @@ async def filtrar_auditoria(request: Request, db: Session = Depends(get_database
     # and (fechaDesde is null or a.accion_fecha >= fechaDesde) 
     # and (fechaHasta is null or a.accion_fecha <= fechaHasta)"
 
-    # Falta filtrar por id_usuario, que se extrae de valor_viejo y valor_nuevo, en las columnas de alta_usuario y modif_usuario
+    # Falta filtrar por idusuario, que se extrae de valor_viejo y valor_nuevo, en las columnas de alta_usuario y modif_usuario
     
     auditoria = db.query(Auditoria).filter(
         sa.or_(Auditoria.accion == accion, accion == None), 

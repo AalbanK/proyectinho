@@ -10,8 +10,11 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from starlette import status
+from routers import auth
+from schemas import usuario as us
 
 from  db.misc import get_database_session
+
 
 app = FastAPI()
 
@@ -25,19 +28,20 @@ router = APIRouter(
 
 @router.get("/")
 async def read_bancos(request: Request, db: Session = Depends(get_database_session)): #funcion para leer todos los bancos
-    return templates.TemplateResponse("bancos/listar.html", {"request": request, "datatables": True}) #.TemplateResponse muestra la interfaz (html)
+    return templates.TemplateResponse("bancos/listar.html", {"request": request, "datatables": True},) #.TemplateResponse muestra la interfaz (html)
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_banco(request: Request, db: Session = Depends(get_database_session)):
     return templates.TemplateResponse("bancos/crear.html", {"request": request}) #.TemplateResponse muestra la interfaz (html)
 
-@router.post("/nuevo") #el action al cual el form llama en el .html crear
-async def create_banco(db: Session = Depends(get_database_session), descripcion = Form(...)): #al agregar una variable = fomrulario (...) lo vuelve obligatorio
-    banco = Banco(descripcion=descripcion) #crea el nuevo objeto en python. La variable es el campo que tengo en mi modelo (models.py) y el valor es lo que viene de mi formulario html (atributo name)
-    db.add(banco) #agrega el objeto banco a la base de datos
-    db.commit() #confirma los cambios
-    db.refresh(banco) #actualiza el objeto banco
-    response = RedirectResponse('/', status_code=303) #redirige al inicio...
+@router.post("/nuevo")
+async def create_banco(db: Session = Depends(get_database_session), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
+    banco = Banco(descripcion=descripcion, alta_usuario = usu.idusuario) 
+    db.add(banco)
+    db.commit()
+    db.refresh(banco)
+    response = RedirectResponse('/', status_code=303)
     return response
 
 @router.get("/todos") #aca la funcion convierte la lista de bancos en un json que luego se usa en datatable

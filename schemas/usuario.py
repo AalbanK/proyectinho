@@ -5,32 +5,32 @@ from .rol import Rol
 
 class UsuarioIn(BaseModel):
     name: constr(max_length=45)
-    id_rol: int
+    idrol: int
     username: str
     password: str
 
 class UsuarioOut(BaseModel):
     name: str|None
     username: str|None
-    id_rol: List[Rol]=[]
+    idrol: List[Rol]=[]
 
-class Config:
-    orm_mode = True
-    allow_population_by_field_name = True
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
 
 class UsuarioCreate(UsuarioIn):
     pass
 
 class Usuario(UsuarioIn):
-    id_uduario: int
+    idusuario: int
 
-class Config:
-    orm_mode = True
-    allow_population_by_field_name = True
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
 
 class UsuarioPWOut(UsuarioOut):
     password: str
 
-class Config:
-    orm_mode = True
-    allow_population_by_field_name = True
+    class Config:
+        orm_mode = True
+        allow_population_by_field_name = True
