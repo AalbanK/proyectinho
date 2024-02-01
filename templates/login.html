@@ -39,7 +39,7 @@
                                     <div class="text-center">
                                         <h1 class="h4 text-gray-900 mb-4">¡Bienvenido/a de nuevo!</h1>
                                     </div>
-                                    {%if error %}
+                                    {% if error %}
                                     <div class="alert alert-danger aviso" role="alert">{{ error.detail }}</div>
                                     {% endif %}
                                     <form class="user" method="POST" action="/auth/login">
