@@ -68,9 +68,6 @@ def autenticar_usuario(username: str, password: str, db: Depends(get_database_se
     '''
     
     return user
-    
-
-
 
 @router.post('/token', response_model=TokenSchema)
 async def login_para_token_de_acceso(response: Response, db: Session=Depends(get_database_session), form_data: OAuth2PasswordRequestForm = Depends()):
@@ -145,8 +142,6 @@ async def get_usuario_actual(token: str = Depends(reuseable_oauth), db: Session=
             detail="No se encontró el usuario.",
         )
     return usuario.Usuario(**user.__dict__)
-
-
 
 
 # verificar si el usuario es superusuario (id = 1)
