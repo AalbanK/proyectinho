@@ -27,30 +27,27 @@
                 <h5> ¿Está seguro/a de eliminar este registro? </h5>
             </div>
             <div class="modal-footer">
-                <form id="eliminarCuenta">
-                </form>
+                <form id="eliminarCuenta"></form>
             </div>
         </div>
     </div>
 </div>
-
 {% endblock content %}
 {% block script %}
-
 <script type="text/javascript">
 
     let $tabla = $("#cuenta");
     let $modal = $('#eliminarModal');
     let botonesEliminar = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">No, Cancelar</button>
-                    <button id="confirmarEliminar" class="btn btn-danger" type="button>Sí, Eliminar</button>`;
+                    <button id="confirmarEliminar" class="btn btn-danger" type="button">Sí, Eliminar</button>`;
     let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">Ok</button>`;
 
     let alertOK = `<div class="alert alert-success aviso" role="alert">
                     Registro eliminado exitosamente.
                 </div>`;
     let botonesEditarYEliminar = (id) => {
-        return `<a href=/cuentas/editar/${id}" class="btn btn-warning editar">Editar</a>
-        <button type="button" class="btn btn-danger eliminar" data-id="${id}"> Eliminar </button>`;
+        return `<a href="/cuentas/editar/${id}" class="btn btn-warning editar">Editar</a>
+                <button type="button" class="btn btn-danger eliminar" data-id="${id}"> Eliminar </button>`;
     }
 
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
@@ -86,7 +83,7 @@
             },
             {
                 data: null,
-                odable: false,
+                ordable: false,
                 searchanle: false,
                 render: function (data, type, row, meta) {
                     return botonesEditarYEliminar(data.idcuenta);
@@ -101,7 +98,7 @@
         });
 
         agregarAlert = (accion, motivo) => {
-            switch (action) {
+            switch (accion) {
                 case'error': {
                     let texto = null;
                     switch (motivo) {
@@ -117,8 +114,8 @@
                             texto = 'Ha ocurrido un error desconocido. Verifique si los datos mostrados posteriormente son correctos.';
                         }
                     }
-                    let alertError = `<div class="alert alert-danger aviso" role ="alert">
-                        <button type="button" class= "close close-alert"
+                    let alertError = ` <div class="alert alert-danger aviso" role="alert">
+                        <button type="button" class="close close-alert" 
                             data-dismiss="alert" aria-hidden="true">
                             ×
                         </button> ${texto}
@@ -135,7 +132,7 @@
             }
         }
 
-        actualizarBotones = (acction) => {
+        actualizarBotones = (action) => {
             $modal.find('#eliminarCuenta').children().remove();
             switch (action) {
                 case 'error': {
@@ -152,10 +149,10 @@
 
         eliminarFila = (e) => {
             let idEliminar = e.data.id;
-            url = `/cuentas/borrar7${idEliminar}`;
+            url = `/cuentas/borrar/${idEliminar}`;
             $.ajax({
                 url: url,
-                metho: 'GET',
+                method: 'GET',
                 dataType: 'json',
                 success: function(data, status, xhr) {
                     if (data.status_code == 200) {
@@ -170,7 +167,7 @@
                     else {
                         agregarAlert('ok');
                         actualizarBotones('ok')
-                        tablaDT.ajax.reload(null,false); //recarga la tabla
+                        tablaDT.ajax.reload(null, false); //recarga la tabla
                         $modal.modal('hide');
                     }
                 },
@@ -183,19 +180,19 @@
         }
 
         $modal.on('shown.bs.modal', function (e){
-            //verificar si existe el id (por si tocan el html en el fom)
+            //verificar si existe el id (por si tocan el html en el dom)
             $.ajax({
                 url: `/cuentas/ver/${$modal.data('id')}`,
                 method: 'GET',
                 dataType: 'json',
-                succes: function (data, status, xhr) {
+                success: function (data, status, xhr) {
                     if(data.status_code == 404) {
                         agregarAlert('error', 'verif')
                         actualizarBotones('error')
                     }
                     else {
                         actualizarBotones('eliminar')
-                        $("confirmarEliminar").ogg('clic').on('click', { id: $modal.sta('id') }, eliminarFila);
+                        $("#confirmarEliminar").off('click').on('click', { id: $modal.data('id') }, eliminarFila);
                     }
                 },
                 error: function (e) {

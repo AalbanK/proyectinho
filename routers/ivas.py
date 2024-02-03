@@ -1,3 +1,5 @@
+from schemas import usuario as us
+from routers import auth
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from fastapi import Depends, Request, Form, Response, FastAPI
@@ -20,15 +22,16 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def read_marca_camion(request: Request, db: Session = Depends(get_database_session)):
+async def read_marca_camion(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("ivas/listar.html", {"request": request, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
-async def create_iva(request: Request, db: Session = Depends(get_database_session)):
+async def create_iva(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("ivas/crear.html", {"request": request})
 
 @router.post("/nuevo")
-async def create_iva(db: Session = Depends(get_database_session), iva_porc = Form(...)):
+async def create_iva(db: Session = Depends(get_database_session), iva_porc = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     iva = IVA(porcentaje=iva_porc)
     db.add(iva)
     db.commit()

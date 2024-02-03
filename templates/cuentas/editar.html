@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/cuentas/update/" method="POST">
+            <div class="form-group">
+                <input type="hidden" name="idcuenta" value="{{Cuenta.idcuenta}}">
+                <fieldset class="form-group">
+                    <div class="form-row">
+                      <legend class="col-form-label col-sm-2 pt-0">¿Cliente o Proveedor?</legend>
+                      <div class="col-sm-10">
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="gridRadios" value="esCliente" {{ "checked" if Cuenta.tipo_razon == "esCliente"}}>
+                          <label class="form-check-label" for="esCliente">
+                            Cliente
+                          </label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="gridRadios" value="esProveedor" {{ "checked" if Cuenta.tipo_razon == "esProveedor"}}>
+                          <label class="form-check-label" for="esProveedor">
+                            Proveedor
+                          </label>
+                        </div>
+                        </div>
+                      </div>
+                    </fieldset>
+                  <label for="nombre_razon">Razon Social</label>
+                  <input type="text" class="form-control" id="nombre_razon" name="nombre_razon" value="{{Cuenta.nombre_razon}}" required>
+                <label for="nro">Número de Cuenta</label>
+                <input type="text" class="form-control" id="nro" name="nro" value="{{Cuenta.nro}}" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <label class="input-group-text" for="idBanco">Banco:</label>
+                      </div>
+                      <select class="custom-select" id="idBanco" name="idBanco">
+                          {% for Banco in Bancos %}
+                          <option value="{{Banco.idbanco}}">{{Banco.descripcion}}</option>
+                          {% endfor %}
+                      </select>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}

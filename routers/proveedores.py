@@ -1,3 +1,5 @@
+from schemas import usuario as us
+from routers import auth
 import statistics
 from fastapi import APIRouter, HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -24,17 +26,18 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def read_proveedor(request: Request, db: Session = Depends(get_database_session)):
+async def read_proveedor(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     #records = db.query(Proveedor).all()
     ciud = db.query(Proveedor.idproveedor, Proveedor.descripcion, Proveedor.ruc, Ciudad.descripcion.label('descripcion_ciudad'),Proveedor.direccion, Proveedor.mail, Proveedor.telefono).join(Ciudad, Proveedor.idciudad == Ciudad.idciudad).all()
     return templates.TemplateResponse("proveedores/listar.html", {"request": request, "proveedores": ciud, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
-async def create_proveedor(request: Request, db: Session = Depends(get_database_session)):
+async def create_proveedor(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("proveedores/crear.html", {"request": request})
 
 @router.post("/nuevo")
-async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...)):
+async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     proveedor = Proveedor(descripcion=descripcion, idciudad = idCiudad, ruc=ruc, mail=mail, direccion=direccion, telefono=telefono)
     db.add(proveedor)
     db.commit()
@@ -44,13 +47,13 @@ async def create_proveedor(db: Session = Depends(get_database_session), descripc
 
 @router.get("/{id}",response_class=HTMLResponse)
 def ver(id:int, response:Response,
-            request:Request,db: Session = Depends(get_database_session)):
+            request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     prove = db.query(Proveedor).get(id)
     depto = db.query(Departamento).get(int(prove.idDepto))
     return templates.TemplateResponse("proveedores/listar.html", {"request": request, "Proveedor": prove, "Departamento": depto})
 
 @router.get("/{id}/iddepto",response_class=HTMLResponse)
-def obtener_iddepto_proveedor(id:int, response:Response, request:Request, db: Session = Depends(get_database_session)):
+def obtener_iddepto_proveedor(id:int, response:Response, request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     prove= db.query(Proveedor).get(id)
     refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(prove.idciudad))
     refdepto = refdepto.__dict__.get('iddepartamento')
@@ -58,14 +61,14 @@ def obtener_iddepto_proveedor(id:int, response:Response, request:Request, db: Se
     return JSONResponse(content=jsonable_encoder(respuesta))
 
 @router.get("/editar/{id}",response_class=HTMLResponse)
-def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session)):
+def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     prove= db.query(Proveedor).get(id)
     depto = db.query(Departamento).all()
     refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(prove.idciudad))
     return templates.TemplateResponse("proveedores/editar.html", {"request": request, "Proveedor": prove, "Departamentos_lista": depto, "ref_depto":refdepto})
 
 @router.post("/update",response_class=HTMLResponse)
-def editar(db: Session = Depends(get_database_session), idproveedor = Form(...), descripcion = Form(...), ruc = Form(...), idciudad = Form(...), direccion = Form(...), mail = Form(), telefono = Form()):
+def editar(db: Session = Depends(get_database_session), idproveedor = Form(...), descripcion = Form(...), ruc = Form(...), idciudad = Form(...), direccion = Form(...), mail = Form(), telefono = Form(), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
         prove= db.query(Proveedor).get(idproveedor)
         prove.descripcion=descripcion
         prove.ruc=ruc
@@ -80,7 +83,7 @@ def editar(db: Session = Depends(get_database_session), idproveedor = Form(...),
         return response
 
 @router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
-def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session)): #se definen los parametros para la funcion
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
     proveedor = db.query(Proveedor).get(id) #obtiene el registro del modelo Cliente por su id
     if(proveedor is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
         return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")

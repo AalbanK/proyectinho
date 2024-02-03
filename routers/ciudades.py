@@ -1,3 +1,5 @@
+from schemas import usuario as us
+from routers import auth
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from fastapi import Depends, Request, Form, Response, FastAPI
@@ -23,18 +25,19 @@ router = APIRouter(
 
 
 @router.get("/")
-async def read_ciudad(request: Request, db: Session = Depends(get_database_session)):
+async def read_ciudad(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     #records = db.query(Ciudad).all()
     records=db.query(Ciudad, Departamento).join(Departamento).all()
     return templates.TemplateResponse("ciudades/listar.html", {"request": request, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
-async def create_ciudad(request: Request, db: Session = Depends(get_database_session)):
+async def create_ciudad(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     depas=db.query(Departamento).all()
     return templates.TemplateResponse("ciudades/crear.html", {"request": request, "Depas_lista":depas})
 
 @router.post("/nuevo")
-async def create_ciudad(db: Session = Depends(get_database_session), descCiudad = Form(...), idDepartamento=Form(...)):
+async def create_ciudad(db: Session = Depends(get_database_session), descCiudad = Form(...), idDepartamento=Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     ciudad = Ciudad(descripcion=descCiudad, iddepartamento=idDepartamento)
     db.add(ciudad)
     db.commit()
@@ -44,7 +47,7 @@ async def create_ciudad(db: Session = Depends(get_database_session), descCiudad 
 
 
 @router.get("/todos")
-async def listar_ciudades(request: Request, db: Session = Depends(get_database_session)):
+async def listar_ciudades(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     ciudades = db.query(Ciudad).all()
     return JSONResponse(jsonable_encoder(ciudades))
 

@@ -1,5 +1,6 @@
 from models import Camion, Marca_camion
 from schemas import usuario as us
+from routers import auth
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, Response, FastAPI
 import statistics
 from fastapi.encoders import jsonable_encoder
@@ -9,7 +10,6 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from starlette import status
-from routers import auth
 
 
 from  db.misc import get_database_session
@@ -37,7 +37,7 @@ async def create_camion(request: Request, db: Session = Depends(get_database_ses
 @router.post("/nuevo")
 async def create_camion(db: Session = Depends(get_database_session), chapaCamion = Form(...), idmarca_camion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    camion = Camion(camion_chapa = chapaCamion, idmarca_camion = idmarca_camion, alta_usuario = usu.idusuario)
+    camion = Camion(camion_chapa = chapaCamion, idmarca_camion = idmarca_camion)
     db.add(camion)
     db.commit()
     db.refresh(camion)
@@ -59,11 +59,9 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idcamion = Form(...), camion_chapa = Form(...), idmarca_camion= Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
-    usu = us.Usuario.from_orm(usuario_actual)
     cami= db.query(Camion).get(idcamion) #obtiene el registro del modelo Camion por su id
     cami.camion_chapa = camion_chapa # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
     cami.idmarca_camion = idmarca_camion
-    cami.alta_usuario =  alta_usuario = usu.idusuario
     db.add(cami) #agrega el objeto usu a la base de datos
     db.commit() #confirma los cambios
     db.refresh(cami) #actualiza el objeto usu

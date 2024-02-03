@@ -1,3 +1,5 @@
+from schemas import usuario as us
+from routers import auth
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from fastapi import Depends, Request, Form, FastAPI
@@ -21,7 +23,8 @@ router = APIRouter(
 
 
 @app.post("/departamentos/")
-async def create_departamento(db: Session = Depends(get_database_session), descDepartamento = Form(...)):
+async def create_departamento(db: Session = Depends(get_database_session), descDepartamento = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     departamento = Departamento(descripcion=descDepartamento)
     db.add(departamento)
     db.commit()
@@ -30,15 +33,15 @@ async def create_departamento(db: Session = Depends(get_database_session), descD
     return response
 
 @app.get("/departamentos/nuevo/", response_class=HTMLResponse)
-async def create_departamentos(request: Request, db: Session = Depends(get_database_session)):
+async def create_departamentos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("departamentos/crear.html", {"request": request})
 
 @app.get("/departamentos/")
-async def read_departamento(request: Request, db: Session = Depends(get_database_session)):
+async def read_departamento(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     records = db.query(Departamento).all()
     return templates.TemplateResponse("departamentos/listar.html", {"request": request, "data": records})
 
 @router.get("/todos")
-async def listar_departamentos(request: Request, db: Session = Depends(get_database_session)):
+async def listar_departamentos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     departamentos = db.query(Departamento).all()
     return JSONResponse(jsonable_encoder(departamentos))

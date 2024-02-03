@@ -1,5 +1,6 @@
 from models import Banco
 from schemas import usuario as us
+from routers import auth
 from fastapi import APIRouter, HTTPException, Depends, Request, Form, Response, FastAPI
 import statistics
 from fastapi.encoders import jsonable_encoder
@@ -9,7 +10,6 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from starlette import status
-from routers import auth
 
 
 from  db.misc import get_database_session
@@ -35,12 +35,16 @@ async def create_banco(request: Request, db: Session = Depends(get_database_sess
 @router.post("/nuevo")
 async def create_banco(db: Session = Depends(get_database_session), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    banco = Banco(descripcion=descripcion, alta_usuario = usu.idusuario) 
+    banco = Banco(descripcion=descripcion) 
     db.add(banco)
     db.commit()
     db.refresh(banco)
     response = RedirectResponse('/', status_code=303)
     return response
+
+async def get_bancos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    bancos = db.query(Banco).all()
+    return bancos
 
 @router.get("/todos") #aca la funcion convierte la lista de bancos en un json que luego se usa en datatable
 async def listar_bancos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
