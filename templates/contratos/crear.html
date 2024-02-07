@@ -2,76 +2,115 @@
 {% block content %}
 <div>
     <form action="/contratos/nuevo" method="POST">
+
         <div class="form-group">
-            <label for="contratoFecha">Fecha de Contrato</label>
-            <input type="date" class="form-control" id="contratoFecha" name="contratoFecha">
+            <label for="Fechas">Plazo de Retiro y Entrega:</label>
+            <div class="input-group">
+                <input type="date" class="form-control" id="FechaInicio" name="FechaInicio" placeholder="Inicio" required>
+                <span class="input-group-addon" style="margin: 0 5px;">hasta</span>
+                <input type="date" class="form-control" id="FechaFin" name="FechaFin" placeholder="Fin" required>
+            </div>
         </div>
 
-        <div class="form-group a-ocultar" id="esProveedor">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="idProveedor">Proveedor:</label>
-                </div>
-                <select class="custom-select" id="idProveedor" name="idProveedor">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="idProducto">Producto:</label>
+            </div>
+            <select class="custom-select" id="idProducto" name="idProducto">
+                {% for Producto in Productos_lista %}
+                <option value="{{Producto.idproducto}}">{{Producto.descripcion}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="cantidad">Cantidad (Kg):</label>
+                <input type="number" class="form-control" style="margin-right: 10px" id="cantidad" name="cantidad" min="1" required>
+
+                <label class="input-group-text" for="precioCompra">Precio Compra (Gs):</label>
+                <input type="number" class="form-control" id="precioCompra" name="precioCompra" min ="1" required>
+
+                <label class="input-group-text" for="precioVenta">Precio Venta (Gs):</label>
+                <input type="number" class="form-control" id="precioVenta" name="precioVenta" min="1" required>
+            </div>
+        </div>
+
+        <label for="origen">Origen:</label>
+        <div class="form-group a-ocultar" id="proveedor">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="proveedor">Proveedor:</label>
+                <select class="custom-select" style="margin-right: 10px" id="proveedor" name="proveedor">
                     <option value="0" selected>Elegir...</option>
                     {% for Proveedor in Proveedores_lista %}
                     <option value="{{Proveedor.idproveedor}}">{{Proveedor.descripcion}}</option>
                     {% endfor %}
                 </select>
+                <label for="nroCuenta" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="nroCuentaP">N° de Cuenta:</label>
+                </div>
+                <select class="custom-select" id="nroCuentaP" name="nroCuentaP">
+                    <option value="0" selected>Elegir...</option>
+                    {% for Cuenta in Cuentas_lista %}
+                    <option value="{{Cuenta.idcuenta}}">{{Cuenta.nro}}</option>
+                    {% endfor %}
+                </select>
             </div>
         </div>
 
-        <div class="form-group a-ocultar" id="esCliente">
-            <div class="input-group mb-3">
+
+        <div class="form-group a-ocultar" id="departamento-ciudadO">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="departamento_O">Departamento:</label>
+                <select class="custom-select" style="margin-right: 10px" id="departamento_O" name="departamento_O">
+                    <option value="0" selected>Elegir...</option>
+                </select>
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="idCliente">Cliente:</label>
+                    <label class="input-group-text" for="ciudad_O">Ciudad:</label>
                 </div>
-                <select class="custom-select" id="idCliente" name="idCliente">
+                <select class="custom-select" id="ciudad_O" name="ciudad_O">
+                    <!-- Opciones de ciudades aquí -->
+                </select>
+            </div>
+        </div>
+
+        
+        <label for="destino">Destino:</label>
+        <div class="form-group a-ocultar" id="cliente">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="cliente">Cliente:</label>
+                <select class="custom-select" style="margin-right: 10px" id="cliente" name="cliente">
                     <option value="0" selected>Elegir...</option>
                     {% for Cliente in Clientes_lista %}
                     <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}}</option>
                     {% endfor %}
                 </select>
-            </div>
-        </div>
-
-
-        <div class="form-group">
-            <div class="input-group mb-3">
+                <label for="nroCuenta" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="idProducto">Producto:</label>
+                    <label class="input-group-text" for="nroCuentaC">N° de Cuenta:</label>
                 </div>
-                <select class="custom-select" id="idProducto" name="idProducto">
-                    {% for Producto in Productos_lista %}
-                    <option value="{{Producto.idproducto}}">{{Producto.producto_desc}}</option>
+                <select class="custom-select" id="nroCuenta" name="nroCuentaC">
+                    <option value="0" selected>Elegir...</option>
+                    {% for Cuenta in Cuentas_lista %}
+                    <option value="{{Cuenta.idcuenta}}">{{Cuenta.nro}}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <div class="form-group">
-                <label for="contratoCantidad">Cantidad del Producto (en kilos):</label>
-                <input type="number" class="form-control" id="contratoCantidad" name="contratoCantidad" min="0">
-            </div>
-        </div>
 
-        <div class="form-row">
-            <div class="form-group col-6">
-                <label for="contratoPrecio">Monto del Contrato:</label>
-                <input type="number" class="form-control" id="contratoPrecio" name="contratoPrecio" min="1">
-            </div>
-            <div class="form-group col-6">
-                <label for="" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="nroCuenta">N° de Cuenta:</label>
-                    </div>
-                    <select class="custom-select" id="nroCuenta" name="nro">
-                    </select>
+        <div class="form-group a-ocultar" id="departamento-ciudad_D">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="departamento_D">Departamento:</label>
+                <select id="departamento_D" name="departamento_D" class="custom-select custom-dropdown custom-form-input">
+                </select>
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="ciudad_D">Ciudad:</label>
                 </div>
+                <select id="ciudad_D" name="ciudad_D" class="custom-select custom-dropdown custom-form-input">
+                </select>
             </div>
         </div>
-
         <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 </div>
@@ -115,17 +154,10 @@
     $(document).ready(function () {
         const selectCuenta = document.querySelector("#nroCuenta");
 
-        toggleClienteProveedor($('[name=gridRadios]:checked').val());
         limpiarCuenta(selectCuenta);
-
-        $("[name=gridRadios]").click(function () {
-            toggleClienteProveedor($(this).val());
-            limpiarCuenta(selectCuenta);
-        });
 
         const selectProveedor = document.querySelector("#idProveedor");
         const selectCliente = document.querySelector("#idCliente");
-        const selectMoneda = document.querySelector("#idMoneda");
         selectCliente.addEventListener('change', async function (event) {
             let idCliente = event.target.value;
             if (idCliente && idCliente != 0) {
@@ -182,5 +214,82 @@
             }
         });
     });
+
+ //---------- Script para ciudades y departamentos
+
+ let jsonCiudades = null;
+
+ agregarOpcion = (elemento,valor, texto) => {
+    let nuevaOpcion = document.createElement("option");
+    nuevaOpcion.value = valor;
+    nuevaOpcion.text = texto;
+    elemento.add(nuevaOpcion);
+ }
+
+ fetchCargarDepartamentos = (listaDeptos) => { //---- listaDeptos es un array
+    listaDeptos.forEach((sel) => { 
+        let selectDepto = null;
+        selectDepto = document.querySelector(`#${sel}`);        
+        agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
+        fetch('/departamentos/todos')
+            .then((response) => response.json())
+            .then((deptos) => {
+                for (let depto of deptos) {
+                    agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
+                }
+            })
+            .catch(error => {
+                console.error(error)
+                agregarOpcion(selectDepto, 0, 'Sin Datos')
+            });
+        });
+    };
+    
+
+async function obtenerCiudades() {
+    const response = await fetch('/ciudades/todos');
+    if (!response.ok) {
+        const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
+        throw new Error(message);
+    }
+    const ciudades = await response.json();
+    return ciudades;
+}
+
+selectDeptos=["departamento_O", "departamento_D"]; //cada string es el id de cada select de Depto
+cargarSelectsDeptos = () => {
+    fetchCargarDepartamentos(selectDeptos);
+}
+let selectCiudades = ["ciudad_O", "ciudad_D"]; //cada string es el id de cada select de Ciudad
+    window.addEventListener('DOMContentLoaded', cargarSelectsDeptos);
+    window.addEventListener('DOMContentLoaded', async () => {
+        await obtenerCiudades()
+        .then(ciudades => {jsonCiudades = ciudades})
+        .catch(error => {
+            console.error(error);
+            jsonCiudades = {};
+        });
+        
+        for (let i = 0; i < selectDeptos.length; i++) {
+            const dep = document.querySelector(`#${selectDeptos[i]}`);
+            dep.addEventListener('change', function (event) {
+
+                let idDepto = event.target.value;
+                let selectCiudad = document.querySelector(`#${selectCiudades[i]}`);
+                if (idDepto && idDepto != "undefined") {
+                    selectCiudad.length = 0;
+
+                    jsonCiudades.map(function (ciu) { 
+                        if ( ciu.iddepartamento == idDepto) {
+                            agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
+                        }
+                    });
+                }
+            });
+        };
+        
+    });
+
+
 </script>
 {% endblock script %}

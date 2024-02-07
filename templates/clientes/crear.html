@@ -45,7 +45,7 @@ fetchCargarDepartamentos = () => {
     selectDepto = document.querySelector("#id_departamento");
     selectDepto.length = 0; //para vaciar el select, por si acaso
     agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
-        fetch('/departamentos/todos')
+    fetch('/departamentos/todos')
         .then((response) => response.json())
         .then((deptos) => {
             for (let depto of deptos) {

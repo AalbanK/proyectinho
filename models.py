@@ -1,3 +1,4 @@
+from sqlalchemy import Date
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Double, Text, DateTime
 from sqlalchemy.orm import relationship
@@ -178,17 +179,18 @@ class Contrato(Base):
     __tablename__= "contrato" #Nombre de la tabla en la Base de Datos
     idcontrato = Column(Integer, primary_key=True, index=True)
     nro = Column(Integer)
-    fecha = Column(DateTime(timezone=True), server_default=func.now())
+    fecha_inicio = Column(Date)
+    fecha_fin = Column(Date)
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     cantidad = Column(Integer)
-    precio_compra = Column(Integer)
-    origen = Column(Integer, ForeignKey("ciudad.idciudad"))
+    precio_compra = Column(Integer)    
+    precio_venta = Column(Integer)
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
     cuenta_proveedor = Column(String(45))
-    precio_venta = Column(Integer)
-    destino = Column(Integer, ForeignKey("ciudad.idciudad"))
+    origen = Column(Integer, ForeignKey("ciudad.idciudad"))
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
     cuenta_cliente = Column(String(45))
+    destino = Column(Integer, ForeignKey("ciudad.idciudad"))
     contratocompra = relationship("Factura_compra_cabecera", back_populates="contrato") #
     contratoventa = relationship("Factura_venta_cabecera", back_populates="contrato")
     alta_usuario = Column(Integer)

@@ -38,7 +38,7 @@ async def create_cliente(request: Request, db: Session = Depends(get_database_se
 @router.post("/nuevo")
 async def create_cliente(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    cliente = Cliente(descripcion=descripcion, ruc=ruc, idciudad = idCiudad, mail=mail, telefono=telefono)
+    cliente = Cliente(descripcion=descripcion, ruc=ruc, idciudad = idCiudad, direccion=direccion, mail=mail, telefono=telefono)
     db.add(cliente)
     db.commit()
     db.refresh(cliente)
