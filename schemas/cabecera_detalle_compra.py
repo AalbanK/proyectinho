@@ -2,7 +2,7 @@ from typing import List, Optional
 from datetime import date
 from pydantic import BaseModel
 
-class Compra_Detalle(BaseModel):
+class Compra_detalle(BaseModel):
     idcabecera_compra: Optional[int] = None
     idproducto: int
     descripcion_producto: str
@@ -12,7 +12,7 @@ class Compra_Detalle(BaseModel):
     subtotaliva: int
     subtotal: int
 
-class Compra_Cabecera(BaseModel):
+class Compra_cabecera(BaseModel):
     idfactura_compra: Optional[int] = None
     numero: str
     timbrado: str

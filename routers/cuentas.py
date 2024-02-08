@@ -59,19 +59,19 @@ async def create_cuenta(db: Session = Depends(get_database_session), nroCuenta =
     response = RedirectResponse('/', status_code=303)
     return response
 
-@router.get("/cliente/{id_cliente}",response_class=JSONResponse)
-def ver_cliente(id_cliente:int, response:Response,request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+@router.get("/cliente/{idcliente}",response_class=JSONResponse)
+def ver_cliente(idcliente:int, response:Response,request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     cuentas = db.query(Cuenta).filter(
-                     Cuenta.id_cliente == id_cliente
+                     Cuenta.idcliente == idcliente
                  ).all()
-    return JSONResponse(jsonable_encoder(cuentas, exclude={'id_proveedor'}))
+    return JSONResponse(jsonable_encoder(cuentas, exclude={'idproveedor'}))
 
-@router.get("/proveedor/{id_proveedor}",response_class=JSONResponse)
-def ver_proveedor(id_proveedor:int, response:Response, request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+@router.get("/proveedor/{idproveedor}",response_class=JSONResponse)
+def ver_proveedor(idproveedor:int, response:Response, request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     cuentas = db.query(Cuenta).filter(
-                     Cuenta.id_proveedor == id_proveedor
+                     Cuenta.idproveedor == idproveedor
                  ).all()
-    return JSONResponse(jsonable_encoder(cuentas, exclude={'id_cliente'}))
+    return JSONResponse(jsonable_encoder(cuentas, exclude={'idcliente'}))
 
 @router.get("/todos")
 async def listar_cuentas(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):

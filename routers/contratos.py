@@ -38,10 +38,33 @@ async def create_contrato(request: Request, db: Session = Depends(get_database_s
 
 @router.post("/nuevo")
 async def create_contrato(db: Session=Depends(get_database_session), nro=Form(...), FechaInicio=Form(...),FechaFin=Form(...),idProducto=Form(...), cantidad=Form(...),
-                          precioCompra=Form(...), precioVenta=Form(...), idCiudad=Form(...), idProveedor=Form(...), nroCuentaP=Form(...), ciudad_O=Form(...),
+                          precioCompra=Form(...), precioVenta=Form(...), idProveedor=Form(...), nroCuentaP=Form(...), ciudad_O=Form(...),
                           idCliente=Form(...), nroCuentaC=Form(...),ciudad_D=Form(...), usuario_actual: us.Usuario=Depends(auth.get_usuario_actual)):
     contrato = Contrato(nro=nro, fecha_inicio=FechaInicio, fecha_fin=FechaFin, idproducto=idProducto, cantidad=cantidad, precio_compra=precioCompra, precio_venta=precioVenta,
                         idproveedor=idProveedor, cuenta_proveedor=nroCuentaP, origen=ciudad_O, idcliente=idCliente, cuenta_cliente=nroCuentaC, destino=ciudad_D)
+    
+    campos_a_agregar = {
+        "nro": nro,
+        "fecha_inicio": FechaInicio,
+        "fecha_fin": FechaFin,
+        "idproducto": idProducto,
+        "idproducto": idProducto,
+        "cantidad": cantidad,
+        "precio_compra": precioCompra,
+        "precio_venta": precioVenta,
+        "idproveedor": idProveedor,
+        "cuenta_proveedor": nroCuentaP,
+        "origen": ciudad_O,
+        "idcliente": idCliente,
+        "cuenta_cliente": nroCuentaC,
+        "destino": ciudad_D
+    }
+    # if idCliente is not None and idCliente != '0':
+    #     campos_a_agregar["id_cliente"] = idCliente
+    
+    # if idProveedor is not None and idProveedor != '0':
+    #     campos_a_agregar["id_proveedor"] = idProveedor
+    contrato = Contrato(**campos_a_agregar)
     db.add(contrato)
     db.commit()
     db.refresh(contrato)
