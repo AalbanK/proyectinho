@@ -35,7 +35,7 @@ async def create_banco(request: Request, db: Session = Depends(get_database_sess
 @router.post("/nuevo")
 async def create_banco(db: Session = Depends(get_database_session), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    banco = Banco(descripcion=descripcion) 
+    banco = Banco(descripcion=descripcion, alta_usuario = usu.idusuario) 
     db.add(banco)
     db.commit()
     db.refresh(banco)

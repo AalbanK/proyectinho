@@ -2,7 +2,7 @@ let jsonProductos = null;
 let jsonCiudades = null;
 let selectProducto = null;
 
-calcularSubtotales = (cantidad, precio, subtotal, subtotaliva, porcentaje_iva) => {
+calcularSubtotales = (cantidad, precio, subtotal, subtotal_iva, porcentaje_iva) => {
 
     cantidad = cantidad.value;
     precio = precio.value;
@@ -12,7 +12,7 @@ calcularSubtotales = (cantidad, precio, subtotal, subtotaliva, porcentaje_iva) =
     let soloDigitos = /^\d+$/;
     if (!cantidad.match(soloDigitos) || !precio.match(soloDigitos)) {            
         subtotal.value = null;
-        subtotaliva.value = null;
+        subtotal_iva.value = null;
         return;
     }
     // Convertir a Integer ambos
@@ -21,7 +21,7 @@ calcularSubtotales = (cantidad, precio, subtotal, subtotaliva, porcentaje_iva) =
     if (cantidad <= 0 || precio <= 0) {
         // para evitar calcular con valores negativos      
         subtotal.value = null;
-        subtotaliva.value = null;
+        subtotal_iva.value = null;
         return;        
     }
     
@@ -29,7 +29,7 @@ calcularSubtotales = (cantidad, precio, subtotal, subtotaliva, porcentaje_iva) =
     
     let importeiva = Math.round((porcentaje_iva * importesubtotal) / (porcentaje_iva + 100));
     subtotal.value = importesubtotal;
-    subtotaliva.value = importeiva;        
+    subtotal_iva.value = importeiva;        
 }
 
 calcularTotal = (arraySubtotales) => {
@@ -147,7 +147,7 @@ crearFila = (crearBotonEliminar) => {
         calcularSubtotales(campoCantidad, 
             campoPrecio, 
             campoSubtotal,
-            campoSubtotalIVA,
+            campoSubtotal_iva,
             campoPorcentajeIVA.value);
         document.getElementById('total').value = calcularTotal(document.getElementsByName('subtotal[]'));
     });
@@ -160,17 +160,17 @@ crearFila = (crearBotonEliminar) => {
     elementoDiv.appendChild(colAutoDiv);
 
     colAutoDiv = crearElemento("div", "", ["form-group", "col", "d-flex", "flex-column", "justify-content-end"]);
-    let labelSubtotalIVA = crearElemento("label", "", [], "Subtotal IVA");
-    let campoSubtotalIVA = crearElemento("input", "subtotal_iva[]", ["form-control"], "", "number", true, true);
-    colAutoDiv.appendChild(labelSubtotalIVA);
-    colAutoDiv.appendChild(campoSubtotalIVA);
+    let labelSubtotal_iva = crearElemento("label", "", [], "Subtotal IVA");
+    let campoSubtotal_iva = crearElemento("input", "subtotal_iva[]", ["form-control"], "", "number", true, true);
+    colAutoDiv.appendChild(labelSubtotal_iva);
+    colAutoDiv.appendChild(campoSubtotal_iva);
     elementoDiv.appendChild(colAutoDiv);
 
     listenerCalculo = () => {
         calcularSubtotales(campoCantidad, 
             campoPrecio, 
             campoSubtotal,
-            campoSubtotalIVA,
+            campoSubtotal_iva,
             campoPorcentajeIVA.value);
         document.getElementById('total').value = calcularTotal(document.getElementsByName('subtotal[]'));
     }

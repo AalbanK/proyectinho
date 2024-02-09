@@ -1,0 +1,19 @@
+@page {
+    size: A4;
+    margin: 0;
+  }
+  @media print {
+    html, body {
+      width: 210mm;
+      height: 297mm;
+    }
+  
+    table.table.table-bordered.print-borde {
+      border: 2px solid rgba(0,0,0,.1);
+    }
+
+    table.table-bordered.print-borde td, table.table.table-bordered.print-borde th{
+        border: 2px solid rgba(0,0,0,.1) !important; /*no se debería usar !important teniendo especificidad. Es solo para sobreescribir el estilo del template*/
+    }
+  
+  }

@@ -15,6 +15,7 @@ class Auditoria(Base):
     valorviejo = Column(String(4000))
     valornuevo = Column(String(4000))
     columnas    = Column(String(4000))
+    modif_usuario = Column(Integer)
 
 
 class Banco(Base):
@@ -23,6 +24,7 @@ class Banco(Base):
     descripcion = Column(String(45), unique=True)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Cliente(Base):
@@ -38,6 +40,7 @@ class Cliente(Base):
     clienteventa = relationship("Factura_venta_cabecera", back_populates="cliente")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Departamento(Base):
@@ -49,6 +52,7 @@ class Departamento(Base):
     ciudad = relationship("Ciudad", back_populates="departamento")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Deposito(Base):
     __tablename__ = "deposito" #Nombre de la tabla en la Base de Datos
@@ -56,8 +60,11 @@ class Deposito(Base):
     descripcion = Column(String(45))
     # campo Hijo = relationship("NombreDelModeloHijo", back_populates="NombreDeLaVariableEnElOtroModelo")
     deposito_y_producto = relationship("Deposito_y_producto", back_populates="deposito")
+    depositocompra = relationship("Factura_compra_cabecera", back_populates="deposito")
+    depositoventa = relationship("Factura_venta_cabecera", back_populates="deposito")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class IVA(Base):
@@ -66,6 +73,7 @@ class IVA(Base):
     porcentaje = Column(Integer, unique=True)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Marca_camion(Base):
@@ -74,6 +82,7 @@ class Marca_camion(Base):
     descripcion = Column(String(45), unique=True)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Marca_carreta(Base):
@@ -82,15 +91,7 @@ class Marca_carreta(Base):
     descripcion = Column(String(45), unique=True)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
-    
-
-class Moneda(Base):
-    __tablename__ = "moneda" #Nombre de la tabla en la Base de Datos
-    idmoneda = Column(Integer, primary_key=True, index=True)
-    descripcion = Column(String(45), unique=True)
-    alta_usuario = Column(Integer)
-    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
-
+    modif_usuario = Column(Integer)
 
 class Proveedor(Base):
     __tablename__ = "proveedor" #Nombre de la tabla en la Base de Datos
@@ -105,6 +106,7 @@ class Proveedor(Base):
     proveedorcompra = relationship("Factura_compra_cabecera", back_populates="proveedor") #relación cruzada para los campos afectados
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Rol(Base):
@@ -114,6 +116,7 @@ class Rol(Base):
     usuario = relationship("Usuario", uselist=False, back_populates="rol")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 #-----LLAVES FORÁNEAS-----
@@ -125,6 +128,7 @@ class Camion(Base):
     idmarca_camion = Column(Integer, ForeignKey("marca_camion.idmarca_camion"))
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Carreta(Base):
@@ -134,6 +138,7 @@ class Carreta(Base):
     idmarca_carreta = Column(Integer, ForeignKey("marca_camion.idmarca_camion"))
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Chofer(Base):
@@ -146,6 +151,7 @@ class Chofer(Base):
     telefono = Column(Integer, unique=True)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Ciudad(Base):
@@ -158,6 +164,7 @@ class Ciudad(Base):
     departamento = relationship("Departamento", back_populates="ciudad")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 # class Comprobante(Base):
@@ -195,6 +202,7 @@ class Contrato(Base):
     contratoventa = relationship("Factura_venta_cabecera", back_populates="contrato")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Cuenta(Base):
@@ -206,6 +214,7 @@ class Cuenta(Base):
     nro = Column(String(45))
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 
 class Producto(Base):
@@ -219,6 +228,7 @@ class Producto(Base):
     deposito_y_producto = relationship("Deposito_y_producto", back_populates="producto")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Remision(Base):
     __tablename__="remision"
@@ -232,6 +242,7 @@ class Remision(Base):
     neto=Column(Double)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Usuario(Base):
     __tablename__="usuario"
@@ -243,62 +254,73 @@ class Usuario(Base):
     rol = relationship("Rol", back_populates="usuario")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Factura_compra_cabecera(Base):
     __tablename__ = "factura_compra_cabecera"
     idfactura_compra = Column(Integer, primary_key=True, index=True)
-    nro = Column(Integer)
+    numero = Column(Integer)
     fecha = Column(DateTime(timezone=True), server_default=func.now())
-    descripcion = Column(String(45))
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor")) #FK del proveedor
     # campo Padre = relationship("NombreDelModeloPadre", back_populates="NombreDeLaVariableEnElOtroModelo")
     proveedor = relationship("Proveedor", back_populates="proveedorcompra") #Relación cruzada en ambos modelos afectados
-    total_iva = Column(Integer)
     total_monto = Column(Integer)
     idcontrato = Column(Integer, ForeignKey("contrato.idcontrato"))      #FK del cliente
     contrato = relationship("Contrato", back_populates="contratocompra") #relación necesaria para que funcione el FK
+    iddeposito = Column(Integer, ForeignKey("deposito.iddeposito"))
+    deposito = relationship("Deposito", back_populates="depositocompra")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Factura_compra_detalle(Base):
     __tablename__ = "factura_compra_detalle"
     iddetalle_compra = Column(Integer, primary_key=True, index=True) #realmente no recuerdo ahora mismo cómo se hace este ya que es FK y PK
-    idfactura_compra = Column(Integer, ForeignKey("factura_compra_cabecera.idfactura_compra"))
+    idcabecera_compra = Column(Integer, ForeignKey("factura_compra_cabecera.idfactura_compra"))
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productocompra")
+    descripcion_producto = Column(String)
     cantidad = Column(Integer)
-    subtotaliva = Column(Integer)
+    precio = Column(Integer)
+    porcentaje_iva = Column(Integer)
+    subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
     alta_usuario = Column(Integer)
-    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())  
+    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
     idfactura_venta = Column(Integer, primary_key=True, index=True)
-    nro = Column(Integer)
+    numero = Column(Integer)
     fecha = Column(DateTime(timezone=True), server_default=func.now())
-    descripcion = Column(String(45))
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
     # campo Padre = relationship("NombreDelModeloPadre", back_populates="NombreDeLaVariableEnElOtroModelo")
     cliente = relationship("Cliente", back_populates="clienteventa")
-    total_iva = Column(Integer)
     total_monto = Column(Integer)
     idcontrato = Column(Integer, ForeignKey("contrato.idcontrato"))
     contrato = relationship("Contrato", back_populates="contratoventa")
+    iddeposito = Column(Integer, ForeignKey("deposito.iddeposito"))
+    deposito = relationship("Deposito", back_populates="depositoventa")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
 
 class Factura_venta_detalle(Base):
     __tablename__ = "factura_venta_detalle"
     iddetalle_venta = Column(Integer, primary_key=True, index=True)
-    idfactura_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"))
+    idcabecera_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"))
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productoventa")
+    descripcion_producto = Column(String)
     cantidad = Column(Integer)
-    subtotaliva = Column(Integer)
+    precio = Column(Integer)
+    porcentaje_iva = Column(Integer)
+    subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
     
 class Deposito_y_producto(Base):
     __tablename__ = "deposito_y_producto"
@@ -309,4 +331,5 @@ class Deposito_y_producto(Base):
     cantidad = Column(Integer)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
     

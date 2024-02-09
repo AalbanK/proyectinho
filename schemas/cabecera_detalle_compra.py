@@ -9,16 +9,16 @@ class Compra_detalle(BaseModel):
     cantidad: int
     precio: int
     porcentaje_iva: int
-    subtotaliva: int
+    subtotal_iva: int
     subtotal: int
 
 class Compra_cabecera(BaseModel):
     idfactura_compra: Optional[int] = None
     numero: str
-    timbrado: str
+    # timbrado: str
     fecha: str
     idproveedor: int
     iddeposito: int
-    #total_monto: int
+    total_monto: int
     idcontrato: Optional[int] = None
-    #detalles: List[Compra_Detalle]
+    detalles: List[Compra_detalle]

@@ -8,7 +8,73 @@
                 <label class="control-label">*Fecha</label>
                 <input type="date" class="form-control" name="fecha" min="2023-01-01" autocomplete="off" required>
             </div>
-            <div class=""></div>
+            <div class="form-group col-12 col-md-3">
+                <label class="control-label">*N° Factura</label>
+                <input type="text" name="numero" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{7}" autocomplete="off" required>
+            </div>
+            <div class="form-group col-12 col-md-3">
+                <label class="control-label">Timbrado: </label>
+                <input type="text" name="timbrado" class="form-control" placeholder="99999999" autocomplete="off" minlength="8" maxlength="8" required>
+            </div>
+            <div class="form-group col-12 col-md-3">
+                <label for="total">Total</label>
+                <input type="number" readonly class="form-control" id="total" name="total_monto" autocomplete="off">
+            </div>
+            <!---->
+        </div>
+        <div class="form-row mb5">
+            <div class="form-group col-12 col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idContrato">Contrato N°</label>
+                    </div>
+                    <select class="custom-select" id="idContrato" name="idcontrato">
+                        <option value="" selected>Seleccione un contrato...</option>
+                        {% for Contrato in Contratos %}
+                        <option value="{{Contrato.idcontrato}}">{{Contrato.idcontrato}} - {{Contato.fecha}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-12 col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idCliente">Cliente: </label>
+                    </div>
+                    <select class="custom-select" id="idCliente" name="idcliente" required>
+                        <option value="" selected>Seleccione un cliente...</option>
+                        {% for Cliente in Clientes %}
+                        <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}} - {{Cliente.ruc}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <!---->
+            <div class="form-group col-12 col-md-4">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idDeposito">Depósito: </label>
+                    </div>
+                    <select class="custom-select" id="idDeposito" name="iddeposito" required>
+                        <option value="" selected> Seleccione un depósito...</option>
+                        {% for Deposito in Depositos %}
+                        <option value="{{Deposito.iddeposito}}">{{Deposito.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <!---->
+        </div>
+        <div id="detalles">
+        </div>
+        <div class="form-row">
+            <button type="button" id="btnAgregarDetalle" class="btn btn-primary">Agregar Detalle</button>
+            <button type="submit" class="btn btn-success px-4 mr-o">Enviar</button>
         </div>
     </form>
 </div>
+{% endblock content %}
+
+{% block script %}
+<script src="{{url_for('static', path='/js/crear-compra.js')}}"></script>
+{% enblock script %}
