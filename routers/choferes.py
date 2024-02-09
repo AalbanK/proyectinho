@@ -29,18 +29,19 @@ router = APIRouter(
 async def read_chofer(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     #records = db.query(Chofer).all()
     ciud = db.query(Chofer.idchofer, Chofer.ci, Chofer.nombre, Chofer.apellido, Ciudad.descripcion.label('descripcion_ciudad'), Chofer.telefono).join(Ciudad, Chofer.idciudad == Ciudad.idciudad).all()
-    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": ciud, "datatables": True})
+    return templates.TemplateResponse("choferes/listar.html", {"request": request, "choferes": ciud, "datatables": True, "usuario_actual": usuario_actual})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_chofer(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     city=db.query(Ciudad).all()
     depas=db.query(Departamento).all()
-    return templates.TemplateResponse("choferes/crear.html", {"request": request, "Depas_lista":depas, "Citys_lista":city})
+    return templates.TemplateResponse("choferes/crear.html", {"request": request, "Depas_lista":depas, "Citys_lista":city, "usuario_actual": usuario_actual})
 
 @router.post("/nuevo")
 async def create_chofer(db: Session = Depends(get_database_session), chofe_ci = Form(...), chofe_nom=Form(...), chofe_ape=Form(...), idCiudad=Form(...), chofe_tel=Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    chofer = Chofer(ci=chofe_ci, nombre=chofe_nom, apellido=chofe_ape, idciudad=idCiudad, telefono=chofe_tel)
+    chofer = Chofer(ci=chofe_ci, nombre=chofe_nom, apellido=chofe_ape, idciudad=idCiudad, telefono=chofe_tel, alta_usuario = usu.idusuario)
     db.add(chofer)
     db.commit()
     db.refresh(chofer)
@@ -52,7 +53,7 @@ def ver(id:int, response:Response,
             request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     chofe = db.query(Chofer).get(id)
     depto = db.query(Departamento).get(int(chofe.idDepto))
-    return templates.TemplateResponse("clientes/listar.html", {"request": request, "Chofer": chofe, "Departamento": depto})
+    return templates.TemplateResponse("clientes/listar.html", {"request": request, "Chofer": chofe, "Departamento": depto, "usuario_actual": usuario_actual})
 
 @router.get("/{id}/iddepto",response_class=JSONResponse)
 def obtener_iddepto_chofer(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -67,10 +68,11 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
     chofe= db.query(Chofer).get(id)
     depto = db.query(Departamento).all()
     refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(chofe.idciudad))
-    return templates.TemplateResponse("choferes/editar.html", {"request": request, "Chofer": chofe, "Departamentos_lista": depto, "ref_depto":refdepto})
+    return templates.TemplateResponse("choferes/editar.html", {"request": request, "Chofer": chofe, "Departamentos_lista": depto, "ref_depto":refdepto, "usuario_actual": usuario_actual})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idchofer = Form(...), ci = Form(...), nombre = Form(...), apellido = Form(...), idciudad = Form(...), telefono = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     chof= db.query(Chofer).get(idchofer)
     chof.idchofer=idchofer
     chof.ci=ci
@@ -78,6 +80,7 @@ def editar(db: Session = Depends(get_database_session), idchofer = Form(...), ci
     chof.apellido=apellido
     chof.idciudad=idciudad
     chof.telefono=telefono
+    chof.modif_usuario = usu.idusuario
     db.add(chof)
     db.commit()
     db.refresh(chof)

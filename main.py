@@ -6,12 +6,14 @@ from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED
 from fastapi.templating import Jinja2Templates
+from schemas import usuario as us
+from routers import auth
 
 from models import *
 
 from db.database import SessionLocal, engine
 import models
-from routers import (auth,bancos,camiones,carretas,choferes,ciudades,clientes,contratos,compras,departamentos,depositos,ivas,marcas_camiones,marcas_carretas,productos,proveedores,roles,usuarios,cuentas#,remisiones,
+from routers import (auth,bancos,camiones,carretas,choferes,ciudades,clientes,contratos,compras,departamentos,depositos,ivas,marcas_camiones,marcas_carretas,productos,proveedores,roles,usuarios,ventas,cuentas#,remisiones,
 )
 
 app = FastAPI()
@@ -29,8 +31,8 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/",response_class=HTMLResponse)
-async def home(request:Request):
-    return templates.TemplateResponse("index.html", {"request":request})
+async def home(request:Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    return templates.TemplateResponse("index.html", {"request":request, "usuario_actual": usuario_actual})
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -60,4 +62,5 @@ app.include_router(carretas.router)
 app.include_router(roles.router)
 app.include_router(contratos.router)
 app.include_router(usuarios.router)
+app.include_router(ventas.router)
 app.include_router(cuentas.router)

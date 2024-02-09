@@ -6,7 +6,7 @@ from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
-from models import Deposito, Proveedor, IVA, Contrato, Factura_compra_cabecera, Factura_compra_detalle, Factura_venta_cabecera, Factura_venta_detalle
+from models import Deposito, Proveedor, IVA, Contrato, Factura_compra_cabecera, Factura_compra_detalle
 from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func

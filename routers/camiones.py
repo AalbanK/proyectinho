@@ -27,17 +27,17 @@ router = APIRouter(
 @router.get("/")
 async def read_camion(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     cami = db.query(Camion.idcamion, Camion.camion_chapa, Marca_camion.descripcion.label('descripcion_marca')).join(Marca_camion, Camion.idcamion == Marca_camion.idmarca_camion).all()
-    return templates.TemplateResponse("camiones/listar.html", {"request": request, "choferes": cami, "datatables": True})
+    return templates.TemplateResponse("camiones/listar.html", {"request": request, "choferes": cami, "usuario_actual": usuario_actual, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_camion(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     marcas=db.query(Marca_camion).all()
-    return templates.TemplateResponse("camiones/crear.html", {"request": request, "Marcas_lista":marcas})
+    return templates.TemplateResponse("camiones/crear.html", {"request": request, "usuario_actual": usuario_actual, "Marcas_lista":marcas})
 
 @router.post("/nuevo")
 async def create_camion(db: Session = Depends(get_database_session), chapaCamion = Form(...), idmarca_camion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    camion = Camion(camion_chapa = chapaCamion, idmarca_camion = idmarca_camion)
+    camion = Camion(camion_chapa = chapaCamion, idmarca_camion = idmarca_camion, alta_usuario = usu.idusuario)
     db.add(camion)
     db.commit()
     db.refresh(camion)
@@ -55,13 +55,15 @@ async def listar_camiones(request: Request, db: Session = Depends(get_database_s
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
     cami= db.query(Camion).get(id) #obtiene el registro del modelo Usuario por su id
     marcas= db.query(Marca_camion).all()
-    return templates.TemplateResponse("camiones/editar.html", {"request": request, "Camion": cami, "Marcas_lista":marcas})  #devuelve el .html de editar
+    return templates.TemplateResponse("camiones/editar.html", {"request": request, "Camion": cami, "Marcas_lista":marcas, "usuario_actual": usuario_actual})  #devuelve el .html de editar
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idcamion = Form(...), camion_chapa = Form(...), idmarca_camion= Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
+    usu = us.Usuario.from_orm(usuario_actual)
     cami= db.query(Camion).get(idcamion) #obtiene el registro del modelo Camion por su id
     cami.camion_chapa = camion_chapa # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
     cami.idmarca_camion = idmarca_camion
+    cami.modif_usuario = usu.idusuario
     db.add(cami) #agrega el objeto usu a la base de datos
     db.commit() #confirma los cambios
     db.refresh(cami) #actualiza el objeto usu

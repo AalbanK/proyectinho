@@ -1,10 +1,12 @@
 from fastapi import APIRouter
+from schemas import usuario as us
+from routers import auth
 from sqlalchemy.orm import Session
-from fastapi import Depends, Request, From, Response, FastAPI
+from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
-from models import Deposito, Cliente, IVA, Contrato, Factura_compra_cabecera, Factura_compra_detalle, Factura_venta_cabecera, Factura_venta_detalle
+from models import Deposito, Cliente, IVA, Contrato, Factura_venta_cabecera, Factura_venta_detalle
 from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func
@@ -20,30 +22,32 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
-    prefix="/compras",
-    tags=["compras"]
+    prefix="/ventas",
+    tags=["ventas"]
 )
 
 @router.get("/", name="listado_ventas")
-async def read_venta(request: Request, db: Session = Depends(get_database_session)):
-    return templates.TemplateResponse("compras/listar.html", {"request": request, "datatables":True})
+async def read_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    return templates.TemplateResponse("ventas/listar.html", {"request": request, "datatables":True})
 
 # @router.get("/todos")
 # async def listar_ventas(request: Request, db: Session = Depends(get_database_session)):
 #     ventas = db.query(Venta).all()
 #     return JSONResponse(jsonable_encoder(ventas))
 
-@router.get("/nuevo", reponse_class=HTMLResponse)
-async def create_venta(request: Request, db: Session = Depends(get_database_session)):
+@router.get("/nuevo", response_class=HTMLResponse)
+async def create_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     clientes = db.query(Cliente).all()
     contratos = db.query(Contrato).all()
     depositos = db.query(Deposito).all()
-    return templates.TemplateResponse("compras/crear.html", {"request": request, "Clientes": clientes, "Contratos": contratos, "Depositos": depositos})
+    return templates.TemplateResponse("ventas/crear.html", {"request": request, "Clientes": clientes, "Contratos": contratos, "Depositos": depositos})
 
 @router.post("/nuevo")
-async def crear_compra(request: Request, cabecera: Venta_cabecera, db: Session = Depends(get_database_session)):
+async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     try:
         cabecera_venta = Factura_venta_cabecera(**cabecera.dict(exclude={'detalles'})) # excluye "detalles" porque serán agregados más abajo
+        cabecera_venta.alta_usuario = usu.idusuario
         detalles = [detalle.dic() for detalle in cabecera.detalles]
         #print(detalles)
         for detalle in detalles:

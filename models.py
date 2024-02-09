@@ -12,10 +12,10 @@ class Auditoria(Base):
     idauditoria = Column(Integer, primary_key=True, index=True)
     accion = Column(String(45))
     accionfecha = Column(DateTime(timezone=True), server_default=func.now())
-    valorviejo = Column(String(4000))
-    valornuevo = Column(String(4000))
+    valorviejo = Column(String(4000), default=None)
+    valornuevo = Column(String(4000), default=None)
     columnas    = Column(String(4000))
-    modif_usuario = Column(Integer)
+    modif_usuario = Column(Integer, default=None)
 
 
 class Banco(Base):

@@ -31,7 +31,7 @@
                     <select class="custom-select" id="idContrato" name="idcontrato">
                         <option value="" selected>Seleccione un contrato...</option>
                         {% for Contrato in Contratos %}
-                        <option value="{{Contrato.idcontrato}}">{{Contrato.idcontrato}} - {{Contato.fecha}}</option>
+                        <option value="{{Contrato.idcontrato}}">{{Contrato.idcontrato}} - {{Contrato.fecha}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -68,7 +68,6 @@
         <div id="detalles">
         </div>
         <div class="form-row">
-            <button type="button" id="btnAgregarDetalle" class="btn btn-primary">Agregar Detalle</button>
             <button type="submit" class="btn btn-success px-4 mr-o">Enviar</button>
         </div>
     </form>
@@ -77,4 +76,4 @@
 
 {% block script %}
 <script src="{{url_for('static', path='/js/crear-compra.js')}}"></script>
-{% enblock script %}
+{% endblock script %}

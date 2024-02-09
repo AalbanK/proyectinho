@@ -26,11 +26,11 @@ router = APIRouter(
 
 @router.get("/")
 async def read_bancos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #funcion para leer todos los bancos
-    return templates.TemplateResponse("bancos/listar.html", {"request": request, "datatables": True},) #.TemplateResponse muestra la interfaz (html)
+    return templates.TemplateResponse("bancos/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables": True},) #.TemplateResponse muestra la interfaz (html)
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_banco(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("bancos/crear.html", {"request": request}) #.TemplateResponse muestra la interfaz (html)
+    return templates.TemplateResponse("bancos/crear.html", {"request": request, "usuario_actual": usuario_actual}) #.TemplateResponse muestra la interfaz (html)
 
 @router.post("/nuevo")
 async def create_banco(db: Session = Depends(get_database_session), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -55,12 +55,14 @@ async def listar_bancos(request: Request, db: Session = Depends(get_database_ses
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
     banc= db.query(Banco).get(id) #obtiene el registro del modelo Banco por su id
-    return templates.TemplateResponse("bancos/editar.html", {"request": request, "Banco": banc})  #devuelve el .html de editar
+    return templates.TemplateResponse("bancos/editar.html", {"request": request, "Banco": banc , "usuario_actual": usuario_actual})  #devuelve el .html de editar
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idbanco = Form(...), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
+    usu = us.Usuario.from_orm(usuario_actual)
     banc= db.query(Banco).get(idbanco) #obtiene el registro del modelo Banco por su id
     banc.descripcion = descripcion # cambia el valor actual de descripcion del objeto banc por lo que recibe en el parametro 'descripcion'
+    banc.modif_usuario = usu.idusuario
     db.add(banc) #agrega el objeto banc a la base de datos
     db.commit() #confirma los cambios
     db.refresh(banc) #actualiza el objeto banc

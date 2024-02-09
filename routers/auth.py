@@ -160,7 +160,7 @@ async def iniciar_sesion(request: Request, db: Session = Depends(get_database_se
     form = await request.form()
     response = RedirectResponse('/', status_code=303)
     log = await login_para_token_de_acceso(response=response, form_data=form, db=db)
-    print(log)
+    print(response.__dict__)
     return response
 
 @router.get("/logout", response_class=HTMLResponse)
