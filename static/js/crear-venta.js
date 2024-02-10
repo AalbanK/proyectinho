@@ -207,10 +207,6 @@ window.addEventListener('DOMContentLoaded', async function () {
     await fetchCargarProductos();
     divDetalles = document.getElementById('detalles');
     divDetalles.appendChild(crearFila(false));
-    botonAgregarFila = document.getElementById('btnAgregarDetalle');
-    botonAgregarFila.addEventListener("click", () => {
-        divDetalles.appendChild(crearFila(true));
-    });
     
     facturaForm = document.getElementById('facturaForm');
     facturaForm.addEventListener('submit', async function(event) {
@@ -261,7 +257,7 @@ window.addEventListener('DOMContentLoaded', async function () {
         divAlerta.id = "respuesta_servidor";
         divAlerta.role = "alert"
 
-        divFacturaCompra = document.getElementById("factura_compra");
+        divFacturaVenta = document.getElementById("factura_venta");
         parrafoMensaje = crearElemento("p");
 
         let opcionesRequest = {
@@ -269,10 +265,10 @@ window.addEventListener('DOMContentLoaded', async function () {
             headers: {'Accept': 'application/json', 'Content-Type': 'application/json' },
             body: facturaJSON
         };
-        await fetch('/compras/nuevo', opcionesRequest)
+        await fetch('/ventas/nuevo', opcionesRequest)
             .then(response => {
                 //console.log(response)
-                if(document.getElementById(divAlerta.id)) divFacturaCompra.removeChild(document.getElementById(divAlerta.id));
+                if(document.getElementById(divAlerta.id)) divFacturaVenta.removeChild(document.getElementById(divAlerta.id));
                 if (response.ok === true){
                     divAlerta.classList.remove("alert-success", "alert-danger");
                     divAlerta.classList.add("alert-success");
@@ -281,7 +277,7 @@ window.addEventListener('DOMContentLoaded', async function () {
                     }
                     parrafoMensaje.textContent = 'La factura se ha insertado correctamente.';
                     divAlerta.appendChild(parrafoMensaje);
-                    divFacturaCompra.prepend(divAlerta); // prepend para ponerlo como primer hijo del div
+                    divFacturaVenta.prepend(divAlerta); // prepend para ponerlo como primer hijo del div
                 }
                 else {
                     divAlerta.classList.remove("alert-success", "alert-danger")
@@ -320,7 +316,7 @@ window.addEventListener('DOMContentLoaded', async function () {
                         })
                     }
                     divAlerta.appendChild(parrafoMensaje);
-                    divFacturaCompra.prepend(divAlerta); // prepend para ponerlo como primer hijo del div
+                    divFacturaVenta.prepend(divAlerta); // prepend para ponerlo como primer hijo del div
                 }
             })
             .then(data => console.log(data))

@@ -271,19 +271,21 @@ class Factura_compra_cabecera(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
+    detalles =  relationship("Factura_compra_detalle", back_populates="detalle")
 
 class Factura_compra_detalle(Base):
     __tablename__ = "factura_compra_detalle"
-    iddetalle_compra = Column(Integer, primary_key=True, index=True) #realmente no recuerdo ahora mismo cómo se hace este ya que es FK y PK
-    idcabecera_compra = Column(Integer, ForeignKey("factura_compra_cabecera.idfactura_compra"))
+    idcabecera_compra = Column(Integer, ForeignKey("factura_compra_cabecera.idfactura_compra"),primary_key=True)
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productocompra")
     descripcion_producto = Column(String)
     cantidad = Column(Integer)
     precio = Column(Integer)
     porcentaje_iva = Column(Integer)
-    subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
+    subtotal_iva = Column(Integer)
+    detalle=relationship("Factura_compra_cabecera", back_populates="detalles")
+
 
 class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
@@ -301,11 +303,11 @@ class Factura_venta_cabecera(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
+    detalles =  relationship("Factura_venta_detalle", back_populates="detalle")
 
 class Factura_venta_detalle(Base):
     __tablename__ = "factura_venta_detalle"
-    iddetalle_venta = Column(Integer, primary_key=True, index=True)
-    idcabecera_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"))
+    idcabecera_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"),primary_key=True)
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productoventa")
     descripcion_producto = Column(String)
@@ -314,6 +316,7 @@ class Factura_venta_detalle(Base):
     porcentaje_iva = Column(Integer)
     subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
+    detalle=relationship("Factura_venta_cabecera", back_populates="detalles")
     
 class Deposito_y_producto(Base):
     __tablename__ = "deposito_y_producto"

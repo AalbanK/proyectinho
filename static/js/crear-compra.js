@@ -255,7 +255,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     
         // Convertir el objeto a JSON
         let facturaJSON = JSON.stringify(factura);
-        // console.log(facturaJSON);
+        console.log(facturaJSON);
         
         divAlerta = crearElemento("div", "", ["alert"]);
         divAlerta.id = "respuesta_servidor";

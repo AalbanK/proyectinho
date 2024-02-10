@@ -31,7 +31,7 @@
                     <select class="custom-select" id="idContrato" name="idcontrato">
                         <option value="" selected>Seleccione un contrato...</option>
                         {% for Contrato in Contratos %}
-                        <option value="{{Contrato.idcontrato}}">{{Contrato.idcontrato}} - {{Contrato.fecha}}</option>
+                        <option value="{{Contrato.idcontrato}}">{{Contrato.idcontrato}} - {{Contrato.fecha_inicio}}</option>
                         {% endfor %}
                     </select>
                 </div>

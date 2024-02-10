@@ -48,7 +48,7 @@ async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = 
     try:
         cabecera_venta = Factura_venta_cabecera(**cabecera.dict(exclude={'detalles'})) # excluye "detalles" porque serán agregados más abajo
         cabecera_venta.alta_usuario = usu.idusuario
-        detalles = [detalle.dic() for detalle in cabecera.detalles]
+        detalles = [detalle.dict() for detalle in cabecera.detalles]
         #print(detalles)
         for detalle in detalles:
             det = Factura_venta_detalle(**detalle)
@@ -59,5 +59,5 @@ async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = 
         response = JSONResponse(content={"error": str(e)}, status_code=500)
         return response
     else: # sin no hubo errores
-        response = JSONResponse(content={"error": str(e)}, status_code=200)
+        response = JSONResponse(content={"error": 'Ninguno.'}, status_code=200)
         return response

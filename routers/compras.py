@@ -50,10 +50,10 @@ async def crear_compra(request: Request, cabecera: Compra_cabecera, db: Session 
         cabecera_compra = Factura_compra_cabecera(**cabecera.dict(exclude = {'detalles'})) # excluye "detalles" porque serán agregados más abajo
         cabecera_compra.alta_usuario = usu.idusuario
         detalles = [detalle.dict() for detalle in cabecera.detalles]
-        #print(detalles)
         for detalle in detalles:
             det = Factura_compra_detalle(**detalle)
             det.detalle = cabecera_compra # con esto se hace el FK a la cabecera
+        print(cabecera_compra.__dict__)
         db.add(cabecera_compra)
         db.commit()
     except Exception as e:
