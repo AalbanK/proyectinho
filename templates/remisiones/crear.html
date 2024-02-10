@@ -1,22 +1,186 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/proveedores/nuevo/" method="POST">
-            <div class="form-group">
-                <label for="prove_descri">Chofer</label>
-                <input type="text" class="form-control" id="prove_descri" name="prove_descri">
-                <label for="prove_ruc">CHAPA 1</label>
-                <input type="text" class="form-control" id="prove_ruc" name="prove_ruc">
-                <label for="ciudad">CHAPA 2</label>
-                <input type="text" class="form-control" id="ciudad" name="prove_ciu">
-                <label for="prove_dir"></label>
-                <input type="text" class="form-control" id="prove_dir" name="prove_dir">
-                <label for="prove_mail">BRUTO</label>
-                <input type="text" class="form-control" id="prove_mail" name="prove_mail">
-                <label for="prove_tel">TARA</label>
-                <input type="text" class="form-control" id="prove_tel" name="prove_tel">
+<div class="container-fluid">
+    <form action="/remisiones/nuevo" method="POST">
+        <div class="row d-flex align-items-end">
+            <div class="col">
+                <div class="form-group">
+                    <label class="control-label">*N° Remisión </label>
+                    <input type="text" name="numero" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{7}"
+                        placeholder="999-999-999999" autocomplete="off" required>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </form>
-    </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="fecha">*Fecha de Emisión: </label>
+                    <input type="date" class="form-control" id="fecha" name="fecha">
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label for="fecha">*Fecha de Descarga: </label>
+                    <input type="date" class="form-control" id="fecha" name="fecha">
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex align-items-end">
+            <div class="col-12">
+                <div class="form-group">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="idContrato">Contrato:</label>
+                        </div>
+                        <select class="custom-select" id="idContrato" name="idContrato">
+                            <option value="" selected>Elegir...</option>
+                            {% for Contrato in Contratos_lista %}
+                            <option value="{{Contrato.idContrato}}">{{Contrato.nro}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ORIGEN-->
+        <div class="row">
+            <div class="col-12">
+                <p>Origen:</p>
+            </div>
+        </div>
+        <div class="row d-flex align-items-end">
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idProveedor">Proveedor:</label>
+                    </div>
+                    <input type="text" name="proveedor" class="form-control" value="" disabled>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idDepartamento">Departamento:</label>
+                    </div>
+                    <input type="text" name="ciudad_O" class="form-control" value="" disabled>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idCiudad">Ciudad:</label>
+                    </div>
+                    <input type="text" name="ciudad_O" class="form-control" value="" disabled>
+                </div>
+            </div>
+        </div>
+        <!-- DESTINO-->
+        <div class="row">
+            <div class="col-12">
+                <p>Destino:</p>
+            </div>
+        </div>
+        <div class="row d-flex align-items-end">
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idCliente">Cliente:</label>
+                    </div>
+                    <input type="text" name="cliente" class="form-control" value="" disabled>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idDepartamento">Departamento:</label>
+                    </div>
+                    <input type="text" name="departamento_D" class="form-control" value="" disabled>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idCiudad">Ciudad:</label>
+                    </div>
+                    <input type="text" name="ciudad_D" class="form-control" value="" disabled>
+                </div>
+            </div>
+        </div>
+        <!--TRASLADO-->
+        <div class="row">
+            <div class="col-12">
+                <p>Detalles del Traslado:</p>
+            </div>
+        </div>
+        <div class="row d-flex align-items-end">
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idChofer">Chofer:</label>
+                    </div>
+                    <select class="custom-select" style="margin-right: 10px" id="idChofer" name="idChofer">
+                        <option value="0" selected>Elegir...</option>
+                        {% for Chofer in Choferes_lista %}
+                        <option value="{{Chofer.idchofer}}">{{Chofer.ci}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idCamion">Camión:</label>
+                    </div>
+                    <select class="custom-select" style="margin-right: 10px" id="idCamion" name="idCamion">
+                        <option value="0" selected>Elegir...</option>
+                        {% for Camion in Camiones_lista %}
+                        <option value="{{Camion.idcamion}}">{{Camion.camion_chapa}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idCarreta">Carreta:</label>
+                    </div>
+                    <select class="custom-select" style="margin-right: 10px" id="idCarreta" name="idCarreta">
+                        <option value="0" selected>Elegir...</option>
+                        {% for Carreta in Carretas_lista %}
+                        <option value="{{Carreta.idcamion}}">{{Carreta.carreta_chapa}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <!--PRODUCTO-->
+        <div class="row d-flex align-items-end">
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Bruto: </label>
+                    <input type="number" name="bruto" class="form-control" pattern="[0-9]{4,5}" required>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Tara: </label>
+                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Neto: </label>
+                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Producto: </label>
+                    <input type="text" name="producto" class="form-control" value="" disabled>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
+
+
 {% endblock content %}
