@@ -284,9 +284,6 @@ class Factura_compra_detalle(Base):
     porcentaje_iva = Column(Integer)
     subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
-    alta_usuario = Column(Integer)
-    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
-    modif_usuario = Column(Integer)
 
 class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
@@ -317,9 +314,6 @@ class Factura_venta_detalle(Base):
     porcentaje_iva = Column(Integer)
     subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
-    alta_usuario = Column(Integer)
-    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
-    modif_usuario = Column(Integer)
     
 class Deposito_y_producto(Base):
     __tablename__ = "deposito_y_producto"

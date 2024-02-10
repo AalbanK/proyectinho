@@ -22,16 +22,16 @@ router = APIRouter(
 )
 @router.get("/")
 async def read_rol(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("roles/listar.html", {"request": request, "datatables": True})
+    return templates.TemplateResponse("roles/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_rol(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("roles/crear.html", {"request": request})
+    return templates.TemplateResponse("roles/crear.html", {"request": request, "usuario_actual": usuario_actual})
 
 @router.post("/nuevo")
 async def create_rol(db: Session = Depends(get_database_session), descri_rol = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    descrol = Rol(descripcion=descri_rol)
+    descrol = Rol(descripcion=descri_rol, alta_usuario = usu.idusuario )
     db.add(descrol)
     db.commit()
     db.refresh(descrol)

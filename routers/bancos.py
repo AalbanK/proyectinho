@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse
 from starlette import status
 
-
 from  db.misc import get_database_session
 
 app = FastAPI()

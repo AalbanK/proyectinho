@@ -29,7 +29,7 @@ router = APIRouter(
 async def read_proveedor(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     #records = db.query(Proveedor).all()
     ciud = db.query(Proveedor.idproveedor, Proveedor.descripcion, Proveedor.ruc, Ciudad.descripcion.label('descripcion_ciudad'),Proveedor.direccion, Proveedor.mail, Proveedor.telefono).join(Ciudad, Proveedor.idciudad == Ciudad.idciudad).all()
-    return templates.TemplateResponse("proveedores/listar.html", {"request": request, "proveedores": ciud, "datatables": True})
+    return templates.TemplateResponse("proveedores/listar.html", {"request": request, "usuario_actual": usuario_actual, "proveedores": ciud, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_proveedor(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -38,7 +38,7 @@ async def create_proveedor(request: Request, db: Session = Depends(get_database_
 @router.post("/nuevo")
 async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    proveedor = Proveedor(descripcion=descripcion, idciudad = idCiudad, ruc=ruc, mail=mail, direccion=direccion, telefono=telefono)
+    proveedor = Proveedor(descripcion=descripcion, idciudad = idCiudad, ruc=ruc, mail=mail, direccion=direccion, telefono=telefono, alta_usuario = usu.idusuario)
     db.add(proveedor)
     db.commit()
     db.refresh(proveedor)
@@ -50,7 +50,7 @@ def ver(id:int, response:Response,
             request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     prove = db.query(Proveedor).get(id)
     depto = db.query(Departamento).get(int(prove.idDepto))
-    return templates.TemplateResponse("proveedores/listar.html", {"request": request, "Proveedor": prove, "Departamento": depto})
+    return templates.TemplateResponse("proveedores/listar.html", {"request": request, "usuario_actual": usuario_actual, "Proveedor": prove, "Departamento": depto})
 
 @router.get("/{id}/iddepto",response_class=HTMLResponse)
 def obtener_iddepto_proveedor(id:int, response:Response, request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -65,10 +65,11 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
     prove= db.query(Proveedor).get(id)
     depto = db.query(Departamento).all()
     refdepto = db.query(Ciudad).options(load_only(Ciudad.iddepartamento)).get(int(prove.idciudad))
-    return templates.TemplateResponse("proveedores/editar.html", {"request": request, "Proveedor": prove, "Departamentos_lista": depto, "ref_depto":refdepto})
+    return templates.TemplateResponse("proveedores/editar.html", {"request": request, "usuario_actual": usuario_actual, "Proveedor": prove, "Departamentos_lista": depto, "ref_depto":refdepto})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idproveedor = Form(...), descripcion = Form(...), ruc = Form(...), idciudad = Form(...), direccion = Form(...), mail = Form(), telefono = Form(), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+        usu = us.Usuario.from_orm(usuario_actual)
         prove= db.query(Proveedor).get(idproveedor)
         prove.descripcion=descripcion
         prove.ruc=ruc
@@ -76,6 +77,7 @@ def editar(db: Session = Depends(get_database_session), idproveedor = Form(...),
         prove.direccion=direccion
         prove.mail=mail
         prove.telefono=telefono
+        prove.modif_usuario = usu.idusuario
         db.add(prove)
         db.commit()
         db.refresh(prove)

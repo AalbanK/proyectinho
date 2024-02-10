@@ -28,7 +28,7 @@ router = APIRouter(
 
 @router.get("/", name="listado_compras")
 async def read_compra(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("compras/listar.html", {"request": request, "datatables":True})
+    return templates.TemplateResponse("compras/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True})
 
 # @router.get("/todos")
 # async def listar_compras(request: Request, db: Session = Depends(get_database_session)):
@@ -40,10 +40,11 @@ async def create_compra(request: Request, db: Session = Depends(get_database_ses
     proveedores = db.query(Proveedor).all()
     contratos = db.query(Contrato).all()
     depositos = db.query(Deposito).all()
-    return templates.TemplateResponse("compras/crear.html", {"request": request, "Proveedores": proveedores, "Contratos": contratos, "Depositos": depositos})
+    return templates.TemplateResponse("compras/crear.html", {"request": request, "Proveedores": proveedores, "Contratos": contratos, "Depositos": depositos, "usuario_actual": usuario_actual})
 
 @router.post("/nuevo")
 async def crear_compra(request: Request, cabecera: Compra_cabecera, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    print(cabecera)
     usu = us.Usuario.from_orm(usuario_actual)
     try:
         cabecera_compra = Factura_compra_cabecera(**cabecera.dict(exclude = {'detalles'})) # excluye "detalles" porque serán agregados más abajo

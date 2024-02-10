@@ -35,37 +35,39 @@ async def create_usuario(request: Request, db: Session = Depends(get_database_se
 @router.post("/nuevo")
 async def create_usuario(db: Session = Depends(get_database_session), nam = Form(...), user = Form(...), pasw = Form(...), idrol = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    usuario = Usuario(name=nam, username=user, password=pasw, idrol=idrol)
-    db.add(usuario)
+    usua = Usuario(name=nam, username=user, password=pasw, idrol=idrol, alta_usuario = usu.idusuario)
+    db.add(usua)
     db.commit()
-    db.refresh(usuario)
+    db.refresh(usua)
     response = RedirectResponse('/', status_code=303)
     return response
 
 @router.get("/todos") #aca la funcion convierte la lista de usuarios en un json que luego se usa en datatable
 async def listar_usuarios(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
     usuarios = db.query(Usuario).all() #guarda en el objeto 'usuarios' todos los usuarios usando sql alchemy
-    usu = db.query(Usuario.idusuario, Usuario.name, Usuario.username, Rol.descripcion.label('descripcion_rol')).join(Rol, Usuario.idrol == Rol.idrol).all()
-    respuesta = [dict(r._mapping) for r in usu]
+    usua = db.query(Usuario.idusuario, Usuario.name, Usuario.username, Rol.descripcion.label('descripcion_rol')).join(Rol, Usuario.idrol == Rol.idrol).all()
+    respuesta = [dict(r._mapping) for r in usua]
     return JSONResponse(jsonable_encoder(respuesta)) #devuele el objeto 'usuarios' en formato json
 
 #            al usar {x} se pasa como parametro lo que esta dentro de las llaves (en este caso x)
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
-    usu= db.query(Usuario).get(id) #obtiene el registro del modelo Usuario por su id
+    usua= db.query(Usuario).get(id) #obtiene el registro del modelo Usuario por su id
     roles= db.query(Rol).all()
-    return templates.TemplateResponse("usuarios/editar.html", {"request": request, "Usuario": usu, "Roles":roles})  #devuelve el .html de editar
+    return templates.TemplateResponse("usuarios/editar.html", {"request": request, "Usuario": usua, "Roles":roles})  #devuelve el .html de editar
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idusuario = Form(...), name = Form(...), username = Form(...), password = Form(...), idrol = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
-    usu= db.query(Usuario).get(idusuario) #obtiene el registro del modelo Usuario por su id
-    usu.name = name # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
-    usu.username = username
-    usu.password = password
-    usu.idrol = idrol
-    db.add(usu) #agrega el objeto usu a la base de datos
+    usu = us.Usuario.from_orm(usuario_actual)
+    usua= db.query(Usuario).get(idusuario) #obtiene el registro del modelo Usuario por su id
+    usua.name = name # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
+    usua.username = username
+    usua.password = password
+    usua.idrol = idrol
+    usua.modif_usuario = usu.idusuario
+    db.add(usua) #agrega el objeto usu a la base de datos
     db.commit() #confirma los cambios
-    db.refresh(usu) #actualiza el objeto usu
+    db.refresh(usua) #actualiza el objeto usu
     response = RedirectResponse('/usuarios/', status_code=303)
     return response
 

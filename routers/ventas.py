@@ -28,7 +28,7 @@ router = APIRouter(
 
 @router.get("/", name="listado_ventas")
 async def read_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("ventas/listar.html", {"request": request, "datatables":True})
+    return templates.TemplateResponse("ventas/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True})
 
 # @router.get("/todos")
 # async def listar_ventas(request: Request, db: Session = Depends(get_database_session)):
@@ -40,7 +40,7 @@ async def create_venta(request: Request, db: Session = Depends(get_database_sess
     clientes = db.query(Cliente).all()
     contratos = db.query(Contrato).all()
     depositos = db.query(Deposito).all()
-    return templates.TemplateResponse("ventas/crear.html", {"request": request, "Clientes": clientes, "Contratos": contratos, "Depositos": depositos})
+    return templates.TemplateResponse("ventas/crear.html", {"request": request, "usuario_actual": usuario_actual, "Clientes": clientes, "Contratos": contratos, "Depositos": depositos})
 
 @router.post("/nuevo")
 async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):

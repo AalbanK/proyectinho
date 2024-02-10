@@ -26,17 +26,17 @@ router = APIRouter(
 
 @router.get("/")
 async def read_producto(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("productos/listar.html", {"request": request, "datatables": True})
+    return templates.TemplateResponse("productos/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_producto(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     ivas=db.query(IVA).all()
-    return templates.TemplateResponse("productos/crear.html", {"request": request, "Ivas_lista":ivas})
+    return templates.TemplateResponse("productos/crear.html", {"request": request, "usuario_actual": usuario_actual, "Ivas_lista":ivas})
 
 @router.post("/nuevo")
 async def create_producto(db: Session = Depends(get_database_session), descProducto = Form(...), idIVA=Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    producto = Producto(descripcion=descProducto, idIVA=idIVA)
+    producto = Producto(descripcion=descProducto, idIVA=idIVA, alta_usuario = usu.idusuario)
     db.add(producto)
     db.commit()
     db.refresh(producto)
@@ -53,18 +53,20 @@ async def listar_productos(request: Request, db: Session = Depends(get_database_
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     produ= db.query(Producto).get(id)
     iv = db.query(IVA).all()
-    return templates.TemplateResponse("productos/editar.html", {"request": request, "Producto": produ, "Ivas_lista": iv})
+    return templates.TemplateResponse("productos/editar.html", {"request": request, "usuario_actual": usuario_actual, "Producto": produ, "Ivas_lista": iv})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idproducto = Form(...), descripcion = Form(...), iva = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-     produ= db.query(Producto).get(idproducto)
-     produ.descripcion=descripcion
-     produ.idIVA=iva
-     db.add(produ)
-     db.commit()
-     db.refresh(produ)
-     response = RedirectResponse('/productos/', status_code=303)
-     return response
+    usu = us.Usuario.from_orm(usuario_actual)
+    produ= db.query(Producto).get(idproducto)
+    produ.descripcion=descripcion
+    produ.idIVA=iva
+    produ.modif_usuario = usu.idusuario
+    db.add(produ)
+    db.commit()
+    db.refresh(produ)
+    response = RedirectResponse('/productos/', status_code=303)
+    return response
 
 @router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion

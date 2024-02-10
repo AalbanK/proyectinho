@@ -26,15 +26,14 @@ router = APIRouter(
 
 @router.get("/")
 async def read_cuenta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    
-    return templates.TemplateResponse("cuentas/listar.html", {"request": request, "datatables": True})
+    return templates.TemplateResponse("cuentas/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_cuenta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     bancos = db.query(Banco).all()
     clientes = db.query(Cliente).all()
     proveedores = db.query(Proveedor).all()
-    return templates.TemplateResponse("cuentas/crear.html", {"request": request, "Proveedores_lista": proveedores, "Clientes_lista": clientes, "Bancos_lista": bancos})
+    return templates.TemplateResponse("cuentas/crear.html", {"request": request, "usuario_actual": usuario_actual, "Proveedores_lista": proveedores, "Clientes_lista": clientes, "Bancos_lista": bancos})
 
 @router.post("/nuevo")
 async def create_cuenta(db: Session = Depends(get_database_session), nroCuenta = Form(...), idCliente=Form(), idProveedor = Form(), idBanco = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -42,6 +41,7 @@ async def create_cuenta(db: Session = Depends(get_database_session), nroCuenta =
     campos_a_agregar = {
         "nro": nroCuenta, 
         "idbanco": idBanco
+
     }
     
     # Ya que debe ser o cliente o proveedor
@@ -52,7 +52,7 @@ async def create_cuenta(db: Session = Depends(get_database_session), nroCuenta =
         campos_a_agregar["idproveedor"] = idProveedor
 
     usu = us.Usuario.from_orm(usuario_actual)
-    cue = Cuenta(**campos_a_agregar)
+    cue = Cuenta(**campos_a_agregar, alta_usuario = usu.idusuario)
     db.add(cue)
     db.commit()
     db.refresh(cue)
@@ -102,9 +102,11 @@ async def editar_view(id:int,response:Response,request:Request,db: Session = Dep
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idcuenta = Form(...), idBanco = Form(...), nro = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     cue= db.query(Cuenta).get(idcuenta)
     cue.idbanco=idBanco
     cue.nro=nro
+    cue.modif_usuario = usu.idusuario
     db.add(cue)
     db.commit()
     db.refresh(cue)

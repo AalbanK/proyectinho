@@ -27,16 +27,16 @@ router = APIRouter(
 
 @router.get("/")
 async def read_depositos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #funcion para leer todos los depositos
-    return templates.TemplateResponse("depositos/listar.html", {"request": request, "datatables": True}) #.TemplateResponse muestra la interfaz (html)
+    return templates.TemplateResponse("depositos/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables": True}) #.TemplateResponse muestra la interfaz (html)
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_deposito(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("depositos/crear.html", {"request": request}) #.TemplateResponse muestra la interfaz (html)
+    return templates.TemplateResponse("depositos/crear.html", {"request": request, "usuario_actual": usuario_actual}) #.TemplateResponse muestra la interfaz (html)
 
 @router.post("/nuevo") #el action al cual el form llama en el .html crear
 async def create_deposito(db: Session = Depends(get_database_session), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #al agregar una variable = fomrulario (...) lo vuelve obligatorio
     usu = us.Usuario.from_orm(usuario_actual)
-    deposito = Deposito(descripcion=descripcion) #crea el nuevo objeto en python. La variable es el campo que tengo en mi modelo (models.py) y el valor es lo que viene de mi formulario html (atributo name)
+    deposito = Deposito(descripcion=descripcion, alta_usuario = usu.idusuario) #crea el nuevo objeto en python. La variable es el campo que tengo en mi modelo (models.py) y el valor es lo que viene de mi formulario html (atributo name)
     db.add(deposito) #agrega el objeto deposito a la base de datos
     db.commit() #confirma los cambios
     db.refresh(deposito) #actualiza el objeto deposito
@@ -51,18 +51,20 @@ async def listar_depositos(request: Request, db: Session = Depends(get_database_
 #            al usar {x} se pasa como parametro lo que esta dentro de las llaves (en este caso x)
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
-     dep= db.query(Deposito).get(id) #obtiene el registro del modelo Deposito por su id
-     return templates.TemplateResponse("depositos/editar.html", {"request": request, "Deposito": dep})  #devuelve el .html de editar
+    dep= db.query(Deposito).get(id) #obtiene el registro del modelo Deposito por su id
+    return templates.TemplateResponse("depositos/editar.html", {"request": request, "Deposito": dep, "usuario_actual": usuario_actual})  #devuelve el .html de editar
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), iddeposito = Form(...), descripcion = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #los names dentro del .html deben llamarse igual que los parametros de esta funcion
-     dep= db.query(Deposito).get(iddeposito) #obtiene el registro del modelo Deposito por su id
-     dep.descripcion=descripcion # cambia el valor actual de descripcion del objeto dep por lo que recibe en el parametro 'descripcion'
-     db.add(dep) #agrega el objeto dep a la base de datos
-     db.commit() #confirma los cambios
-     db.refresh(dep) #actualiza el objeto dep
-     response = RedirectResponse('/depositos/', status_code=303)
-     return response
+    usu = us.Usuario.from_orm(usuario_actual)
+    dep= db.query(Deposito).get(iddeposito) #obtiene el registro del modelo Deposito por su id
+    dep.descripcion=descripcion # cambia el valor actual de descripcion del objeto dep por lo que recibe en el parametro 'descripcion'
+    dep.modif_usuario=usu.idusuario
+    db.add(dep) #agrega el objeto dep a la base de datos
+    db.commit() #confirma los cambios
+    db.refresh(dep) #actualiza el objeto dep
+    response = RedirectResponse('/depositos/', status_code=303)
+    return response
 
 @router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
