@@ -25,12 +25,12 @@ router = APIRouter(
 
 @router.get("/")
 async def read_rol(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("usuarios/listar.html", {"request": request, "datatables": True})
+    return templates.TemplateResponse("usuarios/listar.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual})
 
 @router.get("/nuevo", response_class=HTMLResponse)
-async def create_usuario(request: Request, db: Session = Depends(get_database_session)):
+async def create_usuario(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     rol=db.query(Rol).all()
-    return templates.TemplateResponse("usuarios/crear.html", {"request": request, "Roles_lista":rol})
+    return templates.TemplateResponse("usuarios/crear.html", {"request": request, "usuario_actual": usuario_actual, "Roles_lista":rol})
 
 @router.post("/nuevo")
 async def create_usuario(db: Session = Depends(get_database_session), nam = Form(...), user = Form(...), pasw = Form(...), idrol = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):

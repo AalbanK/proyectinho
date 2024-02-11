@@ -41,8 +41,8 @@ async def create_contrato(request: Request, db: Session = Depends(get_database_s
 
 @router.post("/nuevo")
 async def create_contrato(db: Session=Depends(get_database_session), nro=Form(...), FechaInicio=Form(...),FechaFin=Form(...),idProducto=Form(...), cantidad=Form(...),
-                          precioCompra=Form(...), precioVenta=Form(...), idProveedor=Form(...), nroCuentaP=Form(None), ciudad_O=Form(...),
-                          idCliente=Form(...), nroCuentaC=Form(None),ciudad_D=Form(...), usuario_actual: us.Usuario=Depends(auth.get_usuario_actual)):
+                          precioCompra=Form(...), precioVenta=Form(...), idProveedor=Form(...),idcuentaC=Form(None), nroCuentaP=Form(None), ciudad_O=Form(...),
+                          idCliente=Form(...),idcuentaP=Form(None), nroCuentaC=Form(None),ciudad_D=Form(...), usuario_actual: us.Usuario=Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
     campos_a_agregar = {
         "nro": nro,
@@ -59,9 +59,11 @@ async def create_contrato(db: Session=Depends(get_database_session), nro=Form(..
     }
     if idCliente is not None and idCliente != '0':
         campos_a_agregar["cuenta_cliente"] = nroCuentaC
+        campos_a_agregar["idcuentaC"] = idcuentaC
     
     if idProveedor is not None and idProveedor != '0':
         campos_a_agregar["cuenta_proveedor"] = nroCuentaP
+        campos_a_agregar["idcuentaP"] = idcuentaP
         
     contrato = Contrato(**campos_a_agregar)
     contrato.alta_usuario=usu.idusuario
@@ -78,8 +80,8 @@ async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends
     depto_D=aliased(Departamento)
     ciu_O=aliased(Ciudad)
     ciu_D=aliased(Ciudad)
-    consulta=db.query(Contrato.idcliente, Cliente.descripcion.label("desc_cliente"),Contrato.idproveedor, Proveedor.descripcion.label("desc_proveedor"),
-                      Contrato.idproducto, Producto.descripcion.label("desc_producto"),Contrato.origen,ciu_O.descripcion.label("desc_ciudad_origen"),
+    consulta=db.query(Contrato.idcontrato, Contrato.nro, Cliente.descripcion.label("desc_cliente"), Proveedor.descripcion.label("desc_proveedor"),
+                      Contrato.idproducto, Producto.descripcion.label("desc_producto"),Contrato.cantidad, Contrato.origen,ciu_O.descripcion.label("desc_ciudad_origen"),
                       depto_O.descripcion.label("desc_depto_origen"), Contrato.destino,ciu_D.descripcion.label("desc_ciudad_destino"),
                       depto_D.descripcion.label("desc_depto_destino")
                       ).join(Cliente, Cliente.idcliente==Contrato.idcliente
@@ -93,9 +95,27 @@ async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends
                       ).first()
     return JSONResponse(jsonable_encoder(consulta._asdict()))
 
-# @router.get("/ver/{id}")
-# async def ver_contrato(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-#     return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual})
+@router.get("/ver/{idcontrato}")
+async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    depto_O=aliased(Departamento)
+    depto_D=aliased(Departamento)
+    ciu_O=aliased(Ciudad)
+    ciu_D=aliased(Ciudad)
+    contra = db.query(Contrato.idcontrato, Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Proveedor.descripcion.label("desc_provee"), Proveedor.ruc.label("ruc_provee"),
+                      Cliente.descripcion.label("desc_clie"), Cliente.ruc.label("ruc_clie"), Contrato.idproducto, Producto.descripcion.label("desc_producto"), Contrato.cantidad,
+                      Contrato.precio_compra, Contrato.precio_venta, Contrato.cuenta_proveedor, Contrato.cuenta_proveedor,
+                      Contrato.origen,ciu_O.descripcion.label("desc_ciudad_origen"), depto_O.descripcion.label("desc_depto_origen"),
+                      Contrato.destino,ciu_D.descripcion.label("desc_ciudad_destino"), depto_D.descripcion.label("desc_depto_destino")
+                      ).join(Cliente, Cliente.idcliente==Contrato.idcliente
+                      ).join(ciu_D,ciu_D.idciudad==Contrato.destino
+                      ).join(depto_D,ciu_D.iddepartamento==depto_D.iddepartamento
+                      ).join(Proveedor, Proveedor.idproveedor==Contrato.idproveedor
+                      ).join(ciu_O,ciu_O.idciudad==Contrato.origen
+                      ).join(depto_O,ciu_O.iddepartamento==depto_O.iddepartamento
+                      ).join(Producto, Producto.idproducto==Contrato.idproducto
+                      ).filter(Contrato.idcontrato == idcontrato
+                      ).first()
+    return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual, "Contrato":contra})
 
 
 
@@ -103,7 +123,7 @@ async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends
 async def listar_contratos(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
     ciu_O=aliased(Ciudad)
     ciu_D=aliased(Ciudad)
-    contr = db.query(Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Contrato.idproducto, Proveedor.descripcion.label('descripcion_proveedor'),
+    contr = db.query(Contrato.idcontrato,Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Contrato.idproducto, Proveedor.descripcion.label('descripcion_proveedor'),
                      Cliente.descripcion.label('descripcion_cliente'), ciu_O.descripcion.label('ciudad_o'), ciu_D.descripcion.label('ciudad_d'), Producto.descripcion.label('descripcion_producto'),
                      Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta
                      ).join(Proveedor, Contrato.idproveedor==Proveedor.idproveedor).join(Cliente, Contrato.idcliente==Cliente.idcliente).join(ciu_O, Contrato.origen==ciu_O.idciudad

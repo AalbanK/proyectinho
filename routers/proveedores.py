@@ -33,7 +33,7 @@ async def read_proveedor(request: Request, db: Session = Depends(get_database_se
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_proveedor(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("proveedores/crear.html", {"request": request})
+    return templates.TemplateResponse("proveedores/crear.html", {"request": request, "usuario_actual": usuario_actual})
 
 @router.post("/nuevo")
 async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):

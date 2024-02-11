@@ -193,11 +193,15 @@ class Contrato(Base):
     precio_compra = Column(Integer)    
     precio_venta = Column(Integer)
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
+    idcuentaP= Column(Integer, ForeignKey("cuenta.idcuenta"))
     cuenta_proveedor = Column(String(45))
     origen = Column(Integer, ForeignKey("ciudad.idciudad"))
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
+    idcuentaP= Column(Integer, ForeignKey("cuenta.idcuenta"))
     cuenta_cliente = Column(String(45))
     destino = Column(Integer, ForeignKey("ciudad.idciudad"))
+    idcprove=relationship("Cuenta", back_populates="idcuentaprove")
+    idcclie=relationship("Cuenta", back_populates="idcuentaclie")
     contratocompra = relationship("Factura_compra_cabecera", back_populates="contrato") #
     contratoventa = relationship("Factura_venta_cabecera", back_populates="contrato")
     alta_usuario = Column(Integer)
@@ -216,6 +220,8 @@ class Cuenta(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
+    idcuentaprove=relationship("Contrato", back_populates="idcprove")
+    idcuentaclie=relationship("Contrato", back_populates="idcclie")
 
 
 class Producto(Base):
@@ -276,7 +282,8 @@ class Factura_compra_cabecera(Base):
 
 class Factura_compra_detalle(Base):
     __tablename__ = "factura_compra_detalle"
-    idcabecera_compra = Column(Integer, ForeignKey("factura_compra_cabecera.idfactura_compra"),primary_key=True)
+    iddetalle=Column(Integer, primary_key=True, index=True)
+    idcabecera_compra = Column(Integer, ForeignKey("factura_compra_cabecera.idfactura_compra"))
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productocompra")
     descripcion_producto = Column(String)
@@ -308,7 +315,8 @@ class Factura_venta_cabecera(Base):
 
 class Factura_venta_detalle(Base):
     __tablename__ = "factura_venta_detalle"
-    idcabecera_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"),primary_key=True)
+    iddetalle=Column(Integer, primary_key=True, index=True)
+    idcabecera_venta = Column(Integer, ForeignKey("factura_venta_cabecera.idfactura_venta"))
     idproducto = Column(Integer, ForeignKey("producto.idproducto"))
     producto = relationship("Producto", back_populates="productoventa")
     descripcion_producto = Column(String)

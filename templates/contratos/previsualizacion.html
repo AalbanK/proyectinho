@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', path='/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', path='/css/contrato.css') }}" rel="stylesheet">
-    <title>Ver Contrato</title>
+    <title>Ver Contrato {{Contrato.nro}}</title>
   </head>
   <body>
     <div class="container d-flex">
       <div class="row justify-content-center mx-auto">
         <div class="col-12">
-          <h3 class="mt-5 text-center">Contrato de Compra Venta N°</h3>
+          <h3 class="mt-5 text-center">Contrato de Compra Venta N° {{Contrato.nro}}</h3>
           <hr class="linea" />
         </div>
         <div class="col-auto">
@@ -20,42 +20,50 @@
             <tbody>
               <tr>
                 <th scope="row">01 - Lugar y Fecha:</th>
-                <td>Hohenau, </td>
+                <td>Hohenau,</td>
               </tr>
               <tr>
                 <th scope="row">02 - El Vendedor:</th>
-                <td></td>
+                <td>{{Contrato.desc_provee}} - RUC: {{Contrato.ruc_provee}}</td>
               </tr>
               <tr>
-                <th scope="row">03 - El Comprador:</th>
                 <td></td>
+                <td>N° Cuenta:{{Contrato.cuenta_proveedor}}   Banco: {{Contrato.}}</td>
               </tr>
               <tr>
-                <th scope="row">04- Objeto y Cantidad:</th>
-                <td class=""></td>
+                <th scope="row">03 - El Intermediario:</th>
+                <td> Grupo Evolución S.A. - RUC: 80086212-5</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>N° Cuenta: xxxxxxx  Banco: xxxxx</td>
+              </tr>
+              <tr>
+                <th scope="row">04 - El Comprador:</th>
+                <td>{{Contrato.desc_clie}} - RUC: {{Contrato.ruc_clie}}</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>N° Cuenta: xxxxxxx  Banco: xxxxx</td>
+              </tr>
+              <tr>
+                <th scope="row">05- Objeto y Cantidad:</th>
+                <td>{{Contrato.desc_producto}}, {{Contrato.cantidad}} Kilogramos</td>
+              </tr>
+              <tr>
+                <th scope="row">06- Precio:</th>
+                <td>Todos los valores POR KILOGRAMOS IVA incluido a retirar: GS {{Contrato.precio_compra}}</td>
+              </tr>
+              <tr>
+                <th scope="row"></th>
+                <td>Todos los valores POR KILOGRAMOS IVA incluido a entregar: GS {{Contrato.precio_venta}}</td>
               </tr>
               <tr>
                 <td colspan="2"></td> {# espacio en blanco #}
               </tr>
               <tr>
-                <th scope="row">05- Precio:</th>
-                <td>Todos los valores POR TONELADA IVA incluido a retirar:</td>
-              </tr>
-              <tr>
-                <th scope="row">06- Plazo de Entrega:</th>
+                <th scope="row">07- Plazo de Entrega:</th>
                 <td>Siempre que las condiciones climáticas sean favorables.</td>
-              </tr>
-              <tr>
-                <th scope="row">07- Condición de Facturación:</th>
-                <td></td>
-              </tr>
-              <tr>
-                <th scope="row">Pago:</th>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Datos Bancarios:</td>
-                <td></td>
               </tr>
             </tbody>
           </table>

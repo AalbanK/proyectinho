@@ -67,6 +67,7 @@ crearElemento = (tipo, nombre, listaClases = [], textoContenido, tipoInput, requ
     
     if(deshabilitado){
         elemento.setAttribute("readonly", "readonly");
+        elemento.setAttribute("disabled", "disabled");
     }
 
     if(tipoInput){
@@ -100,7 +101,7 @@ agregarOpcion = (elemento, valor, texto, campos = {}) => {
 
 
 fetchCargarProductos = async () => {
-    selectProducto = crearElemento("select", "productos[]", ["form-control"], "", "", true);
+    selectProducto = crearElemento("select", "productos[]", ["form-control"], "", "", true, true);
     selectProducto.length = 0; //para vaciar el select, por si acaso
     agregarOpcion(selectProducto, '', 'Seleccione un Producto...');
     await fetch('/productos/todos')
@@ -223,13 +224,23 @@ window.addEventListener('DOMContentLoaded', async function () {
     const selectContrato = document.querySelector("#idContrato");
     selectContrato.addEventListener('change', async function (event) {
         let idcontrato = event.target.value; //  equivale al valor desde donde se está disparando el event
+        clienteForm=document.getElementById('desc_cliente');
+        prductoForm=document.querySelector('[name="productos[]"]');
         if (idcontrato && idcontrato != "undefined") {
             let jsonContrato = await obtenerContrato(idcontrato);
             console.log(jsonContrato)
-            clienteForm=document.getElementById('desc_cliente');
             clienteForm.value= jsonContrato.desc_cliente;
-            };
+            prductoForm.value= jsonContrato.idproducto;
+            }
+        else {
+            clienteForm.value= "Primero seleccione un contrato";
+            prductoForm.selectedIndex= 0;
+    
+        }
+        
     });
+    selectContrato.dispatchEvent(new Event("change")); //para disparar el evento de cambio
+    
 
     facturaForm = document.getElementById('facturaForm');
     facturaForm.addEventListener('submit', async function(event) {
