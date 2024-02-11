@@ -72,8 +72,6 @@ async def create_contrato(db: Session=Depends(get_database_session), nro=Form(..
 @router.get("/detalles/{idc}", response_class=JSONResponse)
 async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     
-    print(idc)
-    
     depto_O=aliased(Departamento)
     depto_D=aliased(Departamento)
     ciu_O=aliased(Ciudad)
@@ -90,10 +88,8 @@ async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends
                       ).join(depto_O,ciu_O.iddepartamento==depto_O.iddepartamento
                       ).join(Producto, Producto.idproducto==Contrato.idproducto
                       ).filter(Contrato.idcontrato == idc
-                      ).all()
-
-    respuesta = [dict(r._mapping) for r in consulta]
-    return JSONResponse(jsonable_encoder(respuesta))
+                      ).first()
+    return JSONResponse(jsonable_encoder(consulta._asdict()))
 
 @router.get("/ver")
 async def ver_contrato(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):

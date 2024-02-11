@@ -2,6 +2,16 @@ let jsonProductos = null;
 let jsonCiudades = null;
 let selectProducto = null;
 
+async function obtenerContrato(idcontrato) {
+    const response = await fetch(`/contratos/detalles/${idcontrato}`);
+    if (!response.ok) {
+        const message = `Ocurrió un error al intentar obtener el contrato: ${response.status}`;
+        throw new Error(message);
+    }
+    const contrato = await response.json();
+    return contrato;
+}
+
 calcularSubtotales = (cantidad, precio, subtotal, subtotal_iva, porcentaje_iva) => {
 
     cantidad = cantidad.value;
@@ -204,10 +214,23 @@ crearFila = (crearBotonEliminar) => {
 }
 
 window.addEventListener('DOMContentLoaded', async function () {
+    //cargar linea del detalle
     await fetchCargarProductos();
     divDetalles = document.getElementById('detalles');
     divDetalles.appendChild(crearFila(false));
     
+    //cargar detalles de contrato
+    const selectContrato = document.querySelector("#idContrato");
+    selectContrato.addEventListener('change', async function (event) {
+        let idcontrato = event.target.value; //  equivale al valor desde donde se está disparando el event
+        if (idcontrato && idcontrato != "undefined") {
+            let jsonContrato = await obtenerContrato(idcontrato);
+            console.log(jsonContrato)
+            clienteForm=document.getElementById('desc_cliente');
+            clienteForm.value= jsonContrato.desc_cliente;
+            };
+    });
+
     facturaForm = document.getElementById('facturaForm');
     facturaForm.addEventListener('submit', async function(event) {
         event.preventDefault();

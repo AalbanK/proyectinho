@@ -12,7 +12,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func
 from typing import List
 
-from schemas.cabecera_detalle_venta import Venta_cabecera, Venta_detalle
+from schemas.cabecera_detalle_venta import Venta_cabecera
 
 from db.misc import get_database_session
 
@@ -61,3 +61,13 @@ async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = 
     else: # sin no hubo errores
         response = JSONResponse(content={"error": 'Ninguno.'}, status_code=200)
         return response
+    
+@router.get("/todos")
+async def listar_ventas(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
+    vent = db.query(Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Contrato.nro.label('nro_contrato'), Cliente.descripcion.label('descripcion_cliente'),
+                       Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad, Factura_venta_cabecera.total_monto
+                       ).join(Contrato, Factura_venta_cabecera.idcontrato==Contrato.idcontrato).join(Cliente,Factura_venta_cabecera.idcliente==Cliente.idcliente
+                       ).join(Factura_venta_detalle,
+                       ).all()
+    respuesta = [dict(r._mapping) for r in vent]
+    return JSONResponse(jsonable_encoder(respuesta))

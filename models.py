@@ -203,6 +203,7 @@ class Contrato(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
+    anulado=Column(String(1),default='N')
 
 
 class Cuenta(Base):

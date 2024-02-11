@@ -12,7 +12,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy import func
 from typing import List
 
-from schemas.cabecera_detalle_compra import Compra_cabecera, Compra_detalle
+from schemas.cabecera_detalle_compra import Compra_cabecera
 
 from  db.misc import get_database_session
 
@@ -30,10 +30,6 @@ router = APIRouter(
 async def read_compra(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("compras/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True})
 
-# @router.get("/todos")
-# async def listar_compras(request: Request, db: Session = Depends(get_database_session)):
-#     compras = db.query(Compra).all()
-#     return JSONResponse(jsonable_encoder(compras))
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_compra(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -62,3 +58,26 @@ async def crear_compra(request: Request, cabecera: Compra_cabecera, db: Session 
     else: # si no hubo errores
         response = JSONResponse(content={"error": 'Ninguno.'}, status_code=200)
         return response
+    
+# @router.get("/todos")
+# async def listar_compras(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
+#     compras = db.query(Compra_cabecera.fecha, Compra_cabecera.numero, Contrato.nro.label('nro_contrato'), Proveedor.descripcion.label('descripcion_proveedor'),
+#                        Compra_cabecera.
+#                        ).join(Contrato, Compra_cabecera.idcontrato==Contrato.idcontrato).join(Proveedor,Compra_cabecera.idproveedor==Proveedor.idproveedor
+#                        ).join().all()
+#     return JSONResponse(jsonable_encoder(compras))
+
+
+# data: 'fecha'
+
+# data: 'idcontrato'
+
+# data: 'numero'
+
+# data: 'idproveedor'
+
+# data: 'descripcion_producto'
+
+# data: 'cantidad'
+
+# data: 'total_monto'

@@ -37,12 +37,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCliente">Cliente: </label>
                     </div>
-                    <select class="custom-select" id="idCliente" name="idcliente" required>
-                        <option value="" selected>Seleccione un cliente...</option>
-                        {% for Cliente in Clientes %}
-                        <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}} - {{Cliente.ruc}}</option>
-                        {% endfor %}
-                    </select>
+                    <input class="form-control" type="text" id="desc_cliente" readonly>
                 </div>
             </div>
             <!---->

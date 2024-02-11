@@ -60,14 +60,5 @@ fetchCargarDepartamentos = () => {
             }
     });
 
-    async function obtenerContratos() {
-        const response = await fetch('/contratos/todos');
-        if (!response.ok) {
-            const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
-            throw new Error(message);
-        }
-        const ciudades = await response.json();
-        return ciudades;
-    }
     
 });

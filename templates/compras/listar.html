@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% block content %}
+<table id="compra" class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Fecha</th>
+            <th scope="col">N° Factura</th>
+            <th scope="col">N° Contrato</th>
+            <th scope="col">Proveedor</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Monto</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!--aqui se cargan los datos de datatable-->
+    </tbody>
+</table>
+
+<div class="modal fade" id="anularModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Anular Registro</h4>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <h5> ¿Está seguro/a de anular este registro? </h5>
+            </div>
+            <div class="modal-footer">
+                <form id="anularCompra"></form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block script %}
+<script type="text/javascript">
+
+    let $tabla = $("#compra");
+    let $modal = $('#anularModal');
+    let botonesAnular = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">No, Cancelar</button>
+                    <button id="confirmarAnular" class="btn btn-danger" type="button">Sí, Anular</button>`;
+    let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">Ok</button>`;
+
+    let alertOK = `<div class="alert alert-success aviso" role="alert">
+                    Registro anulado exitosamente.
+                </div>`;
+    let botonesVerYAnular = (id) => {
+        return `<a href="/compras/ver/${id}" class="btn btn-warning ver">Ver</a>
+                <button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
+    }
+
+    let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
+
+    let tablaDT = null;
+
+    inicializarDataTable = (tabla, url, columnas, urlIdioma) => {
+        return tabla.DataTable({
+            ajax: {
+                url: url,
+                dataSrc: '',
+            },
+            columns: columnas,
+            language: {
+                url: urlIdioma
+            },
+        })
+    }
+    $(document).ready(function () {
+        columnas = [
+            {
+                data: 'fecha'
+            },
+            {
+                data: 'numero'
+            },
+            {
+                data: 'idcontrato'
+            },
+            {
+                data: 'idproveedor'
+            },
+            {
+                data: 'descripcion_producto'
+            },
+            {
+                data: 'cantidad'
+            },
+            {
+                data: 'total_monto'
+            },
+            {
+                data: null,
+                sortable: false,
+                searchable: false,
+                render: function (data, type, row, meta) {
+                    return botonesVerYAnular(data.idcompra);
+                }
+            },
+        ];
+        tablaDT = inicializarDataTable($tabla, '/compras/todos', columnas, urlEspanholDT)
+
+        $tabla.on('click', '.btn-danger.anular', function (e) {
+            let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de "whatever"
+            $modal.data('id', id).modal('show');
+        });
+
+        agregarAlert = (accion, motivo) => {
+            switch (accion) {
+                case 'error': {
+                    let texto = null;
+                    switch (motivo) {
+                        case 'verif': {
+                            texto = 'Ocurrió un error al verificar si existe el registro seleccionado.';
+                            break;
+                        }
+                        case 'elim': {
+                            texto = 'Ocurrió un error al verificar si el registro fue anulado correctamente. Verifique si los datos mostrados posteriormente son consistentes.';
+                            break;
+                        }
+                        default: {
+                            texto = 'Ha ocurrido un error desconocido. Verifique si los datos mostrados posteriormente son correctos.';
+                        }
+                    }
+                    let alertError = ` <div class="alert alert-danger aviso" role="alert">
+                <button type="button" class="close close-alert" 
+                    data-dismiss="alert" aria-hidden="true">
+                    ×
+                </button> ${texto}
+            </div>`;
+
+                    $('.modal-body').append(alertOK);
+                    break;
+                }
+                case 'ok': {
+                    $('.modal-body').append(alertOK);
+                    break;
+                }
+                default: break;
+            }
+        }
+
+        actualizarBotones = (action) => {
+            $modal.find('#anularCompra').children().remove();
+            switch (action) {
+                case 'error': {
+                    $modal.find('#anularCompra').append(botonesOK);
+                    break;
+                }
+                case 'anular': {
+                    $modal.find('#anularCompra').append(botonesAnular);
+                    break;
+                }
+                default: $modal.find('#anularCompra').append(botonesOK);
+            }
+        }
+
+        anularFila = (e) => {
+            let idAnular = e.data.id;
+            url = `/compras/anular/${idAnular}`;
+            $.ajax({
+                url: url,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 200) {
+                        agregarAlert('ok');
+                        actualizarBotones('ok')
+                        tablaDT.ajax.reload(null, false); //recaga la tabla
+                    }
+                    else if (data.status_code == 404) {
+                        agregarAlert('error')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        agregarAlert('ok');
+                        actualizarBotones('ok')
+                        tablaDT.ajax.reload(null, false); //recarga la tabla
+                        $modal.modal('hide');
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error', 'elim')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        }
+
+        $modal.on('shown.bs.modal', function (e) {
+            //verificar si existe el id (por si tocan el html en el dom)
+            $.ajax({
+                url: `/compras/ver/${$modal.data('id')}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 404) {
+                        agregarAlert('error', 'verif')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        actualizarBotones('anular')
+                        $("#confirmarAnular").off('click').on('click', { id: $modal.data('id') }, anularFila);
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        });
+
+        $modal.on('hidden.bs.modal', function (e) {
+            $modal.removeData('id');
+            $modal.find('aviso').remove();
+            $modal.find('anularCompra').children().remove
+        })
+    })
+
+</script>
+
+{% endblock script %}
