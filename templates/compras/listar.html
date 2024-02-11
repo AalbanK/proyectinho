@@ -10,6 +10,7 @@
             <th scope="col">Producto</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Monto</th>
+            <th scope="col">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -76,16 +77,17 @@
                 data: 'numero'
             },
             {
-                data: 'idcontrato'
+                data: 'contrato.nro',
+                defaultContent: '-'
             },
             {
-                data: 'idproveedor'
+                data: 'proveedor.descripcion'
             },
             {
-                data: 'descripcion_producto'
+                data: 'detalle.descripcion_producto'
             },
             {
-                data: 'cantidad'
+                data: 'detalle.cantidad'
             },
             {
                 data: 'total_monto'

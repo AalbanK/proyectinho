@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div>
+        <form action="/contratos/update" method="POST">
+            <div class="form-group">
+                <div class="input-group-prepend">
+                    <input type="hidden" class="form-control" id="idcontrato" name="idcontrato" value="{{Contrato.idcontrato}}">
+                    <label class="input-group-text" for="nro">Numero de contrato: </label>
+                    <input type="number" class="form-control" style="margin-right: 10px" id="nro" name="nro" value="{Contrato.nro}" readonly>
+                </div>
+            </div>
+            
+
+        <div class="form-group">
+            <label for="Fechas">Plazo de Retiro y Entrega:</label>
+            <div class="input-group">
+                <input type="date" class="form-control" id="FechaInicio" name="FechaInicio" value="{Contrato.fecha_incio}" readonly>
+                <span class="input-group-addon" style="margin: 0 5px;">hasta</span>
+                <input type="date" class="form-control" id="FechaFin" name="FechaFin" required>
+            </div>
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="idProducto">Producto:</label>
+            </div>
+            <input type="text" class="form-control" style="margin-right: 10px" id="idProducto" name="idProducto" value="{Contrato.idproducto}" readonly>
+        </div>
+        
+        <div class="row">
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="cantidad">Cantidad (Kg):</label>
+                </div>
+                  <input type="number" class="form-control" style="margin-right: 10px" id="cantidad" name="cantidad" min="1" required>
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="precioCompra">Precio Compra (Gs):</label>
+                </div>
+                  <input type="number" class="form-control" id="precioCompra" name="precioCompra" min="1" required>
+              </div>
+            </div>
+            <div class="col-xs-12 col-md-4">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="precioVenta">Precio Venta (Gs):</label>
+                </div>
+                  <input type="number" class="form-control" id="precioVenta" name="precioVenta" min="1" required>
+              </div>
+            </div>
+          </div>
+
+        <label for="origen">Origen:</label>
+        <div class="form-group" id="proveedor">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="idProveedor">Proveedor:</label>
+                <select class="custom-select" style="margin-right: 10px" id="idProveedor" name="idProveedor">
+                    <option value="0" selected>Elegir...</option>
+                    {% for Proveedor in Proveedores_lista %}
+                    <option value="{{Proveedor.idproveedor}}">{{Proveedor.descripcion}}</option>
+                    {% endfor %}
+                </select>
+                <label for="nroCuentaP" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="nroCuentaP">N° de Cuenta:</label>
+                </div>
+                <select class="custom-select" id="nroCuentaP" name="nroCuentaP">
+                    <option value="0" selected>Elegir...</option>
+                </select>
+            </div>
+        </div>
+
+
+        <div class="form-group" id="departamento-ciudadO">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="departamento_O">Departamento:</label>
+                <select class="custom-select" style="margin-right: 10px" id="departamento_O" name="departamento_O">
+                    <option value="0" selected>Elegir...</option>
+                </select>
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="ciudad_O">Ciudad:</label>
+                </div>
+                <select class="custom-select" id="ciudad_O" name="ciudad_O">
+                    <!-- Opciones de ciudades aquí -->
+                </select>
+            </div>
+        </div>
+
+        
+        <label for="destino">Destino:</label>
+        <div class="form-group" id="cliente">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="idCliente">Cliente:</label>
+                <select class="custom-select" style="margin-right: 10px" id="idCliente" name="idCliente">
+                    <option value="0" selected>Elegir...</option>
+                    {% for Cliente in Clientes_lista %}
+                    <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}}</option>
+                    {% endfor %}
+                </select>
+                <label for="nroCuentaC" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="nroCuentaC">N° de Cuenta:</label>
+                </div>
+                <select class="custom-select" id="nroCuentaC" name="nroCuentaC">
+                    <option value="0" selected>Elegir...</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group" id="departamento-ciudad_D">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="departamento_D">Departamento:</label>
+                <select id="departamento_D" name="departamento_D" class="custom-select custom-dropdown custom-form-input">
+                </select>
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="ciudad_D">Ciudad:</label>
+                </div>
+                <select id="ciudad_D" name="ciudad_D" class="custom-select custom-dropdown custom-form-input">
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+{% endblock content %}
+{% block script %}
+{% endblock script %}

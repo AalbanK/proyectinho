@@ -1,7 +1,8 @@
-from fastapi.encoders import jsonable_encoder
+import statistics
 from schemas import usuario as us
 from routers import auth
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session, aliased
 from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
@@ -9,6 +10,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
 from models import Contrato, Producto, Proveedor, Cliente, Cuenta, Departamento, Ciudad
 from fastapi.staticfiles import StaticFiles
+from starlette import status
 
 from  db.misc import get_database_session
 
@@ -91,6 +93,21 @@ async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends
                       ).first()
     return JSONResponse(jsonable_encoder(consulta._asdict()))
 
-@router.get("/ver")
-async def ver_contrato(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual})
+# @router.get("/ver/{id}")
+# async def ver_contrato(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+#     return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual})
+
+
+
+@router.get("/todos")
+async def listar_contratos(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
+    ciu_O=aliased(Ciudad)
+    ciu_D=aliased(Ciudad)
+    contr = db.query(Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Contrato.idproducto, Proveedor.descripcion.label('descripcion_proveedor'),
+                     Cliente.descripcion.label('descripcion_cliente'), ciu_O.descripcion.label('ciudad_o'), ciu_D.descripcion.label('ciudad_d'), Producto.descripcion.label('descripcion_producto'),
+                     Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta
+                     ).join(Proveedor, Contrato.idproveedor==Proveedor.idproveedor).join(Cliente, Contrato.idcliente==Cliente.idcliente).join(ciu_O, Contrato.origen==ciu_O.idciudad
+                     ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto
+                     ).all()
+    respuesta = [dict(r._mapping) for r in contr]
+    return JSONResponse(jsonable_encoder(respuesta))
