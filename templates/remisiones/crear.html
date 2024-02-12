@@ -52,7 +52,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idProveedor">Proveedor:</label>
                     </div>
-                    <input type="text" name="proveedor" class="form-control" value="" disabled>
+                    <input class="form-control" type="text" id="desc_proveedor" readonly>
                 </div>
             </div>
             <div class="col-xs-12 col-md-4">
@@ -184,3 +184,6 @@
 
 
 {% endblock content %}
+{% block script %}
+<script src="{{url_for('static', path='/js/crear-remision.js')}}"></script>
+{% endblock script %}

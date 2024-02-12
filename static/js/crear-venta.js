@@ -230,7 +230,9 @@ window.addEventListener('DOMContentLoaded', async function () {
             let jsonContrato = await obtenerContrato(idcontrato);
             console.log(jsonContrato)
             clienteForm.value= jsonContrato.desc_cliente;
+            clienteForm.setAttribute(`data-idcliente`, jsonContrato.idcliente);
             prductoForm.value= jsonContrato.idproducto;
+            prductoForm.dispatchEvent(new Event("change"));
             }
         else {
             clienteForm.value= "Primero seleccione un contrato";
@@ -248,6 +250,9 @@ window.addEventListener('DOMContentLoaded', async function () {
        
         let factura = {};
         let formData = new FormData(event.target);
+
+        let idcli=document.querySelector('#desc_cliente').getAttribute('data-idcliente');
+        
         for (let pair of formData.entries()) {
             if(pair[0].substring(pair[0].length - 2) !== '[]') { // solo agregar si la clave no termina en "[]", ya que lo que es de array se agrega más abajo en "detalles"
                 if(pair[1]){ // solo si el value no es null, undefined o vacío
@@ -255,6 +260,8 @@ window.addEventListener('DOMContentLoaded', async function () {
                 }
             }
         }
+
+        factura['idcliente']=idcli // se setea aparte porqu el input no tiene "name"
 
         let lineasDetalles = facturaForm.querySelectorAll('.fila_detalle');
         let formDatas = [];

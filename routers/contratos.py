@@ -80,7 +80,7 @@ async def ver_detalle_contrato(idc: int, request: Request, db: Session = Depends
     depto_D=aliased(Departamento)
     ciu_O=aliased(Ciudad)
     ciu_D=aliased(Ciudad)
-    consulta=db.query(Contrato.idcontrato, Contrato.nro, Cliente.descripcion.label("desc_cliente"), Proveedor.descripcion.label("desc_proveedor"),
+    consulta=db.query(Contrato.idcontrato, Contrato.nro,Contrato.idcliente, Cliente.descripcion.label("desc_cliente"),Contrato.idproveedor, Proveedor.descripcion.label("desc_proveedor"),
                       Contrato.idproducto, Producto.descripcion.label("desc_producto"),Contrato.cantidad, Contrato.origen,ciu_O.descripcion.label("desc_ciudad_origen"),
                       depto_O.descripcion.label("desc_depto_origen"), Contrato.destino,ciu_D.descripcion.label("desc_ciudad_destino"),
                       depto_D.descripcion.label("desc_depto_destino")

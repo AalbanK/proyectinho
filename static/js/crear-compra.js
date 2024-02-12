@@ -101,7 +101,7 @@ agregarOpcion = (elemento, valor, texto, campos = {}) => {
 
 
 fetchCargarProductos = async () => {
-    selectProducto = crearElemento("select", "productos[]", ["form-control"], "", "", true, true);
+    selectProducto = crearElemento("select", "productos[]", ["form-control"], "", "", true);
     selectProducto.length = 0; //para vaciar el select, por si acaso
     agregarOpcion(selectProducto, '', 'Seleccione un Producto...');
     await fetch('/productos/todos')
@@ -226,18 +226,32 @@ window.addEventListener('DOMContentLoaded', async function () {
     const selectContrato = document.querySelector("#idContrato");
     selectContrato.addEventListener('change', async function (event) {
         let idcontrato = event.target.value; //  equivale al valor desde donde se está disparando el event
-        proveedorForm=document.getElementById('desc_proveedor');
+        proveedorForm=document.getElementById('idProveedor');
         prductoForm=document.querySelector('[name="productos[]"]');
         if (idcontrato && idcontrato != "undefined") {
             let jsonContrato = await obtenerContrato(idcontrato);
-            console.log(jsonContrato)
-            proveedorForm.value= jsonContrato.desc_proveedor;
+           
+            let optionsArray = Array.from(proveedorForm.options); // Convierte en array los options
+            let valorABuscar = jsonContrato.idproveedor
+            let index = optionsArray.findIndex(option => option.value == valorABuscar);
+            proveedorForm.selectedIndex = index
+            proveedorForm.setAttribute('disabled', 'disabled')
+
             prductoForm.value= jsonContrato.idproducto;
             botonAgregarFila.style.display = 'none'
+            prductoForm.setAttribute('readonly', 'readonly')
+            prductoForm.setAttribute('disabled', 'disabled')
+            prductoForm.dispatchEvent(new Event("change"));
+
             }
         else {
-            proveedorForm.value= "Primero seleccione un contrato";
+            proveedorForm.selectedIndex= 0
+            proveedorForm.removeAttribute('disabled')
+
+            prductoForm.removeAttribute('readonly')
+            prductoForm.removeAttribute('disabled')
             prductoForm.selectedIndex= 0
+
             botonAgregarFila.style.display = 'block'
         }
         
@@ -251,13 +265,20 @@ window.addEventListener('DOMContentLoaded', async function () {
        
         let factura = {};
         let formData = new FormData(event.target);
+
+        let idprove=document.querySelector('#idProveedor').value;
+
         for (let pair of formData.entries()) {
             if(pair[0].substring(pair[0].length - 2) !== '[]') { // solo agregar si la clave no termina en "[]", ya que lo que es de array se agrega más abajo en "detalles"
+                
                 if(pair[1]){ // solo si el value no es null, undefined o vacío
                     factura[pair[0]] = pair[1]; // 0 para key (clave), 1 para value (valor)
                 }
             }
         }
+
+        factura['idproveedor']=idprove // se setea aparte porqu el input no tiene "name"
+
 
         let lineasDetalles = facturaForm.querySelectorAll('.fila_detalle');
         let formDatas = [];

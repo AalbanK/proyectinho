@@ -41,7 +41,12 @@
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="idProveedor">Proveedor: </label>
                   </div>
-                  <input class="form-control" type="text" id="desc_proveedor" readonly>
+                  <select class="custom-select" id="idProveedor" name="idproveedor" required>
+                    <option value="" selected>Seleccione un proveedor...</option>
+                    {% for Proveedor in Proveedores %}
+                    <option value="{{Proveedor.idproveedor}}">{{Proveedor.descripcion}} - {{Proveedor.ruc}}</option>
+                    {% endfor %}
+                  </select>
                 </div>
               </div>
               <!---->

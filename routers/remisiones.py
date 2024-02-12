@@ -36,9 +36,9 @@ async def create_remision(request: Request, db: Session = Depends(get_database_s
 
 @router.post("/nuevo")
 async def create_remision(db: Session=Depends(get_database_session), fechacarga=Form(...), fechadescarga=Form(), bruto=Form(...), tara=Form(...),neto=Form(...),
-                          idchofer=Form(...), idcontrato=Form(...), idcamion=Form(...),usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+                          idchofer=Form(...), idcontrato=Form(...), idcamion=Form(...), idcarreta=Form(...),usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    remi = Remision(fecha_carga=fechacarga, fecha_descarga=fechadescarga, bruto_carga=bruto, tara_carga=tara, neto_carga=neto, idchofer=idchofer, idcontrato=idcontrato,alta_usuario = usu.idusuario)
+    remi = Remision(idcontrato=idcontrato,fecha_carga=fechacarga, fecha_descarga=fechadescarga, bruto_carga=bruto, tara_carga=tara, neto_carga=neto, idchofer=idchofer, alta_usuario = usu.idusuario)
     db.add(remi)
     db.commit()
     db.refresh(remi)

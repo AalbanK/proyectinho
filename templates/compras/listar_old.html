@@ -1,13 +1,12 @@
-
 {% extends 'base.html' %}
 {% block content %}
-<table id="venta" class="table table-striped">
+<table id="compra" class="table table-striped">
     <thead>
         <tr>
             <th scope="col">Fecha</th>
             <th scope="col">N° Factura</th>
             <th scope="col">N° Contrato</th>
-            <th scope="col">Cliente</th>
+            <th scope="col">Proveedor</th>
             <th scope="col">Producto</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Monto</th>
@@ -30,7 +29,7 @@
                 <h5> ¿Está seguro/a de anular este registro? </h5>
             </div>
             <div class="modal-footer">
-                <form id="anularVenta"></form>
+                <form id="anularCompra"></form>
             </div>
         </div>
     </div>
@@ -39,7 +38,7 @@
 {% block script %}
 <script type="text/javascript">
 
-    let $tabla = $("#venta");
+    let $tabla = $("#compra");
     let $modal = $('#anularModal');
     let botonesAnular = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">No, Cancelar</button>
                     <button id="confirmarAnular" class="btn btn-danger" type="button">Sí, Anular</button>`;
@@ -49,7 +48,7 @@
                     Registro anulado exitosamente.
                 </div>`;
     let botonesVerYAnular = (id) => {
-        return `<a href="/ventas/ver/${id}" class="btn btn-warning ver">Ver</a>
+        return `<a href="/compras/ver/${id}" class="btn btn-warning ver">Ver</a>
                 <button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
     }
 
@@ -78,16 +77,17 @@
                 data: 'numero'
             },
             {
-                data: 'nro_contrato'
+                data: 'contrato.nro',
+                defaultContent: '-'
             },
             {
-                data: 'descripcion_cliente'
+                data: 'proveedor.descripcion'
             },
             {
-                data: 'descripcion_producto'
+                data: 'detalles'
             },
             {
-                data: 'cantidad'
+                data: 'detalles'
             },
             {
                 data: 'total_monto'
@@ -97,11 +97,11 @@
                 sortable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {
-                    return botonesVerYAnular(data.idfactura_venta);
+                    return botonesVerYAnular(data.idcompra);
                 }
             },
         ];
-        tablaDT = inicializarDataTable($tabla, '/ventas/todos', columnas, urlEspanholDT)
+        tablaDT = inicializarDataTable($tabla, '/compras/todos', columnas, urlEspanholDT)
 
         $tabla.on('click', '.btn-danger.anular', function (e) {
             let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de "whatever"
@@ -144,23 +144,23 @@
         }
 
         actualizarBotones = (action) => {
-            $modal.find('#anularVenta').children().remove();
+            $modal.find('#anularCompra').children().remove();
             switch (action) {
                 case 'error': {
-                    $modal.find('#anularVenta').append(botonesOK);
+                    $modal.find('#anularCompra').append(botonesOK);
                     break;
                 }
                 case 'anular': {
-                    $modal.find('#anularVenta').append(botonesAnular);
+                    $modal.find('#anularCompra').append(botonesAnular);
                     break;
                 }
-                default: $modal.find('#anularVenta').append(botonesOK);
+                default: $modal.find('#anularCompra').append(botonesOK);
             }
         }
 
         anularFila = (e) => {
             let idAnular = e.data.id;
-            url = `/ventas/anular/${idAnular}`;
+            url = `/compras/anular/${idAnular}`;
             $.ajax({
                 url: url,
                 method: 'GET',
@@ -193,7 +193,7 @@
         $modal.on('shown.bs.modal', function (e) {
             //verificar si existe el id (por si tocan el html en el dom)
             $.ajax({
-                url: `/ventas/ver/${$modal.data('id')}`,
+                url: `/compras/ver/${$modal.data('id')}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function (data, status, xhr) {
@@ -217,7 +217,7 @@
         $modal.on('hidden.bs.modal', function (e) {
             $modal.removeData('id');
             $modal.find('aviso').remove();
-            $modal.find('anularVenta').children().remove
+            $modal.find('anularCompra').children().remove
         })
     })
 
