@@ -1,4 +1,4 @@
-from sqlalchemy import Date
+from sqlalchemy import Date, ForeignKeyConstraint
 from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.types import String, Integer, Double, Text, DateTime
 from sqlalchemy.orm import relationship
@@ -11,11 +11,10 @@ class Auditoria(Base):
     __tablename__ = "auditoria" #Nombre de la tabla en la Base de Datos
     idauditoria = Column(Integer, primary_key=True, index=True)
     accion = Column(String(45))
-    accionfecha = Column(DateTime(timezone=True), server_default=func.now())
-    valorviejo = Column(String(4000), default=None)
-    valornuevo = Column(String(4000), default=None)
+    accion_fecha = Column(DateTime(timezone=True), server_default=func.now())
+    valor_viejo = Column(String(4000), default=None)
+    valor_nuevo = Column(String(4000), default=None)
     columnas    = Column(String(4000))
-    modif_usuario = Column(Integer, default=None)
 
 
 class Banco(Base):
@@ -193,15 +192,21 @@ class Contrato(Base):
     precio_compra = Column(Integer)    
     precio_venta = Column(Integer)
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
+    # idcprove=relationship("Cuenta", foreign_keys=[idproveedor]
     idcuentaP= Column(Integer, ForeignKey("cuenta.idcuenta"))
+    # ForeignKeyConstraint(
+    #     ["idcuentaP"], ["invoice.invoice_id", "invoice.ref_num"]
+    # )
     cuenta_proveedor = Column(String(45))
     origen = Column(Integer, ForeignKey("ciudad.idciudad"))
+    
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
-    idcuentaP= Column(Integer, ForeignKey("cuenta.idcuenta"))
+    idcuentaC= Column(Integer, ForeignKey("cuenta.idcuenta"))
+    # idcclie=relationship("Cuenta", foreign_keys=[idcliente])
     cuenta_cliente = Column(String(45))
     destino = Column(Integer, ForeignKey("ciudad.idciudad"))
-    idcprove=relationship("Cuenta", back_populates="idcuentaprove")
-    idcclie=relationship("Cuenta", back_populates="idcuentaclie")
+    
+    
     contratocompra = relationship("Factura_compra_cabecera", back_populates="contrato") #
     contratoventa = relationship("Factura_venta_cabecera", back_populates="contrato")
     alta_usuario = Column(Integer)
@@ -220,8 +225,8 @@ class Cuenta(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
-    idcuentaprove=relationship("Contrato", back_populates="idcprove")
-    idcuentaclie=relationship("Contrato", back_populates="idcclie")
+    # idcuentaprove=relationship("Contrato", back_populates="idcprove")
+    # idcuentaclie=relationship("Contrato", back_populates="idcclie")
 
 
 class Producto(Base):

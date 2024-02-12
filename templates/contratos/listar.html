@@ -33,7 +33,7 @@
                 <h5> ¿Está seguro/a de anular este registro? </h5>
             </div>
             <div class="modal-footer">
-                <form id="anularVenta"></form>
+                <form id="anularContrato"></form>
             </div>
         </div>
     </div>
@@ -114,7 +114,11 @@
                 sortable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {
-                    return botonesVerYAnular(data.idcontrato);
+                    if (data.anulado=='S') {
+                        return `<a href="/contratos/ver/${data.idcontrato}" class="btn btn-info ver">Ver</a>
+                <button type="button" class="btn btn-light" data-id="${data.idcontrato}" disabled> Anulado </button>`;
+                    }
+                    else return botonesVerYAnular(data.idcontrato);
                 }
             },
         ];
@@ -160,6 +164,38 @@
             }
         }
 
+        $modal.on('shown.bs.modal', function (e) {
+            //verificar si existe el id (por si tocan el html en el dom)
+            $.ajax({
+                url: `/contratos/verificar/${$modal.data('id')}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 404) {
+                        agregarAlert('error', 'verif')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        actualizarBotones('anular')
+                        $("#confirmarAnular").off('click').on('click', { id: $modal.data('id') }, anularFila);
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        });
+
+
+        $modal.on('hidden.bs.modal', function (e) {
+            $modal.removeData('id');
+            $modal.find('aviso').remove();
+            $modal.find('#anularContrato').children().remove
+        })
+
+
         actualizarBotones = (action) => {
             $modal.find('#anularContrato').children().remove();
             switch (action) {
@@ -168,6 +204,7 @@
                     break;
                 }
                 case 'anular': {
+                    console.log($modal.find('#anularContrato'))
                     $modal.find('#anularContrato').append(botonesAnular);
                     break;
                 }
@@ -206,36 +243,6 @@
                 }
             });
         }
-
-        $modal.on('shown.bs.modal', function (e) {
-            //verificar si existe el id (por si tocan el html en el dom)
-            $.ajax({
-                url: `/contratos/ver/${$modal.data('id')}`,
-                method: 'GET',
-                dataType: 'json',
-                success: function (data, status, xhr) {
-                    if (data.status_code == 404) {
-                        agregarAlert('error', 'verif')
-                        actualizarBotones('error')
-                    }
-                    else {
-                        actualizarBotones('anular')
-                        $("#confirmarAnular").off('click').on('click', { id: $modal.data('id') }, anularFila);
-                    }
-                },
-                error: function (e) {
-                    agregarAlert('error')
-                    actualizarBotones('error')
-                    console.log(e)
-                }
-            });
-        });
-
-        $modal.on('hidden.bs.modal', function (e) {
-            $modal.removeData('id');
-            $modal.find('aviso').remove();
-            $modal.find('anularContrato').children().remove
-        })
     })
 
 </script>

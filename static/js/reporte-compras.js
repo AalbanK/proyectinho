@@ -22,7 +22,7 @@ inicializarDataTable = (tabla, datos, columnas, urlIdioma, parametros, titulo_re
         language: {
             url: urlIdioma
         },
-        dom: 'Bfrtip',
+        dom: 'Bfrtip', //la B es para los buttons
         buttons: [
             {
                 extend: 'excel', // extensión del plugin

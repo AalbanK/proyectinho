@@ -8,7 +8,7 @@ from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
-from models import Contrato, Producto, Proveedor, Cliente, Cuenta, Departamento, Ciudad
+from models import Contrato, Producto, Proveedor, Cliente, Cuenta, Departamento, Ciudad, Banco
 from fastapi.staticfiles import StaticFiles
 from starlette import status
 
@@ -123,11 +123,31 @@ async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(ge
 async def listar_contratos(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
     ciu_O=aliased(Ciudad)
     ciu_D=aliased(Ciudad)
+    # banc_P=aliased(Banco)
+    # banc_C=aliased(Banco)
+
     contr = db.query(Contrato.idcontrato,Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Contrato.idproducto, Proveedor.descripcion.label('descripcion_proveedor'),
                      Cliente.descripcion.label('descripcion_cliente'), ciu_O.descripcion.label('ciudad_o'), ciu_D.descripcion.label('ciudad_d'), Producto.descripcion.label('descripcion_producto'),
-                     Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta
+                     Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta, Contrato.anulado #, banc_C.descripcion.label('desc_bancoC'), banc_P.descripcion.label('desc_bancoP'),
                      ).join(Proveedor, Contrato.idproveedor==Proveedor.idproveedor).join(Cliente, Contrato.idcliente==Cliente.idcliente).join(ciu_O, Contrato.origen==ciu_O.idciudad
-                     ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto
+                     ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto #).join(banc_C, Contrato.idcuentaC==banc_C.idcuenta).join(banc_P, Contrato.idcuentaP==banc_P.idcuenta
                      ).all()
     respuesta = [dict(r._mapping) for r in contr]
     return JSONResponse(jsonable_encoder(respuesta))
+
+@router.get("/verificar/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
+    contrato = db.query(Contrato).get(id) #obtiene el registro del modelo Cliente por su id
+    if(contrato is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(contrato)) #en caso de que exista el registro, lo devuelve en formato json
+
+@router.get("/anular/{id}",response_class=JSONResponse)
+def anular(id : int, db: Session = Depends(get_database_session)):
+    contra= db.query(Contrato).filter(Contrato.idcontrato == id).first()
+    contra.anulado='S'
+    db.add(contra)
+    db.commit()
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro anulado correctamente.") #retorna el codigo http 200
+    return response

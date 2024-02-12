@@ -1,29 +1,174 @@
 {% extends 'base.html' %}
 {% block content %}
+
+<form id="parametros_auditoria">
+
+  <fieldset class="form-group">
+    <div class="row">
+      <legend class="col-form-label col-2 pt-0">Filtrar fecha:</legend>
+      <div class="col-10">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gridRadios" value="esQuince">
+          <label class="form-check-label" for="esQuince">
+            Últimos 15 días
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="gridRadios" value="esPersonalizado" checked>
+          <label class="form-check-label" for="esPersonalizado">
+            Personalizado
+          </label>
+        </div>
+        </div>
+      </div>
+  </fieldset>
+
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputDesde">Desde</label>
+      <input type="date" class="form-control" id="inputDesde">
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputHasta">Hasta</label>
+      <input type="date" class="form-control" id="inputHasta">
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputUsuario">Usuario</label>
+      <select id="inputUsuario" class="form-control">
+        <option value="" selected>Elegir...</option>
+        {% for Usuario in Usuarios_lista %}
+        <option value="{{Usuario.idusuario}}">{{Usuario.username}}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group col-md-6">
+      <label for="inputAccion">Acción</label>
+      <select id="inputAccion" class="form-control">
+        <option value="" selected>Elegir...</option>
+        <option value="INSERTAR">Inserción</option>
+        <option value="ACTUALIZAR">Actualización</option>
+        <option value="ELIMINAR">Eliminación</option>
+      </select>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+<hr>
 <table id="auditorias" class="table table-striped">
     <thead>
       <tr>
             <th scope="col">ID</th>
-            <th scope="col">Descripcion</th>
+            <th scope="col">Columnas</th>
+            <th scope="col">Acción</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Valor Viejo</th>
+            <th scope="col">Valor Nuevo</th>
       </tr>
     </thead>
     <tbody>
-      {% for departamento in data %}
-      <tr>
-            <td>{{ departamento.id_departamento}}</td>
-            <td>{{ departamento.descripcion }}</td>
-      </tr>
-      {% endfor %}
   </tbody>
 </table>
 {% endblock content %}
 {% block script %}
-<script src="{{url_for('static', path='/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{url_for('static', path='/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
+    
+    let fechaHoy = new Date()
+    let fechaHoyCadena = fechaHoy.toISOString().substr(0, 10) // formato: yyyy-mm-dd
+    let quinceDiasEnMilisegundos = 1000 * 60 * 60 * 24 * 15; // milisegundos * (1 segundo) * (1 minuto) * (1 día) * (15 días)
+    let resta = fechaHoy.getTime() - quinceDiasEnMilisegundos; //getTime devuelve milisegundos de esa fecha
+    let fechaHaceDosSemanas = new Date(resta);
+    let fechaHaceDosSemanasCadena = fechaHaceDosSemanas.toISOString().substr(0, 10)
+
+    let tablaAuditoria, tablaDT =  null;
+    let urlEspanholDT =  '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
+
+    inicializarDataTable = (tabla, datos, columnas, urlIdioma) => {
+      if ( $.fn.DataTable.isDataTable(tabla) ) { 
+        tabla.DataTable().destroy(); //destruir el formato de datatable
+      }
+      return tabla.DataTable({
+          data: datos,
+          columns: columnas,
+          language: {
+              url: urlIdioma
+          },
+      });
+    }
+
+    toggleFechas = (elemento) => {
+      let rangoFechas = elemento
+      switch(rangoFechas){
+        case "esQuince": {
+          $('#inputDesde').val(fechaHaceDosSemanasCadena);
+          $('#inputHasta').val(fechaHoyCadena);
+          $('#inputDesde').prop( "disabled", true );
+          $('#inputHasta').prop( "disabled", true );
+          break;
+        }
+        case "esPersonalizado": {
+          $('#inputDesde').val(fechaHoyCadena);
+          $('#inputHasta').val(fechaHoyCadena);
+          $('#inputDesde').prop( "disabled", false );
+          $('#inputHasta').prop( "disabled", false );
+          break;
+        }
+      }   
+    }
+    
     $(document).ready(function(){
-        $("#tabla_departamentos").DataTable();
+
+      tablaAuditoria = $("#auditorias");
+      columnas = [
+                {
+                    data: 'idauditoria',
+                },
+                {
+                    data: 'columnas',
+                },
+                {
+                    data: 'accion',
+                },
+                {
+                    data: 'accion_fecha',
+                },
+                {
+                    data: 'valor_viejo',
+                },
+                {
+                    data: 'valor_nuevo',
+                }
+              ];
+      url = "/auditoria/filtrar";
+      toggleFechas($('[name=gridRadios]:checked').val());
+
+      $("[name=gridRadios]").click(function(){
+        toggleFechas($(this).val())
+    });
+
+    $("#parametros_auditoria").submit(function (event) {
+      let formData = {
+        fechaDesde: $("#inputDesde").val(),
+        fechaHasta: $("#inputHasta").val(),
+        accion: $("#inputAccion").val(),
+        usuarioAltaModif: $("#inputUsuario").val(), // se asume que la anteantepenúltima (?) columna es la de alta_usuario, y la penúltima la de modif_usuario
+      };
+
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: formData,
+        dataType: "json",
+      }).done(function (datos) {
+        console.log(datos)
+        tablaDT = inicializarDataTable(tablaAuditoria, datos, columnas, urlEspanholDT)
+      });
+
+      event.preventDefault();
+    });
+
     });
 </script>
 {% endblock script %}

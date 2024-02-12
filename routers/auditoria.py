@@ -6,13 +6,13 @@ import sqlalchemy as sa
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from starlette import status
+from schemas import usuario as us
 
 templates = Jinja2Templates(directory="templates")
 
-from ..db.sesion import get_database_session
-from ..models.models import Auditoria, Usuario
-from ..routers import auth, usuarios
-from ..schemas import usuario
+from db.misc import get_database_session
+from models import Auditoria, Usuario
+from routers import auth
 
 router = APIRouter(
     prefix="/auditoria",
@@ -22,9 +22,9 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def read_auditoria(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario)):
+async def read_auditoria(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usuarios = db.query(Usuario).all()
-    return templates.TemplateResponse("auditorias/listar.html", {"request": request, "datatables": True, "Usuarios_lista": usuarios, "datatables": True})
+    return templates.TemplateResponse("auditorias/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables": True, "Usuarios_lista": usuarios, "datatables": True})
 
 @router.get("/todos")
 async def listar_auditoria(request: Request, db: Session = Depends(get_database_session)):
@@ -33,7 +33,10 @@ async def listar_auditoria(request: Request, db: Session = Depends(get_database_
 
 @router.post("/filtrar")
 async def filtrar_auditoria(request: Request, db: Session = Depends(get_database_session), fechaDesde = Form(), fechaHasta = Form(), accion = Form(default = None), usuarioAltaModif = Form(default = None)):
-    
+    print(accion)
+    print(fechaDesde)
+    print(fechaHasta)
+    print(usuarioAltaModif)
     # es como hacer 
     # "select * from auditoria a 
     # where (parametroAccion is null or a.accion = parametroAccion) 
@@ -43,9 +46,10 @@ async def filtrar_auditoria(request: Request, db: Session = Depends(get_database
     # Falta filtrar por idusuario, que se extrae de valor_viejo y valor_nuevo, en las columnas de alta_usuario y modif_usuario
     
     auditoria = db.query(Auditoria).filter(
-        sa.or_(Auditoria.accion == accion, accion == None), 
-        sa.or_(Auditoria.accion_fecha >= fechaDesde, fechaDesde == None),
-        sa.or_(Auditoria.accion_fecha <= fechaHasta, fechaHasta == None)).all()
+        sa.or_(Auditoria.accion == accion, accion == None),
+        sa.or_(sa.func.date(Auditoria.accion_fecha) >= fechaDesde if fechaDesde else True), # se convierte en true = 1 si fecha_desde es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+        sa.or_(sa.func.date(Auditoria.accion_fecha) <= fechaHasta if fechaHasta else True)).all()
+    
     return JSONResponse(jsonable_encoder(auditoria))
 
 #-----------------------------------------------------------------------------------------------------

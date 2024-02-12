@@ -41,9 +41,8 @@ router = APIRouter(
     responses={404: {"description": "No encontrado"}},
 )
 
-def autenticar_usuario(username: str, password: str, db: Depends(get_database_session)):
+def autenticar_usuario(username: str, password: str, db: Session= Depends(get_database_session)):
     user = db.query(Usuario).filter(Usuario.username == username).first()
-    print(user.__dict__)
 
     if user is None:
         raise HTTPException(
@@ -134,7 +133,6 @@ async def get_usuario_actual(token: str = Depends(reuseable_oauth), db: Session=
         )
 
     user = db.query(Usuario).filter(Usuario.username == token_data.sub).first()
-    print(user.__dict__)
 
     if user is None:
         raise HTTPException(
@@ -146,7 +144,7 @@ async def get_usuario_actual(token: str = Depends(reuseable_oauth), db: Session=
 
 # verificar si el usuario es superusuario (id = 1)
 async def verificar_si_usuario_es_superusuario(usuario_actual: usuario.Usuario = Depends(get_usuario_actual)) -> usuario.Usuario:
-    if not usuario_actual.id_rol == 1:
+    if not usuario_actual.idrol == 2:
         raise HTTPException(status_code=401, detail="No tiene privilegios suficientes para realizar esta acción.")
     return usuario_actual
 
@@ -160,7 +158,6 @@ async def iniciar_sesion(request: Request, db: Session = Depends(get_database_se
     form = await request.form()
     response = RedirectResponse('/', status_code=303)
     log = await login_para_token_de_acceso(response=response, form_data=form, db=db)
-    print(response.__dict__)
     return response
 
 @router.get("/logout", response_class=HTMLResponse)
