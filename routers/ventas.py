@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from schemas import usuario as us
 from routers import auth
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, load_only
 from fastapi import Depends, Request, Form, Response, FastAPI
 from starlette.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -30,11 +30,6 @@ router = APIRouter(
 async def read_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("ventas/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True})
 
-# @router.get("/todos")
-# async def listar_ventas(request: Request, db: Session = Depends(get_database_session)):
-#     ventas = db.query(Venta).all()
-#     return JSONResponse(jsonable_encoder(ventas))
-
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     clientes = db.query(Cliente).all()
@@ -62,12 +57,35 @@ async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = 
         response = JSONResponse(content={"error": 'Ninguno.'}, status_code=200)
         return response
     
+# @router.get("/todos")
+# async def listar_ventas(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
+#     vent = db.query(Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Contrato.nro.label('nro_contrato'), Cliente.descripcion.label('descripcion_cliente'),
+#                        Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad, Factura_venta_cabecera.total_monto
+#                        ).join(Contrato, Factura_venta_cabecera.idcontrato==Contrato.idcontrato).join(Cliente,Factura_venta_cabecera.idcliente==Cliente.idcliente
+#                        ).join(Factura_venta_detalle
+#                        ).all()
+#     respuesta = [dict(r._mapping) for r in vent]
+#     return JSONResponse(jsonable_encoder(respuesta))
+
 @router.get("/todos")
-async def listar_ventas(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
-    vent = db.query(Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Contrato.nro.label('nro_contrato'), Cliente.descripcion.label('descripcion_cliente'),
-                       Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad, Factura_venta_cabecera.total_monto
-                       ).join(Contrato, Factura_venta_cabecera.idcontrato==Contrato.idcontrato).join(Cliente,Factura_venta_cabecera.idcliente==Cliente.idcliente
-                       ).join(Factura_venta_detalle,
-                       ).all()
-    respuesta = [dict(r._mapping) for r in vent]
+async def listar_venta(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
+
+    print('hola')
+    respuesta = db.query(Factura_venta_cabecera).options(
+            joinedload(Factura_venta_cabecera.detalles).load_only(Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad),
+            joinedload(Factura_venta_cabecera.cliente).load_only(Cliente.descripcion),
+            joinedload(Factura_venta_cabecera.contrato).load_only(Contrato.nro), load_only(Factura_venta_cabecera.idfactura_venta, Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Factura_venta_cabecera.total_monto)
+        )
+    respuesta = respuesta.all()
+    
+    print(jsonable_encoder(respuesta))
+    #respuesta = [dict(r._mapping) for r in vent]
     return JSONResponse(jsonable_encoder(respuesta))
+
+    """
+    vent = db.query(Factura_compra_cabecera.fecha, Factura_compra_cabecera.numero, Contrato.nro.label('nro_contrato'), Proveedor.descripcion.label('descripcion_proveedor'),
+                       Factura_compra_detalle.descripcion_producto, Factura_compra_detalle.cantidad, Factura_compra_cabecera.total_monto
+                       ).join(Contrato, Factura_compra_cabecera.idcontrato==Contrato.idcontrato).join(Proveedor,Factura_compra_cabecera.idproveedor==Proveedor.idproveedor
+                       ).join(Factura_compra_detalle,
+                       ).all()
+    """

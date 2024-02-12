@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<table id="remisiones" class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Nro</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Contrato N°</th>
+            <th scope="col">Chofer</th>
+            <th scope="col">Chapa Camion</th>
+            <th scope="col">Chapa Carreta</th>
+            <th scope="col">KG Neto</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for remision in data %}
+      <tr>
+            <td>{{ remision.numero}}</td>
+            <td>{{ remision.fecha_carga}}</td>            
+            <td>{{ remision.nro_contrato}}</td>
+            <td>{{ remision.idchofer}}</td>
+            <td>{{ remision.chapacamion}}</td>
+            <td>{{ remision.idcarreta}}</td>
+            <td>{{ remision.neto}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock content %}
+
+{% block script %}
+<script src="{{url_for('static', path='/datatables/jquery.dataTables.min.js')}}"></script>
+<script src="{{url_for('static', path='/datatables/dataTables.bootstrap4.min.js')}}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#remisiones").DataTable();
+    });
+</script>
+{% endblock script %}

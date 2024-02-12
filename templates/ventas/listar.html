@@ -1,17 +1,18 @@
-
 {% extends 'base.html' %}
 {% block content %}
 <table id="venta" class="table table-striped">
     <thead>
         <tr>
-            <th scope="col">Fecha</th>
+            <!-- 
+                <th scope="col">Fecha</th>
             <th scope="col">N° Factura</th>
             <th scope="col">N° Contrato</th>
             <th scope="col">Cliente</th>
             <th scope="col">Producto</th>
             <th scope="col">Cantidad</th>
             <th scope="col">Monto</th>
-            <th scope="col">Acciones</th>
+            <th scope="col">Acciones</th> 
+        -->
         </tr>
     </thead>
     <tbody>
@@ -49,8 +50,7 @@
                     Registro anulado exitosamente.
                 </div>`;
     let botonesVerYAnular = (id) => {
-        return `<a href="/ventas/ver/${id}" class="btn btn-warning ver">Ver</a>
-                <button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
+        return `<button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
     }
 
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
@@ -72,27 +72,37 @@
     $(document).ready(function () {
         columnas = [
             {
+                "className": 'details-control',
+                "orderable": false,
+                "data": null,
+                "defaultContent": '',
+                render: function (data, type, row, meta) {
+                    return `<button type="button" class="btn btn-outline-info">+</button>`;
+                }
+            },
+            {
+                title: 'Fecha',
                 data: 'fecha'
             },
             {
+                title: 'N° Factura',
                 data: 'numero'
             },
             {
-                data: 'nro_contrato'
+                title: 'N° Contrato',
+                data: 'contrato.nro',
+                defaultContent: '-'
             },
             {
-                data: 'descripcion_cliente'
+                title: 'Cliente',
+                data: 'cliente.descripcion'
             },
             {
-                data: 'descripcion_producto'
-            },
-            {
-                data: 'cantidad'
-            },
-            {
+                title: 'Monto',
                 data: 'total_monto'
             },
             {
+                title: 'Acciones',
                 data: null,
                 sortable: false,
                 searchable: false,
@@ -106,6 +116,42 @@
         $tabla.on('click', '.btn-danger.anular', function (e) {
             let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de "whatever"
             $modal.data('id', id).modal('show');
+        });
+
+
+        $('#venta tbody').on('click', 'td.details-control', function () {
+
+            function format(d) {
+                // `d` es el objeto data original de la fila
+
+                let cadenaDetalles = "";
+                for (let i = 0; i < d.detalles.length; i++) {
+                    console.log(d.detalles[i])
+                    cadenaDetalles = cadenaDetalles + `<dd> Producto: ${d.detalles[i].descripcion_producto}, Cantidad: ${d.detalles[i].cantidad} </dd>`;
+                }
+
+                return (
+                    '<dl>' +
+                    '<dt>Detalles:</dt>' +
+                    '<dd>' +
+                    cadenaDetalles +
+                    '</dd>' +
+                    '</dl>'
+                );
+            }
+
+            let tr = $(this).closest('tr');
+            let row = tablaDT.row(tr);
+
+            if (row.child.isShown()) {
+                // Esta fila ya está abierta: cerrarla
+                row.child.hide();
+                tr.removeClass('shown');
+            } else {
+                // Abrir esta fila
+                row.child(format(row.data())).show();
+                tr.addClass('shown');
+            }
         });
 
         agregarAlert = (accion, motivo) => {

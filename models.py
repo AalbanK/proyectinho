@@ -165,22 +165,6 @@ class Ciudad(Base):
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
 
-
-# class Comprobante(Base):
-#     __tablename__ = "comprobantes" #Nombre de la tabla en la Base de Datos
-#     id_comprobante  = Column(Integer, primary_key=True, index=True)
-#     id_tipo_comprobante  = Column(Integer, ForeignKey("tiposcomprobantes.idtipocomprobante"))
-#     fechaemision = Column(DateTime(timezone=True), server_default=func.now())
-#     Nro = Column(Integer, unique=True)
-#     idproducto  = Column(Integer, ForeignKey("productos.idproducto"))
-#     idproveedor = Column(Integer, ForeignKey ("proveedores.idproveedor"))
-#     idcliente = Column(Integer, ForeignKey("clientes.idcliente"))
-#     comprobpunit = Column(Integer)
-#     cant = Column(Integer)
-#     total = Column(Integer)
-#     totaliva = Column(Integer)
-
-
 class Contrato(Base):
     __tablename__= "contrato" #Nombre de la tabla en la Base de Datos
     idcontrato = Column(Integer, primary_key=True, index=True)
@@ -192,17 +176,16 @@ class Contrato(Base):
     precio_compra = Column(Integer)    
     precio_venta = Column(Integer)
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor"))
-    # idcprove=relationship("Cuenta", foreign_keys=[idproveedor]
     idcuentaP= Column(Integer, ForeignKey("cuenta.idcuenta"))
-    # ForeignKeyConstraint(
-    #     ["idcuentaP"], ["invoice.invoice_id", "invoice.ref_num"]
-    # )
+    idcprove=relationship("Cuenta", foreign_keys=[idcuentaP])
+
     cuenta_proveedor = Column(String(45))
     origen = Column(Integer, ForeignKey("ciudad.idciudad"))
     
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
     idcuentaC= Column(Integer, ForeignKey("cuenta.idcuenta"))
-    # idcclie=relationship("Cuenta", foreign_keys=[idcliente])
+    idcclie=relationship("Cuenta", foreign_keys=[idcuentaC])
+
     cuenta_cliente = Column(String(45))
     destino = Column(Integer, ForeignKey("ciudad.idciudad"))
     
@@ -225,8 +208,8 @@ class Cuenta(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
-    # idcuentaprove=relationship("Contrato", back_populates="idcprove")
-    # idcuentaclie=relationship("Contrato", back_populates="idcclie")
+    #idcuentaprove=relationship("Contrato", back_populates="idcprove")
+    #idcuentaclie=relationship("Contrato", back_populates="idcclie")
 
 
 class Producto(Base):

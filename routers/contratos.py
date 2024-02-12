@@ -101,11 +101,17 @@ async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(ge
     depto_D=aliased(Departamento)
     ciu_O=aliased(Ciudad)
     ciu_D=aliased(Ciudad)
+    cuen_P=aliased(Cuenta)
+    cuen_C=aliased(Cuenta)
+    banc_P=aliased(Banco)
+    banc_C=aliased(Banco)
+
     contra = db.query(Contrato.idcontrato, Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Proveedor.descripcion.label("desc_provee"), Proveedor.ruc.label("ruc_provee"),
                       Cliente.descripcion.label("desc_clie"), Cliente.ruc.label("ruc_clie"), Contrato.idproducto, Producto.descripcion.label("desc_producto"), Contrato.cantidad,
                       Contrato.precio_compra, Contrato.precio_venta, Contrato.cuenta_proveedor, Contrato.cuenta_proveedor,
                       Contrato.origen,ciu_O.descripcion.label("desc_ciudad_origen"), depto_O.descripcion.label("desc_depto_origen"),
                       Contrato.destino,ciu_D.descripcion.label("desc_ciudad_destino"), depto_D.descripcion.label("desc_depto_destino")
+                      , banc_C.descripcion.label('desc_bancoC'), banc_P.descripcion.label('desc_bancoP'),
                       ).join(Cliente, Cliente.idcliente==Contrato.idcliente
                       ).join(ciu_D,ciu_D.idciudad==Contrato.destino
                       ).join(depto_D,ciu_D.iddepartamento==depto_D.iddepartamento
@@ -113,6 +119,8 @@ async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(ge
                       ).join(ciu_O,ciu_O.idciudad==Contrato.origen
                       ).join(depto_O,ciu_O.iddepartamento==depto_O.iddepartamento
                       ).join(Producto, Producto.idproducto==Contrato.idproducto
+                             ).join(cuen_C, Contrato.idcuentaC==cuen_C.idcuenta).join(cuen_P, Contrato.idcuentaP==cuen_P.idcuenta
+                             ).join(banc_C, cuen_C.idbanco==banc_C.idbanco).join(banc_P, cuen_P.idbanco==banc_P.idbanco
                       ).filter(Contrato.idcontrato == idcontrato
                       ).first()
     return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual, "Contrato":contra})
@@ -123,14 +131,12 @@ async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(ge
 async def listar_contratos(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
     ciu_O=aliased(Ciudad)
     ciu_D=aliased(Ciudad)
-    # banc_P=aliased(Banco)
-    # banc_C=aliased(Banco)
 
     contr = db.query(Contrato.idcontrato,Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Contrato.idproducto, Proveedor.descripcion.label('descripcion_proveedor'),
                      Cliente.descripcion.label('descripcion_cliente'), ciu_O.descripcion.label('ciudad_o'), ciu_D.descripcion.label('ciudad_d'), Producto.descripcion.label('descripcion_producto'),
-                     Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta, Contrato.anulado #, banc_C.descripcion.label('desc_bancoC'), banc_P.descripcion.label('desc_bancoP'),
+                     Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta, Contrato.anulado 
                      ).join(Proveedor, Contrato.idproveedor==Proveedor.idproveedor).join(Cliente, Contrato.idcliente==Cliente.idcliente).join(ciu_O, Contrato.origen==ciu_O.idciudad
-                     ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto #).join(banc_C, Contrato.idcuentaC==banc_C.idcuenta).join(banc_P, Contrato.idcuentaP==banc_P.idcuenta
+                     ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto 
                      ).all()
     respuesta = [dict(r._mapping) for r in contr]
     return JSONResponse(jsonable_encoder(respuesta))

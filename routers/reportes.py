@@ -34,7 +34,7 @@ router = APIRouter(
 )
 
 @router.get("/")
-async def mostrar_interfaz_reportes(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+async def mostrar_interfaz_reportes(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     return templates.TemplateResponse("reportes.html", {"request": request, "usuario_actual": usuario_actual})
 
 @router.get("/stock")
