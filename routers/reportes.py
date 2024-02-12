@@ -38,7 +38,7 @@ async def mostrar_interfaz_reportes(request: Request, db: Session = Depends(get_
     return templates.TemplateResponse("reportes.html", {"request": request, "usuario_actual": usuario_actual})
 
 @router.get("/stock")
-async def mostrar_parametros_stock(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+async def mostrar_parametros_stock(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     productos = await routerproductos.listado_productos(request=request, db=db)
     return templates.TemplateResponse("/reportes/stock.html", {"request": request, "Productos": productos, "datatables": True, "usuario_actual": usuario_actual})
 
@@ -108,7 +108,7 @@ def mostrar_stock(request: Request, db: Session = Depends(get_database_session),
     return JSONResponse(jsonable_encoder(respuesta))
 
 @router.get("/ventas")
-async def mostrar_parametros_ventas(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+async def mostrar_parametros_ventas(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     clientes = await routerclientes.listado_clientes(request=request, db=db)
     productos = await routerproductos.listado_productos(request=request, db=db)
     return templates.TemplateResponse("/reportes/ventas.html", {"request": request, "Clientes": clientes, "Productos": productos, "datatables": True, "usuario_actual": usuario_actual})
@@ -153,7 +153,7 @@ def mostrar_ventas(request: Request, db: Session = Depends(get_database_session)
     return {}
 
 @router.get("/compras")
-async def mostrar_parametros_compras(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+async def mostrar_parametros_compras(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     proveedores = await routerproveedores.listado_proveedores(request=request, db=db)
     productos = await routerproductos.listado_productos(request=request, db=db)
     return templates.TemplateResponse("/reportes/compras.html", {"request": request, "Proveedores": proveedores, "Productos": productos, "datatables": True, "usuario_actual": usuario_actual})
