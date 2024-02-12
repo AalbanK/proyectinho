@@ -35,10 +35,12 @@ async def create_remision(request: Request, db: Session = Depends(get_database_s
     return templates.TemplateResponse("remisiones/crear.html", {"request": request, "usuario_actual": usuario_actual, "Contratos_lista":contras, "Choferes_lista":chofes, "Camiones_lista":camis,"Carretas_lista":carres})
 
 @router.post("/nuevo")
-async def create_remision(db: Session=Depends(get_database_session), fechacarga=Form(...), fechadescarga=Form(), bruto=Form(...), tara=Form(...),neto=Form(...),
-                          idchofer=Form(...), idcontrato=Form(...), idcamion=Form(...), idcarreta=Form(...),usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+async def create_remision(db: Session=Depends(get_database_session),usuario_actual: us.Usuario = Depends(auth.get_usuario_actual),numero=Form(...),fechacarga=Form(...),
+                          fechadescarga=Form(),idcontrato=Form(...), idchofer=Form(...), idcamion=Form(...), idcarreta=Form(...),bruto=Form(...), tara=Form(...),neto=Form(...)):
+    
     usu = us.Usuario.from_orm(usuario_actual)
-    remi = Remision(idcontrato=idcontrato,fecha_carga=fechacarga, fecha_descarga=fechadescarga, bruto_carga=bruto, tara_carga=tara, neto_carga=neto, idchofer=idchofer, alta_usuario = usu.idusuario)
+    remi = Remision(numero=numero, fecha_carga=fechacarga, fecha_descarga=fechadescarga, idcontrato=idcontrato, idchofer = idchofer,idcamion=idcamion, idcarreta=idcarreta,
+                    bruto=bruto, tara=tara,neto=neto, alta_usuario = usu.idusuario)
     db.add(remi)
     db.commit()
     db.refresh(remi)

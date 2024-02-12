@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+                    <!-- Page Heading -->
+                    <h1 class="h2 mb-1 text-gray-800">Reportes</h1>
+                    <hr class="mb-4">
+
+                    <!-- Content Row -->
+                    <div class="row">
+
+                        <!-- Border Left Utilities -->
+                        <div class="col-lg-6">
+
+                            <div class="card mb-4 py-2 border-left-success">
+                                <div class="card-body">
+                                    <a href="/informes/compras">Compras (según proveedor / producto)</a>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4 py-2 border-left-success">
+                                <div class="card-body">
+                                    <a href="/informes/ventas">Ventas (según cliente / producto)</a>
+                                </div>
+                            </div>
+
+                            <div class="card mb-4 py-2 border-left-success">
+                                <div class="card-body">
+                                    <a href="/informes/stock">Movimientos de Stock según Producto</a>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+{% endblock content %}

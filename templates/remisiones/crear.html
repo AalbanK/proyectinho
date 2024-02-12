@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container-fluid">
-    <form action="/remisiones/nuevo" method="POST">
+<div class="container-fluid" id="remision">
+    <form action="/remisiones/nuevo" id="remisionForm" method="POST">
         <div class="row d-flex align-items-end">
             <div class="col">
                 <div class="form-group">
@@ -13,13 +13,13 @@
             <div class="col">
                 <div class="form-group">
                     <label for="fecha">*Fecha de Emisión: </label>
-                    <input type="date" class="form-control" id="fecha" name="fecha">
+                    <input type="date" class="form-control" id="fecha_carga" name="fechacarga">
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
                     <label for="fecha">*Fecha de Descarga: </label>
-                    <input type="date" class="form-control" id="fecha" name="fecha">
+                    <input type="date" class="form-control" id="fecha_descarga" name="fechadescarga">
                 </div>
             </div>
         </div>
@@ -30,10 +30,10 @@
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="idContrato">Contrato:</label>
                         </div>
-                        <select class="custom-select" id="idContrato" name="idContrato">
+                        <select class="custom-select" id="idContrato" name="idcontrato">
                             <option value="" selected>Elegir...</option>
                             {% for Contrato in Contratos_lista %}
-                            <option value="{{Contrato.idContrato}}">{{Contrato.nro}}</option>
+                            <option value="{{Contrato.idcontrato}}">{{Contrato.nro}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -50,7 +50,7 @@
             <div class="col-xs-12 col-md-4">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="idProveedor">Proveedor:</label>
+                        <label class="input-group-text" for="desc_proveedor">Proveedor:</label>
                     </div>
                     <input class="form-control" type="text" id="desc_proveedor" readonly>
                 </div>
@@ -58,9 +58,9 @@
             <div class="col-xs-12 col-md-4">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="idDepartamento">Departamento:</label>
+                        <label class="input-group-text">Departamento:</label>
                     </div>
-                    <input type="text" name="ciudad_O" class="form-control" value="" disabled>
+                    <input type="text" name="departamento_O" class="form-control" readonly>
                 </div>
             </div>
             <div class="col-xs-12 col-md-4">
@@ -68,7 +68,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCiudad">Ciudad:</label>
                     </div>
-                    <input type="text" name="ciudad_O" class="form-control" value="" disabled>
+                    <input type="text" name="ciudad_O" class="form-control" value="" readonly>
                 </div>
             </div>
         </div>
@@ -82,9 +82,9 @@
             <div class="col-xs-12 col-md-4">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="idCliente">Cliente:</label>
+                        <label class="input-group-text" for="desc_cliente">Cliente:</label>
                     </div>
-                    <input type="text" name="cliente" class="form-control" value="" disabled>
+                    <input type="text" name="cliente" class="form-control" id="desc_cliente" readonly>
                 </div>
             </div>
             <div class="col-xs-12 col-md-4">
@@ -92,7 +92,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idDepartamento">Departamento:</label>
                     </div>
-                    <input type="text" name="departamento_D" class="form-control" value="" disabled>
+                    <input type="text" name="departamento_D" class="form-control" value="" readonly>
                 </div>
             </div>
             <div class="col-xs-12 col-md-4">
@@ -100,7 +100,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCiudad">Ciudad:</label>
                     </div>
-                    <input type="text" name="ciudad_D" class="form-control" value="" disabled>
+                    <input type="text" name="ciudad_D" class="form-control" value="" readonly>
                 </div>
             </div>
         </div>
@@ -116,7 +116,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idChofer">Chofer:</label>
                     </div>
-                    <select class="custom-select" style="margin-right: 10px" id="idChofer" name="idChofer">
+                    <select class="custom-select" style="margin-right: 10px" id="idChofer" name="idchofer">
                         <option value="0" selected>Elegir...</option>
                         {% for Chofer in Choferes_lista %}
                         <option value="{{Chofer.idchofer}}">{{Chofer.ci}}</option>
@@ -129,7 +129,7 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCamion">Camión:</label>
                     </div>
-                    <select class="custom-select" style="margin-right: 10px" id="idCamion" name="idCamion">
+                    <select class="custom-select" style="margin-right: 10px" id="idCamion" name="idcamion">
                         <option value="0" selected>Elegir...</option>
                         {% for Camion in Camiones_lista %}
                         <option value="{{Camion.idcamion}}">{{Camion.camion_chapa}}</option>
@@ -142,10 +142,10 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCarreta">Carreta:</label>
                     </div>
-                    <select class="custom-select" style="margin-right: 10px" id="idCarreta" name="idCarreta">
+                    <select class="custom-select" style="margin-right: 10px" id="idCarreta" name="idcarreta">
                         <option value="0" selected>Elegir...</option>
                         {% for Carreta in Carretas_lista %}
-                        <option value="{{Carreta.idcamion}}">{{Carreta.carreta_chapa}}</option>
+                        <option value="{{Carreta.idcarreta}}">{{Carreta.carreta_chapa}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -168,13 +168,13 @@
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Neto: </label>
-                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
+                    <input type="number" name="neto" class="form-control" pattern="[0-9]{4,5}" required>
                 </div>
             </div>
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Producto: </label>
-                    <input type="text" name="producto" class="form-control" value="" disabled>
+                    <input type="text" name="producto" class="form-control" value="" readonly>
                 </div>
             </div>
         </div>

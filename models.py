@@ -240,12 +240,16 @@ class Producto(Base):
 class Remision(Base):
     __tablename__="remision"
     idremision=Column(Integer, primary_key=True, index=True)
+    numero=Column(String(45))
     fecha_carga=Column(DateTime(timezone=True), server_default=func.now())
     fecha_descarga=Column(DateTime(timezone=True), server_default=func.now())
+    idcontrato=Column(Integer, ForeignKey("contrato.idcontrato"))
     bruto=Column(Double)
     tara=Column(Double)
     neto=Column(Double)
+    idchofer=Column(Integer, ForeignKey("chofer.idchofer"))
     idcamion=Column(Integer, ForeignKey("camion.idcamion"))
+    idcarreta=Column(Integer, ForeignKey("carreta.idcarreta"))
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
