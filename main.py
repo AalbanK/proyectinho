@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from starlette.status import HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST
+from starlette.status import HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 from fastapi.templating import Jinja2Templates
 from schemas import usuario as us
 from routers import auth
@@ -19,11 +19,15 @@ from routers import (auth,auditoria,bancos,camiones,carretas,choferes,ciudades,c
 app = FastAPI()
 from fastapi.templating import Jinja2Templates
 
+@app.exception_handler(404)
+async def custom_404_handler(request, __):
+    return templates.TemplateResponse("404.html", {"request": request})
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     if exc.status_code == HTTP_403_FORBIDDEN or exc.status_code == HTTP_401_UNAUTHORIZED or exc.status_code == HTTP_400_BAD_REQUEST:
        return templates.TemplateResponse("login.html", {"request": request, "error": exc.detail})
-    # Si el error no es 401 o 403 o 400, relanzarlo
+        # Si el error no es 401 o 403 o 400, relanzarlo
     raise exc
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
