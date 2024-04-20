@@ -56,11 +56,11 @@ def editar_view(id:int,response:Response,request:Request,db: Session = Depends(g
     return templates.TemplateResponse("productos/editar.html", {"request": request, "usuario_actual": usuario_actual, "Producto": produ, "Ivas_lista": iv})
 
 @router.post("/update",response_class=HTMLResponse)
-def editar(db: Session = Depends(get_database_session), idproducto = Form(...), descripcion = Form(...), iva = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+def editar(db: Session = Depends(get_database_session), idproducto = Form(...), descripcion = Form(...), idiva = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
     produ= db.query(Producto).get(idproducto)
     produ.descripcion=descripcion
-    produ.idIVA=iva
+    produ.idIVA=idiva
     produ.modif_usuario = usu.idusuario
     db.add(produ)
     db.commit()
