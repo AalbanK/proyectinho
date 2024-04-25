@@ -1,18 +1,21 @@
-from models import Cuenta, Banco, Cliente, Proveedor
-from schemas import usuario as us
-from fastapi import APIRouter, Depends, HTTPException, Request, Form, Response, FastAPI
 import statistics
+
+from fastapi import (APIRouter, Depends, FastAPI, Form, HTTPException, Request,
+                     Response)
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy.orm import Session
+from fastapi.templating import Jinja2Templates
 from sqlalchemy import and_, case, literal
-from starlette.responses import RedirectResponse
+from sqlalchemy.orm import Session
 from starlette import status
-from routers import auth, bancos as bank
+from starlette.responses import RedirectResponse
 
-from  db.misc import get_database_session
+from db.misc import get_database_session
+from models import Banco, Cliente, Cuenta, Proveedor
+from routers import auth
+from routers import bancos as bank
+from schemas import usuario as us
 
 app = FastAPI()
 

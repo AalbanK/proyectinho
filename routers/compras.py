@@ -1,20 +1,21 @@
-from fastapi import APIRouter
-from schemas import usuario as us
-from routers import auth
-from sqlalchemy.orm import Session, joinedload, load_only
-from fastapi import Depends, Request, Form, Response, FastAPI
-from starlette.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
-from models import Deposito, Proveedor, IVA, Contrato, Factura_compra_cabecera, Factura_compra_detalle
-from fastapi.staticfiles import StaticFiles
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy import func
 from typing import List
 
-from schemas.cabecera_detalle_compra import Compra_cabecera, Compra_cabecera_Vista
+from fastapi import APIRouter, Depends, FastAPI, Form, Request, Response
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import func
+from sqlalchemy.orm import Session, joinedload, load_only
+from starlette.responses import RedirectResponse
 
-from  db.misc import get_database_session
+from db.misc import get_database_session
+from models import (IVA, Contrato, Deposito, Factura_compra_cabecera,
+                    Factura_compra_detalle, Proveedor)
+from routers import auth
+from schemas import usuario as us
+from schemas.cabecera_detalle_compra import (Compra_cabecera,
+                                             Compra_cabecera_Vista)
 
 app = FastAPI()
 

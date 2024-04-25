@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, Request, Form, Body
+import sqlalchemy as sa
+from fastapi import APIRouter, Body, Depends, Form, HTTPException, Request
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse, Response
-from sqlalchemy.orm import Session
-import sqlalchemy as sa
 from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse
+from sqlalchemy.orm import Session
 from starlette import status
+from starlette.responses import RedirectResponse
+
 from schemas import usuario as us
 
 templates = Jinja2Templates(directory="templates")

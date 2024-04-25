@@ -1,10 +1,10 @@
 from sqlalchemy import Date, ForeignKeyConstraint
-from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import String, Integer, Double, Text, DateTime
 from sqlalchemy.orm import relationship
+from sqlalchemy.schema import Column, ForeignKey
 from sqlalchemy.sql import func
-from db.database import Base
+from sqlalchemy.types import DateTime, Double, Integer, String, Text
 
+from db.database import Base
 
 
 class Auditoria(Base):

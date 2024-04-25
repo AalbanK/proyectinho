@@ -1,18 +1,20 @@
 import statistics
-from schemas import usuario as us
-from routers import auth
-from fastapi import APIRouter, HTTPException
-from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session, aliased
-from fastapi import Depends, Request, Form, Response, FastAPI
-from starlette.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
-from models import Contrato, Producto, Proveedor, Cliente, Cuenta, Departamento, Ciudad, Banco
-from fastapi.staticfiles import StaticFiles
-from starlette import status
 
-from  db.misc import get_database_session
+from fastapi import (APIRouter, Depends, FastAPI, Form, HTTPException, Request,
+                     Response)
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from sqlalchemy.orm import Session, aliased
+from starlette import status
+from starlette.responses import RedirectResponse
+
+from db.misc import get_database_session
+from models import (Banco, Ciudad, Cliente, Contrato, Cuenta, Departamento,
+                    Producto, Proveedor)
+from routers import auth
+from schemas import usuario as us
 
 app = FastAPI()
 
@@ -119,11 +121,12 @@ async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(ge
                       ).join(ciu_O,ciu_O.idciudad==Contrato.origen
                       ).join(depto_O,ciu_O.iddepartamento==depto_O.iddepartamento
                       ).join(Producto, Producto.idproducto==Contrato.idproducto
-                             ).join(cuen_C, Contrato.idcuentaC==cuen_C.idcuenta).join(cuen_P, Contrato.idcuentaP==cuen_P.idcuenta
-                             ).join(banc_C, cuen_C.idbanco==banc_C.idbanco).join(banc_P, cuen_P.idbanco==banc_P.idbanco
+                             ).join(cuen_C, Contrato.idcuentaC==cuen_C.idcuenta, isouter = True).join(cuen_P, Contrato.idcuentaP==cuen_P.idcuenta, isouter = True
+                             ).join(banc_C, cuen_C.idbanco==banc_C.idbanco, isouter = True).join(banc_P, cuen_P.idbanco==banc_P.idbanco, isouter = True
                       ).filter(Contrato.idcontrato == idcontrato
                       ).first()
-    return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "datatables": True, "usuario_actual": usuario_actual, "Contrato":contra})
+    print(contra)
+    return templates.TemplateResponse("contratos/previsualizacion.html", {"request": request, "usuario_actual": usuario_actual, "Contrato":contra})
 
 
 

@@ -1,27 +1,25 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, Depends, FastAPI, Form, Request, Response
 from fastapi.encoders import jsonable_encoder
-from sqlalchemy.orm import Session
-from fastapi import Depends, Request, Form, Response, FastAPI
-from starlette.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, JSONResponse
-from models import IVA
 from fastapi.staticfiles import StaticFiles
-from schemas import usuario as us
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import and_, cast, func, label, literal, or_, union_all
+from sqlalchemy.orm import Session
+from starlette.responses import RedirectResponse
+
+from db.misc import get_database_session
+from models import (IVA, Cliente, Factura_compra_cabecera,
+                    Factura_compra_detalle, Factura_venta_cabecera,
+                    Factura_venta_detalle, Producto, Proveedor, Remision)
 from routers import auth
-from sqlalchemy import literal, func, label, and_, or_, union_all, cast
-
-
-from . import productos as routerproductos
-from . import clientes as routerclientes
-from . import proveedores as routerproveedores
-from  db.misc import get_database_session
-from models import Factura_compra_cabecera, Factura_compra_detalle, Factura_venta_cabecera, Factura_venta_detalle, Producto, Remision, Cliente, Proveedor
 from schemas import reporte
+from schemas import usuario as us
 
-from  db.misc import get_database_session
+from . import clientes as routerclientes
+from . import productos as routerproductos
+from . import proveedores as routerproveedores
 
 app = FastAPI()
 

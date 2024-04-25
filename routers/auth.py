@@ -1,36 +1,27 @@
 # https://www.fastapitutorial.com/blog/permissions-in-fastapi/
 
 from datetime import datetime
-from typing import List, Union, Any
+from typing import Any, List, Union
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Form, Body, status, Response
+import sqlalchemy
+from fastapi import (APIRouter, Body, Depends, FastAPI, Form, HTTPException,
+                     Request, Response, status)
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.templating import Jinja2Templates
 from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
-import sqlalchemy
 from starlette.responses import RedirectResponse
 
-from fastapi import FastAPI
-from fastapi.security import OAuth2PasswordRequestForm
-
+from db.misc import (ALGORITHM, JWT_SECRET_KEY, crear_access_token,
+                     crear_refresh_token, get_database_session,
+                     get_password_hasheado, verificar_password)
 from db.utils import OAuth2PasswordBearerWithCookie
-
-from db.misc import get_database_session
-from models import Usuario, Rol
+from models import Rol, Usuario
 from schemas import usuario
 from schemas.token import TokenPayload, TokenSchema
-
-from db.misc import (
-    get_password_hasheado,
-    crear_access_token,
-    crear_refresh_token,
-    verificar_password,
-    ALGORITHM,
-    JWT_SECRET_KEY
-)
 
 templates = Jinja2Templates(directory="templates")
 

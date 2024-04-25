@@ -1,23 +1,25 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, Form
+from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.responses import RedirectResponse
 from sqlalchemy.orm import Session
-from starlette.status import HTTP_403_FORBIDDEN, HTTP_401_UNAUTHORIZED, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
-from fastapi.templating import Jinja2Templates
-from schemas import usuario as us
-from routers import auth
+from starlette.responses import RedirectResponse
+from starlette.status import (HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED,
+                              HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND)
 
-from models import *
-
-from db.database import SessionLocal, engine
 import models
-from routers import (auth,auditoria,bancos,camiones,carretas,choferes,ciudades,clientes,contratos,compras,departamentos,depositos,ivas,marcas_camiones,marcas_carretas,productos,proveedores,reportes,remisiones,roles,usuarios,ventas,cuentas#,remisiones,
-)
+from db.database import SessionLocal, engine
+from models import *
+from routers import (auditoria, auth, bancos, camiones,  # ,remisiones,
+                     carretas, choferes, ciudades, clientes, compras,
+                     contratos, cuentas, departamentos, depositos, ivas,
+                     marcas_camiones, marcas_carretas, productos, proveedores,
+                     remisiones, reportes, roles, usuarios, ventas)
+from schemas import usuario as us
 
 app = FastAPI()
 from fastapi.templating import Jinja2Templates
+
 
 @app.exception_handler(404)
 async def custom_404_handler(request, __):
