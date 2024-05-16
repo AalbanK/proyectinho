@@ -4,7 +4,7 @@
     <form action="/productos/nuevo" method="POST">
         <div class="form-group">
             <label for="descProducto">Nombre Producto: </label>
-            <input type="text" class="form-control" id="descProducto" name="descProducto" >
+            <input type="text" class="form-control" id="descProducto" name="descProducto">
         </div>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -16,6 +16,7 @@
                 {% endfor %}
             </select>
         </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
         <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 </div>

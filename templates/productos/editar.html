@@ -1,25 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/productos/update/" method="POST">
+<div>
+    <form action="/productos/update/" method="POST">
+        <div class="form-group">
+            <input type="hidden" class="form-control" id="idproducto" name="idproducto" value="{{Producto.idproducto}}">
+            <label for="descripcion">Nombre Producto</label>
+            <input type="text" class="form-control" id="descripcion" name="descripcion"
+                value="{{Producto.descripcion}}">
             <div class="form-group">
-                <input type="hidden" class="form-control" id="idproducto" name="idproducto" value="{{Producto.idproducto}}">
-                <label for="descripcion">Nombre Producto</label>
-                <input type="text" class="form-control" id="descripcion" name="descripcion" value="{{Producto.descripcion}}">
-                <div class="form-group">
-                    <div class="input-group mt-3 mb-3">
-                        <div class="input-group-prepend">
-                            <label class="input-group-text" for="idiva"> % IVA </label>
-                        </div>
-                        <select class="custom-select" id="idiva" name="idiva" required>
-                            {% for Iva in Ivas_lista %}
-                            <option value="{{Iva.idIVA}}" {{ "selected" if Iva.idIVA == Producto.idIVA}}>{{Iva.porcentaje}}</option>
-                            {% endfor %}
-                        </select>
+                <div class="input-group mt-3 mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="idiva"> % IVA </label>
                     </div>
+                    <select class="custom-select" id="idiva" name="idiva" required>
+                        {% for Iva in Ivas_lista %}
+                        <option value="{{Iva.idIVA}}" {{ "selected" if Iva.idIVA==Producto.idIVA}}>{{Iva.porcentaje}}
+                        </option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </form>
-    </div>
+        </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
 {% endblock content %}

@@ -26,6 +26,7 @@
             <label for="telefono">Teléfono</label>
             <input type="text" class="form-control" id="telefono" name="telefono" value="{{ Chofer.telefono}}">
         </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
         <button type="submit" class="btn btn-primary">Guardar</button>
         </form>
     </div>    
@@ -102,7 +103,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-     await obtenerCiudadDeptoCho()
+    await obtenerCiudadDeptoCho()
     .then(deptocho => {ciudepto = deptocho })
     .catch(error => {
         console.error(error);

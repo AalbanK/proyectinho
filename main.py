@@ -10,7 +10,7 @@ from starlette.status import (HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED,
 import models
 from db.database import SessionLocal, engine
 from models import *
-from routers import (auditoria, auth, bancos, camiones,  # ,remisiones,
+from routers import (auditoria, auth, bancos, camiones,
                      carretas, choferes, ciudades, clientes, compras,
                      contratos, cuentas, departamentos, depositos, ivas,
                      marcas_camiones, marcas_carretas, productos, proveedores,
@@ -28,7 +28,7 @@ async def custom_404_handler(request, __):
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):
     if exc.status_code == HTTP_403_FORBIDDEN or exc.status_code == HTTP_401_UNAUTHORIZED or exc.status_code == HTTP_400_BAD_REQUEST:
-       return templates.TemplateResponse("login.html", {"request": request, "error": exc.detail})
+        return templates.TemplateResponse("login.html", {"request": request, "error": exc.detail})
         # Si el error no es 401 o 403 o 400, relanzarlo
     raise exc
 

@@ -2,7 +2,7 @@
 {% block content %}
 <table id="cliente" class="table table-striped">
     <thead>
-      <tr>
+        <tr>
             <th scope="col">ID</th>
             <th scope="col">Nombre</th>
             <th scope="col">RUC</th>
@@ -11,11 +11,11 @@
             <th scope="col">Correo</th>
             <th scope="col">Contacto</th>
             <th scope="col">Acciones</th>
-      </tr>
+        </tr>
     </thead>
     <tbody>
-      {% for cliente in clientes %}
-      <tr>
+        {% for cliente in clientes %}
+        <tr>
             <td>{{ cliente.idcliente}}</td>
             <td>{{ cliente.descripcion}}</td>
             <td>{{ cliente.ruc}}</td>
@@ -24,29 +24,32 @@
             <td>{{ cliente.mail}}</td>
             <td>{{ cliente.telefono}}</td>
             <td><a href="/clientes/editar/{{- cliente.idcliente -}}" class="btn btn-warning editar">Editar</a>
-                <button type="button" class="btn btn-danger eliminar" data-toggle="modal" data-target="#eliminarModal" data-id="{{- cliente.idcliente -}}"> Eliminar </button></td>
-      </tr>
-      {% endfor %}
+                <button type="button" class="btn btn-danger eliminar" data-toggle="modal" data-target="#eliminarModal"
+                    data-id="{{- cliente.idcliente -}}"> Eliminar </button>
+            </td>
+        </tr>
+        {% endfor %}
     </tbody>
 
 </table>
+<button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
 
 <div class="modal fade" id="eliminarModal">
-  <div class="modal-dialog">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h4 class="modal-title">Eliminar Registro</h4>
-              <a href="#" class="close" data-dismiss="modal">&times;</a>
-          </div>
-          <div class="modal-body">
-              <h5> ¿Está seguro/a de eliminar este registro? </h5>
-          </div>
-          <div class="modal-footer">
-              <form id="eliminarCliente">
-              </form>
-          </div>
-      </div>
-  </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Eliminar Registro</h4>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <h5> ¿Está seguro/a de eliminar este registro? </h5>
+            </div>
+            <div class="modal-footer">
+                <form id="eliminarCliente">
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock content %}
@@ -55,7 +58,7 @@
 <script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
-    
+
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
     let $tabla = $("#cliente");
     let $modal = $('#eliminarModal');
@@ -72,7 +75,7 @@
         $modal.data('id', id).modal('show');
     });
 
-    $(document).ready(function(){
+    $(document).ready(function () {
         $("#cliente").DataTable();
 
         $modal.on('shown.bs.modal', function (e) {

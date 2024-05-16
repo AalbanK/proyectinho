@@ -1,7 +1,7 @@
 import statistics
 
 from fastapi import (APIRouter, Depends, FastAPI, Form, HTTPException, Request,
-                     Response)
+                    Response)
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,7 +12,7 @@ from starlette import status
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import Ciudad, Departamento, Proveedor
+from models import Ciudad, Departamento, Proveedor, Banco, Cuenta
 from routers import auth
 from schemas import usuario as us
 
@@ -34,15 +34,30 @@ async def read_proveedor(request: Request, db: Session = Depends(get_database_se
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_proveedor(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("proveedores/crear.html", {"request": request, "usuario_actual": usuario_actual})
+    bancos = db.query (Banco).all()
+    return templates.TemplateResponse("proveedores/crear.html", {"request": request, "usuario_actual": usuario_actual, "Bancos_lista": bancos})
 
 @router.post("/nuevo")
-async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+async def create_proveedor(db: Session = Depends(get_database_session), descripcion = Form(...), ruc = Form(...), idCiudad=Form(...), direccion = Form(...), mail = Form(...), telefono = Form(...), nroCuenta = Form(...), idBanco=Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
     proveedor = Proveedor(descripcion=descripcion, idciudad = idCiudad, ruc=ruc, mail=mail, direccion=direccion, telefono=telefono, alta_usuario = usu.idusuario)
     db.add(proveedor)
     db.commit()
     db.refresh(proveedor)
+
+    # Obtener el ID del proveedor
+    id_proveedor = proveedor.idproveedor
+
+    # Crear la cuenta usando el ID del proveedor
+    campos_a_agregar = {
+        "nro": nroCuenta, 
+        "idbanco": idBanco,
+        "idproveedor": id_proveedor
+    }
+    cue = Cuenta(**campos_a_agregar, alta_usuario=usu.idusuario)
+    db.add(cue)
+    db.commit()
+    db.refresh(cue)
     response = RedirectResponse('/', status_code=303)
     return response
 
@@ -87,7 +102,7 @@ def editar(db: Session = Depends(get_database_session), idproveedor = Form(...),
 
 @router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
-    proveedor = db.query(Proveedor).get(id) #obtiene el registro del modelo Cliente por su id
+    proveedor = db.query(Proveedor).get(id) #obtiene el registro del modelo proveedor por su id
     if(proveedor is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
         return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
     else:

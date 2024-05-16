@@ -6,7 +6,8 @@
         <div class="form-group">
             <div class="input-group-prepend">
                 <label class="input-group-text" for="nro">Numero de contrato: </label>
-                <input type="number" class="form-control" style="margin-right: 10px" id="nro" name="nro" min="1" required>
+                <input type="number" class="form-control" style="margin-right: 10px" id="nro" name="nro" min="1"
+                    required>
             </div>
         </div>
 
@@ -29,33 +30,34 @@
                 {% endfor %}
             </select>
         </div>
-        
+
         <div class="row">
             <div class="col-xs-12 col-md-4">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="cantidad">Cantidad (Kg):</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="cantidad">Cantidad (Kg):</label>
+                    </div>
+                    <input type="number" class="form-control" style="margin-right: 10px" id="cantidad" name="cantidad"
+                        min="1" required>
                 </div>
-                  <input type="number" class="form-control" style="margin-right: 10px" id="cantidad" name="cantidad" min="1" required>
-              </div>
             </div>
             <div class="col-xs-12 col-md-4">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="precioCompra">Precio Compra (Gs):</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="precioCompra">Precio Compra (Gs):</label>
+                    </div>
+                    <input type="number" class="form-control" id="precioCompra" name="precioCompra" min="1" required>
                 </div>
-                  <input type="number" class="form-control" id="precioCompra" name="precioCompra" min="1" required>
-              </div>
             </div>
             <div class="col-xs-12 col-md-4">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="precioVenta">Precio Venta (Gs):</label>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="precioVenta">Precio Venta (Gs):</label>
+                    </div>
+                    <input type="number" class="form-control" id="precioVenta" name="precioVenta" min="1" required>
                 </div>
-                  <input type="number" class="form-control" id="precioVenta" name="precioVenta" min="1" required>
-              </div>
             </div>
-          </div>
+        </div>
 
         <label for="origen">Origen:</label>
         <div class="form-group" id="proveedor">
@@ -67,7 +69,8 @@
                     <option value="{{Proveedor.idproveedor}}">{{Proveedor.descripcion}}</option>
                     {% endfor %}
                 </select>
-                <label for="nroCuentaP" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
+                <label for="nroCuentaP" class="mb-4"></label>
+                <!-- Truquito para colocar los campos a la misma altura -->
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="nroCuentaP">N° de Cuenta:</label>
                 </div>
@@ -93,7 +96,7 @@
             </div>
         </div>
 
-        
+
         <label for="destino">Destino:</label>
         <div class="form-group" id="cliente">
             <div class="input-group-prepend">
@@ -104,7 +107,8 @@
                     <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}}</option>
                     {% endfor %}
                 </select>
-                <label for="nroCuentaC" class="mb-4"></label> <!-- Truquito para colocar los campos a la misma altura -->
+                <label for="nroCuentaC" class="mb-4"></label>
+                <!-- Truquito para colocar los campos a la misma altura -->
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="nroCuentaC">N° de Cuenta:</label>
                 </div>
@@ -117,7 +121,8 @@
         <div class="form-group" id="departamento-ciudad_D">
             <div class="input-group-prepend">
                 <label class="input-group-text" for="departamento_D">Departamento:</label>
-                <select id="departamento_D" name="departamento_D" class="custom-select custom-dropdown custom-form-input">
+                <select id="departamento_D" name="departamento_D"
+                    class="custom-select custom-dropdown custom-form-input">
                 </select>
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="ciudad_D">Ciudad:</label>
@@ -126,6 +131,7 @@
                 </select>
             </div>
         </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
         <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 </div>
@@ -228,61 +234,61 @@
         });
     });
 
- //---------- Script para ciudades y departamentos
+    //---------- Script para ciudades y departamentos
 
- let jsonCiudades = null;
+    let jsonCiudades = null;
 
- agregarOpcion = (elemento,valor, texto) => {
-    let nuevaOpcion = document.createElement("option");
-    nuevaOpcion.value = valor;
-    nuevaOpcion.text = texto;
-    elemento.add(nuevaOpcion);
- }
+    agregarOpcion = (elemento, valor, texto) => {
+        let nuevaOpcion = document.createElement("option");
+        nuevaOpcion.value = valor;
+        nuevaOpcion.text = texto;
+        elemento.add(nuevaOpcion);
+    }
 
- fetchCargarDepartamentos = (listaDeptos) => { //---- listaDeptos es un array
-    listaDeptos.forEach((sel) => { 
-        let selectDepto = null;
-        selectDepto = document.querySelector(`#${sel}`);        
-        agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
-        fetch('/departamentos/todos')
-            .then((response) => response.json())
-            .then((deptos) => {
-                for (let depto of deptos) {
-                    agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
-                }
-            })
-            .catch(error => {
-                console.error(error)
-                agregarOpcion(selectDepto, 0, 'Sin Datos')
-            });
+    fetchCargarDepartamentos = (listaDeptos) => { //---- listaDeptos es un array
+        listaDeptos.forEach((sel) => {
+            let selectDepto = null;
+            selectDepto = document.querySelector(`#${sel}`);
+            agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
+            fetch('/departamentos/todos')
+                .then((response) => response.json())
+                .then((deptos) => {
+                    for (let depto of deptos) {
+                        agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
+                    }
+                })
+                .catch(error => {
+                    console.error(error)
+                    agregarOpcion(selectDepto, 0, 'Sin Datos')
+                });
         });
     };
-    
 
-async function obtenerCiudades() {
-    const response = await fetch('/ciudades/todos');
-    if (!response.ok) {
-        const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
-        throw new Error(message);
+
+    async function obtenerCiudades() {
+        const response = await fetch('/ciudades/todos');
+        if (!response.ok) {
+            const message = `Ocurrió un error al intentar obtener las ciudades: ${response.status}`;
+            throw new Error(message);
+        }
+        const ciudades = await response.json();
+        return ciudades;
     }
-    const ciudades = await response.json();
-    return ciudades;
-}
 
-selectDeptos=["departamento_O", "departamento_D"]; //cada string es el id de cada select de Depto
-cargarSelectsDeptos = () => {
-    fetchCargarDepartamentos(selectDeptos);
-}
-let selectCiudades = ["ciudad_O", "ciudad_D"]; //cada string es el id de cada select de Ciudad
+    selectDeptos = ["departamento_O", "departamento_D"]; //cada string es el id de cada select de Depto
+    cargarSelectsDeptos = () => {
+        fetchCargarDepartamentos(selectDeptos);
+    }
+    let selectCiudades = ["ciudad_O", "ciudad_D"]; //cada string es el id de cada select de Ciudad
     window.addEventListener('DOMContentLoaded', cargarSelectsDeptos);
     window.addEventListener('DOMContentLoaded', async () => {
         await obtenerCiudades()
-        .then(ciudades => {jsonCiudades = ciudades})
-        .catch(error => {
-            console.error(error);
-            jsonCiudades = {};
-        });
-        
+            .then(ciudades => { jsonCiudades = ciudades })
+            .catch(error => {
+                console.error(error);
+                jsonCiudades = {};
+            });
+
         for (let i = 0; i < selectDeptos.length; i++) {
             const dep = document.querySelector(`#${selectDeptos[i]}`);
             dep.addEventListener('change', function (event) {
@@ -292,15 +298,15 @@ let selectCiudades = ["ciudad_O", "ciudad_D"]; //cada string es el id de cada se
                 if (idDepto && idDepto != "undefined") {
                     selectCiudad.length = 0;
 
-                    jsonCiudades.map(function (ciu) { 
-                        if ( ciu.iddepartamento == idDepto) {
+                    jsonCiudades.map(function (ciu) {
+                        if (ciu.iddepartamento == idDepto) {
                             agregarOpcion(selectCiudad, ciu.idciudad, `${ciu.descripcion}`);
                         }
                     });
                 }
             });
         };
-        
+
     });
 
 

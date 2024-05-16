@@ -2,7 +2,7 @@
 {% block content %}
 <table id="chofer" class="table table-striped">
     <thead>
-      <tr>
+        <tr>
             <th scope="col">ID</th>
             <th scope="col">C.I.</th>
             <th scope="col">Nombre</th>
@@ -10,11 +10,11 @@
             <th scope="col">Ciudad</th>
             <th scope="col">Teléfono</th>
             <th scope="col">Acciones</th>
-      </tr>
+        </tr>
     </thead>
     <tbody>
-      {% for chofer in choferes %}
-      <tr>
+    {% for chofer in choferes %}
+        <tr>
             <td>{{ chofer.idchofer}}</td>
             <td>{{ chofer.ci}}</td>
             <td>{{ chofer.nombre}}</td>
@@ -23,11 +23,11 @@
             <td>{{ chofer.telefono}}</td>
             <td><a href="/choferes/editar/{{- chofer.idchofer -}}" class="btn btn-warning editar">Editar</a>
                 <button type="button" class="btn btn-danger eliminar" data-toggle="modal" data-target="#eliminarModal" data-id="{{- chofer.idchofer -}}"> Eliminar </button></td>
-      </tr>
-      {% endfor %}
+        </tr>
+    {% endfor %}
     </tbody>
-
 </table>
+<button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
 
 <div class="modal fade" id="eliminarModal">
   <div class="modal-dialog">

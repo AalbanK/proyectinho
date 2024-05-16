@@ -10,23 +10,29 @@
             <th scope="col">Chapa Camion</th>
             <th scope="col">Chapa Carreta</th>
             <th scope="col">KG Neto</th>
+            <th scope="col">Acciones</th>
         </tr>
     </thead>
     <tbody>
         {% for remision in data %}
-      <tr>
+        <tr>
             <td>{{ remision.numero}}</td>
-            <td>{{ remision.fecha_carga}}</td>            
+            <td>{{ remision.fecha_carga}}</td>
             <td>{{ remision.nro_contrato}}</td>
             <td>{{ remision.idchofer}}</td>
             <td>{{ remision.chapacamion}}</td>
             <td>{{ remision.idcarreta}}</td>
             <td>{{ remision.neto}}</td>
-      </tr>
-      {% endfor %}
+            <td><a href="/remisiones/editar/{{- remision.idremision -}}" class="btn btn-warning editar">Editar</a>
+                <button type="button" class="btn btn-danger eliminar" data-toggle="modal" data-target="#eliminarModal"
+                    data-id="{{- remision.idremision -}}"> Eliminar </button>
+            </td>
+        </tr>
+        {% endfor %}
     </tbody>
 
 </table>
+<button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
 
 {% endblock content %}
 
@@ -35,7 +41,7 @@
 <script src="{{url_for('static', path='/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
-    $(document).ready(function(){
+    $(document).ready(function () {
         $("#remisiones").DataTable();
     });
 </script>

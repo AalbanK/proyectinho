@@ -1,61 +1,82 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/clientes/nuevo/" method="POST">
+<div>
+    <form action="/clientes/nuevo/" method="POST">
+        <div class="form-group">
+            <label for="descripcion">Nombre Cliente</label>
+            <input type="text" class="form-control" id="descripcion" name="descripcion">
+            <label for="ruc">RUC</label>
+            <input type="text" class="form-control" id="ruc" name="ruc">
             <div class="form-group">
-                <label for="descripcion">Nombre Cliente</label>
-                <input type="text" class="form-control" id="descripcion" name="descripcion">
-                <label for="ruc">RUC</label>
-                <input type="text" class="form-control" id="ruc" name="ruc">
-                <div class="form-group">
-                    <label for="id_departamento">Departamento</label>
-                    <select id="id_departamento" name="idDepartamento" class="custom-select custom-dropdown custom-form-input">
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="id_ciudad">Ciudad</label>
-                    <select id="id_ciudad" name="idCiudad" class="custom-select custom-dropdown custom-form-input">
-                    </select>
-                </div>
-                <label for="direccion">Dirección</label>
-                <input type="text" class="form-control" id="direccion" name="direccion">
-                <label for="mail">Correo</label>
-                <input type="text" class="form-control" id="mail" name="mail">
-                <label for="telefono">Teléfono</label>
-                <input type="text" class="form-control" id="telefono" name="telefono">
+                <label for="id_departamento">Departamento</label>
+                <select id="id_departamento" name="idDepartamento"
+                    class="custom-select custom-dropdown custom-form-input">
+                </select>
             </div>
+            <div class="form-group">
+                <label for="id_ciudad">Ciudad</label>
+                <select id="id_ciudad" name="idCiudad" class="custom-select custom-dropdown custom-form-input">
+                </select>
+            </div>
+            <label for="direccion">Dirección</label>
+            <input type="text" class="form-control" id="direccion" name="direccion">
+            <label for="mail">Correo</label>
+            <input type="text" class="form-control" id="mail" name="mail">
+            <label for="telefono">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" name="telefono">
+            <div class="form-group">
+                <div class="form-group">
+                    <label for="nroCuenta">N° de Cuenta:</label>
+                    <input type="text" class="form-control" id="nroCuenta" name="nroCuenta">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="idBanco">Banco:</label>
+                        </div>
+                        <select class="custom-select" id="idBanco" name="idBanco">
+                            {% for Banco in Bancos_lista %}
+                            <option value="{{Banco.idbanco}}">{{Banco.descripcion}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
             <button type="submit" class="btn btn-primary">Guardar</button>
-          </form>
-    </div>
+    </form>
+</div>
 {% endblock content %}
 {% block script %}
 <script>
 
-let jsonCiudades = null;
-let selectDepto = null;
+    let jsonCiudades = null;
+    let selectDepto = null;
 
-agregarOpcion = (elemento, valor, texto) => {
-    let nuevaOpcion = document.createElement("option");
-    nuevaOpcion.value = valor;
-    nuevaOpcion.text = texto;
-    elemento.add(nuevaOpcion);
-}
+    agregarOpcion = (elemento, valor, texto) => {
+        let nuevaOpcion = document.createElement("option");
+        nuevaOpcion.value = valor;
+        nuevaOpcion.text = texto;
+        elemento.add(nuevaOpcion);
+    }
 
-fetchCargarDepartamentos = () => {
-    selectDepto = document.querySelector("#id_departamento");
-    selectDepto.length = 0; //para vaciar el select, por si acaso
-    agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
-    fetch('/departamentos/todos')
-        .then((response) => response.json())
-        .then((deptos) => {
-            for (let depto of deptos) {
-                agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
-            }
-        })
-        .catch(error => {
-            console.error(error)
-            agregarOpcion(selectDepto, 0, 'Sin Datos');
-        });
+    fetchCargarDepartamentos = () => {
+        selectDepto = document.querySelector("#id_departamento");
+        selectDepto.length = 0; //para vaciar el select, por si acaso
+        agregarOpcion(selectDepto, '', 'Seleccione un Departamento...');
+        fetch('/departamentos/todos')
+            .then((response) => response.json())
+            .then((deptos) => {
+                for (let depto of deptos) {
+                    agregarOpcion(selectDepto, depto.iddepartamento, depto.descripcion)
+                }
+            })
+            .catch(error => {
+                console.error(error)
+                agregarOpcion(selectDepto, 0, 'Sin Datos');
+            });
     };
 
     async function obtenerCiudades() {
@@ -71,11 +92,11 @@ fetchCargarDepartamentos = () => {
     window.addEventListener('DOMContentLoaded', fetchCargarDepartamentos);
     window.addEventListener('DOMContentLoaded', async () => {
         await obtenerCiudades()
-        .then(ciudades => {jsonCiudades = ciudades })
-        .catch(error => {
-            console.error(error);
-            jsonCiudades = {};
-        });
+            .then(ciudades => { jsonCiudades = ciudades })
+            .catch(error => {
+                console.error(error);
+                jsonCiudades = {};
+            });
         const selectCiudad = document.querySelector("#id_ciudad");
 
         selectDepto.addEventListener('change', function (event) {
@@ -91,7 +112,7 @@ fetchCargarDepartamentos = () => {
                     }
                 });
             }
+        });
     });
-});
 </script>
 {% endblock script %}

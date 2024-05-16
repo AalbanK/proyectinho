@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container-fluid" id="remision">
-    <form action="/remisiones/nuevo" id="remisionForm" method="POST">
+    <form action="/remisiones/editar" id="remisionForm" method="POST">
         <div class="row d-flex align-items-end">
             <div class="col">
                 <div class="form-group">
@@ -19,7 +19,7 @@
             <div class="col">
                 <div class="form-group">
                     <label for="fecha">*Fecha de Descarga: </label>
-                    <input type="date" class="form-control" id="fecha_descarga" name="fechadescarga" disabled>
+                    <input type="date" class="form-control" id="fecha_descarga" name="fechadescarga">
                 </div>
             </div>
         </div>
@@ -155,47 +155,26 @@
         <div class="row d-flex align-items-end">
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
-                    <label class="control-label">Producto: </label>
+                    <label class="control-label">*Bruto: </label>
+                    <input type="number" name="bruto" class="form-control" pattern="[0-9]{4,5}" required>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Tara: </label>
+                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Neto: </label>
+                    <input type="number" name="neto" class="form-control" pattern="[0-9]{4,5}" required>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-3">
+                <div class="form-group">
+                    <label class="control-label">*Producto: </label>
                     <input type="text" name="producto" class="form-control" value="" readonly>
-                </div>
-            </div>
-            <div class="col-xs-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">*Bruto Origen: </label>
-                    <input type="number" name="bruto" class="form-control" pattern="[0-9]{4,5}" required>
-                </div>
-            </div>
-            <div class="col-xs-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">*Tara Origen: </label>
-                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
-                </div>
-            </div>
-            <div class="col-xs-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">*Neto Origen: </label>
-                    <input type="number" name="neto" class="form-control" pattern="[0-9]{4,5}" readonly>
-                </div>
-            </div>
-        </div>
-        <div class="row d-flex align-items-end">
-            <div class="col-xs-12 col-md-3"></div>
-            <div class="col-xs-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">*Bruto Destino: </label>
-                    <input type="number" name="bruto" class="form-control" pattern="[0-9]{4,5}" required>
-                </div>
-            </div>
-            <div class="col-xs-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">*Tara Destino: </label>
-                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
-                </div>
-            </div>
-            <div class="col-xs-12 col-md-3">
-                <div class="form-group">
-                    <label class="control-label">*Neto Destino: </label>
-                    <input type="number" name="neto" class="form-control" pattern="[0-9]{4,5}" readonly>
                 </div>
             </div>
         </div>

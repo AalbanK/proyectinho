@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/camiones/nuevo/" method="POST">
-            <div class="form-group">
-                <label for="chapaCamion">Chapa Camion</label>
-                <input type="text" class="form-control" id="chapaCamion" name="chapaCamion">
+<div>
+    <form action="/camiones/nuevo/" method="POST">
+        <div class="form-group">
+            <label for="chapaCamion">Chapa Camion</label>
+            <input type="text" class="form-control" id="chapaCamion" name="chapaCamion">
+        </div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="idmarca_camion">Marca: </label>
             </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <label class="input-group-text" for="idmarca_camion">Marca: </label>
-                </div>
-                <select class="custom-select" id="idmarca_camion" name="idmarca_camion">
-                    {% for Marca in Marcas_lista %}
-                    <option value="{{Marca.idmarca_camion}}">{{Marca.descripcion}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-          </form>
-    </div>
+            <select class="custom-select" id="idmarca_camion" name="idmarca_camion">
+                {% for Marca in Marcas_lista %}
+                <option value="{{Marca.idmarca_camion}}">{{Marca.descripcion}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
 {% endblock content %}

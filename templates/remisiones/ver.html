@@ -1,117 +1,120 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="{{ url_for('static', path='/css/sb-admin-2.min.css') }}" rel="stylesheet">
-  <link href="{{ url_for('static', path='/css/remision.css') }}" rel="stylesheet">
-  <title>Ver Remisión</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{{ url_for('static', path='/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', path='/css/remision.css') }}" rel="stylesheet">
+    <title>Ver Remisión</title>
 </head>
 
 <body>
     <div class="container-fluid mt-3">
-       <div class="row mx-auto">
-          <div class="col">
-               <label for="fecha_emision">Fecha de emisión:</label>
-               <input type="text" id="fecha_emision" class="border-top-0 border-left-0 border-right-0">
-           </div>
-       </div>
-       <!--Destinatario Mercadería -->
-       <table class="table table-borderless">
-           <thead>
-               <tr>
-                   <th scope="col" colspan="4">Destinatario de la Mercadería:</th>
-               </tr>
-           </thead>
-           <tbody>
-               <tr>
-                   <td colspan="2">Nombre o Razón Social:</td>
-                   <td colspan="2">RUC o CI:</td>
-               </tr>
-               <tr>
-                   <td colspan="4">Domicilio:</td>
-               </tr>
-           </tbody>
-       </table>
-       <!-- Datos de Traslado -->
-       <table class="table table-borderless">
-           <thead>
-               <tr>
-                   <th scope="col" colspan="4">Datos de Traslado:</th>
-              </tr>
-           </thead>
-           <tbody>
-               <tr>
-                   <td colspan="2">Motivo de Traslado:</td>
-                   <td colspan="2">Comprobante de Venta N°:</td>
-               </tr>
-               <tr>
-                   <td colspan="4"></td>
-               </tr>
-               <tr>
-                   <td scope="col" colspan="4">Dirección de Punto de Partida:</td>
-               </tr>
-               <tr>
-                   <td colspan="2">Ciudad: </td>
-                   <td colspan="2">Departamento: </td>
-               </tr>
-               <tr>
-                   <td scope="col" colspan="4">Dirección de Punto de Llegada:</td>
-               </tr>
-               <tr>
-                   <td colspan="2">Ciudad: </td>
-                   <td colspan="2">Departamento: </td>
-               </tr>
-           </tbody>
-       </table>
-       <!-- Datos de Vehículo de Transporte-->
-       <table class="table table-borderless">
-           <thead>
-               <tr>
-                   <th scope="col" colspan="4">Datos de Vehículo de Transporte:</th>
-               </tr>
-           </thead>
-           <tbody>
-               <tr>
-                   <td colspan="4">Marca de Vehículo:</td>
-               </tr>
-               <tr>
-                   <td colspan="4">Número de Registro Único de Automotor (RUA):</td>
-               </tr>
-               <tr>
-                   <td colspan="4">Número de Registro Único de Automotor (RUA) del Remolque/Tracto/Semiremolque:</td>
-               </tr>
-           </tbody>
-       </table>
-       <!--Datos del Conductor del Vehículo -->
-       <table class="table table-borderless">
-           <thead>
-               <tr>
-                   <th scope="col" colspan="4">Datos del Conductor del Vehículo:</th>
-               </tr>
-           </thead>
-           <tbody>
-               <tr>
-                   <td colspan="4">Nombre o Razón Social:</td>
-               </tr>
-               <tr>
-                   <td colspan="2">Domicilio:</td>
-                   <td colspan="2">RUC o CI:</td>
-               </tr>
-           </tbody>
-       </table>
-       <table class="table table-bordered print-borde" id="detalle_remision">
-           <thead>
-               <tr>
-                   <th scope="col">Cantidad</th>
-                   <th scope="col">Unidad de Medida</th>
-                   <th scope="col">Descripción de Mercadería</th>
-               </tr>
-           </thead>
-           <tbody>
-           </tbody>
-       </table>
-   </div>
+        <div class="row mx-auto">
+            <div class="col">
+                <label for="fecha_emision">Fecha de emisión:</label>
+                <input type="text" id="fecha_emision" class="border-top-0 border-left-0 border-right-0">
+            </div>
+        </div>
+        <!--Destinatario Mercadería -->
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="4">Destinatario de la Mercadería:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">Nombre o Razón Social:</td>
+                    <td colspan="2">RUC o CI:</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Domicilio:</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Datos de Traslado -->
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="4">Datos de Traslado:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="2">Motivo de Traslado:</td>
+                    <td colspan="2">Comprobante de Venta N°:</td>
+                </tr>
+                <tr>
+                    <td colspan="4"></td>
+                </tr>
+                <tr>
+                    <td scope="col" colspan="4">Dirección de Punto de Partida:</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Ciudad: </td>
+                    <td colspan="2">Departamento: </td>
+                </tr>
+                <tr>
+                    <td scope="col" colspan="4">Dirección de Punto de Llegada:</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Ciudad: </td>
+                    <td colspan="2">Departamento: </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Datos de Vehículo de Transporte-->
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="4">Datos de Vehículo de Transporte:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4">Marca de Vehículo:</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Número de Registro Único de Automotor (RUA):</td>
+                </tr>
+                <tr>
+                    <td colspan="4">Número de Registro Único de Automotor (RUA) del Remolque/Tracto/Semiremolque:</td>
+                </tr>
+            </tbody>
+        </table>
+        <!--Datos del Conductor del Vehículo -->
+        <table class="table table-borderless">
+            <thead>
+                <tr>
+                    <th scope="col" colspan="4">Datos del Conductor del Vehículo:</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4">Nombre o Razón Social:</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Domicilio:</td>
+                    <td colspan="2">RUC o CI:</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="table table-bordered print-borde" id="detalle_remision">
+            <thead>
+                <tr>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Unidad de Medida</th>
+                    <th scope="col">Descripción de Mercadería</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
+    </div>
 </body>
+
 </html>
