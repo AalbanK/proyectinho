@@ -341,8 +341,8 @@ window.addEventListener('DOMContentLoaded', async function () {
                                 parrafoMensaje.textContent += mensaje_error;
                             }
                         })
-                    }
-                    else if(response.status === 500){
+                    } //409 es cuando la factura ya existe en este caso
+                    else if(response.status === 500 || response.status===409){
                         response.json().then( (respuesta) =>{
                             if(respuesta.error){
                                 let mensaje_error;

@@ -359,7 +359,7 @@ window.addEventListener('DOMContentLoaded', async function () {
                             }
                         })
                     }
-                    else if(response.status === 500){
+                    else if(response.status === 500 || response.status===409){
                         response.json().then( (respuesta) =>{
                             if(respuesta.error){
                                 let mensaje_error;

@@ -257,7 +257,8 @@ class Usuario(Base):
 class Factura_compra_cabecera(Base):
     __tablename__ = "factura_compra_cabecera"
     idfactura_compra = Column(Integer, primary_key=True, index=True)
-    numero = Column(Integer)
+    numero = Column(String)
+    timbrado = Column(Integer)
     fecha = Column(DateTime(timezone=True), server_default=func.now())
     idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor")) #FK del proveedor
     # campo Padre = relationship("NombreDelModeloPadre", back_populates="NombreDeLaVariableEnElOtroModelo")
@@ -290,7 +291,7 @@ class Factura_compra_detalle(Base):
 class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
     idfactura_venta = Column(Integer, primary_key=True, index=True)
-    numero = Column(Integer)
+    numero = Column(String)
     fecha = Column(DateTime(timezone=True), server_default=func.now())
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
     # campo Padre = relationship("NombreDelModeloPadre", back_populates="NombreDeLaVariableEnElOtroModelo")

@@ -15,7 +15,7 @@ class Compra_detalle(BaseModel):
 class Compra_cabecera(BaseModel):
     idfactura_compra: Optional[int] = None
     numero: str
-    # timbrado: str
+    timbrado: str
     fecha: str
     idproveedor: int
     iddeposito: int

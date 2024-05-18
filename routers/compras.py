@@ -1,10 +1,11 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, FastAPI, Form, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette import status
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload, load_only
 from starlette.responses import RedirectResponse
@@ -14,8 +15,7 @@ from models import (IVA, Contrato, Deposito, Factura_compra_cabecera,
                     Factura_compra_detalle, Proveedor)
 from routers import auth
 from schemas import usuario as us
-from schemas.cabecera_detalle_compra import (Compra_cabecera,
-                                             Compra_cabecera_Vista)
+from schemas.cabecera_detalle_compra import (Compra_cabecera, Compra_cabecera_Vista)
 
 app = FastAPI()
 
@@ -26,6 +26,11 @@ router = APIRouter(
     prefix="/compras",
     tags=["compras"]
 )
+
+#funcion para verificar si ya existe el número de factura y timbrado en la bd
+def buscar_nro(numero:str, timbrado:int, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    fact_compra = db.query(Factura_compra_cabecera).filter_by(numero=numero, timbrado=timbrado).first()
+    return fact_compra
 
 @router.get("/", name="listado_compras")
 async def read_compra(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -45,14 +50,18 @@ async def crear_compra(request: Request, cabecera: Compra_cabecera, db: Session 
     usu = us.Usuario.from_orm(usuario_actual)
     try:
         cabecera_compra = Factura_compra_cabecera(**cabecera.dict(exclude = {'detalles'})) # excluye "detalles" porque serán agregados más abajo
-        cabecera_compra.alta_usuario = usu.idusuario
-        detalles = [detalle.dict() for detalle in cabecera.detalles]
-        for detalle in detalles:
-            det = Factura_compra_detalle(**detalle)
-            det.detalle = cabecera_compra # con esto se hace el FK a la cabecera
-        print(cabecera_compra.__dict__)
-        db.add(cabecera_compra)
-        db.commit()
+        if buscar_nro(numero=cabecera_compra.numero, timbrado=cabecera_compra.timbrado, request=request, db=db, usuario_actual=usuario_actual) is None: #si es "None" significa que no existe
+            cabecera_compra.alta_usuario = usu.idusuario
+            detalles = [detalle.dict() for detalle in cabecera.detalles]
+            for detalle in detalles:
+                det = Factura_compra_detalle(**detalle)
+                det.detalle = cabecera_compra # con esto se hace el FK a la cabecera
+            print(cabecera_compra.__dict__)
+            db.add(cabecera_compra)
+            db.commit()
+        else:
+            response= JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"error":"El número de factura y timbrado ingresados ya existen."})
+            return response
     except Exception as e:
         response = JSONResponse(content={"error": str(e)}, status_code=500)
         return response

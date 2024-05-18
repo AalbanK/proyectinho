@@ -6,12 +6,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
+from starlette import status
 from sqlalchemy.orm import Session, joinedload, load_only
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import (IVA, Cliente, Contrato, Deposito, Factura_venta_cabecera,
-                    Factura_venta_detalle)
+from models import (IVA, Cliente, Contrato, Deposito, Factura_venta_cabecera, Factura_venta_detalle)
 from routers import auth
 from schemas import usuario as us
 from schemas.cabecera_detalle_venta import Venta_cabecera
@@ -25,6 +25,12 @@ router = APIRouter(
     prefix="/ventas",
     tags=["ventas"]
 )
+
+#funcion para verificar si ya existe el número de factura y timbrado en la bd
+def buscar_nro(numero:str, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    fact_venta = db.query(Factura_venta_cabecera).filter_by(numero=numero).first()
+    print(fact_venta)
+    return fact_venta
 
 @router.get("/", name="listado_ventas")
 async def read_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -42,14 +48,18 @@ async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = 
     usu = us.Usuario.from_orm(usuario_actual)
     try:
         cabecera_venta = Factura_venta_cabecera(**cabecera.dict(exclude={'detalles'})) # excluye "detalles" porque serán agregados más abajo
-        cabecera_venta.alta_usuario = usu.idusuario
-        detalles = [detalle.dict() for detalle in cabecera.detalles]
-        #print(detalles)
-        for detalle in detalles:
-            det = Factura_venta_detalle(**detalle)
-            det.detalle = cabecera_venta #con esto se hace el FK a la cabecera
-        db.add(cabecera_venta)
-        db.commit()
+        if buscar_nro(numero=cabecera_venta.numero, request=request, db=db, usuario_actual=usuario_actual) is None:
+            cabecera_venta.alta_usuario = usu.idusuario
+            detalles = [detalle.dict() for detalle in cabecera.detalles]
+            #print(detalles)
+            for detalle in detalles:
+                det = Factura_venta_detalle(**detalle)
+                det.detalle = cabecera_venta #con esto se hace el FK a la cabecera
+            db.add(cabecera_venta)
+            db.commit()
+        else:
+            response= JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"error":"El número de factura ingresado ya se utilizó."})
+            return response
     except Exception as e:
         response = JSONResponse(content={"error": str(e)}, status_code=500)
         return response
