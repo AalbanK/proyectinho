@@ -41,8 +41,14 @@
 <script src="{{url_for('static', path='/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
+    let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
+    
     $(document).ready(function () {
-        $("#remisiones").DataTable();
+        $("#remisiones").DataTable({
+            language: {
+                url: urlEspanholDT
+            }
+        });
     });
 </script>
 {% endblock script %}

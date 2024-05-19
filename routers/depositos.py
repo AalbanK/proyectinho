@@ -6,12 +6,12 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, load_only
 from starlette import status
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import Deposito
+from models import Deposito, Deposito_y_producto, Producto
 from routers import auth
 from schemas import usuario as us
 
@@ -45,7 +45,13 @@ async def create_deposito(db: Session = Depends(get_database_session), descripci
 
 @router.get("/todos") #aca la funcion convierte la lista de depositos en un json que luego se usa en datatable
 async def listar_depositos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): 
-    depositos = db.query(Deposito).all() #guarda en el objeto 'depositos' todos los depositos usando sql alchemy
+    #depositos = db.query(Deposito).all() #guarda en el objeto 'depositos' todos los depositos usando sql alchemy
+    depositos = db.query(Deposito).options(
+            joinedload(Deposito.deposito_y_producto).load_only(Deposito_y_producto.idproducto, Deposito_y_producto.cantidad),
+            #joinedload(Deposito_y_producto.producto).load_only(Producto.descripcion)
+        ).join(Producto, Producto.idproducto==Deposito_y_producto.idproducto)
+    
+    depositos = depositos.all()
     return JSONResponse(jsonable_encoder(depositos)) #devuele el objeto 'depositos' en formato json
 
 #            al usar {x} se pasa como parametro lo que esta dentro de las llaves (en este caso x)

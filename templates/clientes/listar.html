@@ -49,7 +49,7 @@
                 </form>
             </div>
         </div>
-    </div>
+    </div>holDT
 </div>
 
 {% endblock content %}
@@ -60,6 +60,7 @@
 <script type="text/javascript">
 
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
+    
     let $tabla = $("#cliente");
     let $modal = $('#eliminarModal');
     let botonesEliminar = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">No, Cancelar</button>
@@ -76,7 +77,11 @@
     });
 
     $(document).ready(function () {
-        $("#cliente").DataTable();
+        $("#cliente").DataTable({
+            language: {
+                url: urlEspanholDT
+            }
+        });
 
         $modal.on('shown.bs.modal', function (e) {
             // verificar si existe el id (por si tocan el html en el dom)

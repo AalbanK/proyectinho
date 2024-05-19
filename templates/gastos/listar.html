@@ -1,11 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<table id="depositos" class="table table-striped"> <!--table-striped es para colorear las filas de la tabla-->
-    <thead> <!--cabecera de la tabla-->
+<!-- Page Heading -->
+<h1 class="h2 mb-1 text-gray-800">Gastos</h1>
+<hr class="mb-4">
+<table border="0"  cellspacing="5" cellpadding="5">
+    <tbody><tr>
+        <td>Desde:</td>
+        <td><input type="text" id="min" name="min"></td>
+        <td>Hasta:</td>
+        <td><input type="text" id="max" name="max"></td>
+    </tr>
+    </tbody>
+</table>
+<table id="gasto" class="table table-striped">
+    <thead>
         <tr>
-            <!-- 
-            <th scope="col">ID</th>
-            <th scope="col">Descripción</th>
+            <!--
+            <th scope="col">Fecha</th>
+            <th scope="col">N° Factura</th>
+            <th scope="col">N° Contrato</th>
+            <th scope="col">Proveedor</th>
+            <th scope="col">Producto</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Monto</th>
             <th scope="col">Acciones</th>
             -->
         </tr>
@@ -13,45 +30,41 @@
     <tbody>
         <!--aqui se cargan los datos de datatable-->
     </tbody>
-
 </table>
 <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
 
-<div class="modal fade" id="eliminarModal"> <!--ultimo modal mostrado al intentar eliminar un registro-->
+<div class="modal fade" id="anularModal">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Eliminar Registro</h4>
+                <h4 class="modal-title">Anular Registro</h4>
                 <a href="#" class="close" data-dismiss="modal">&times;</a>
             </div>
             <div class="modal-body">
-                <h5> ¿Está seguro/a de eliminar este registro? </h5>
+                <h5> ¿Está seguro/a de anular este registro? </h5>
             </div>
             <div class="modal-footer">
-                <form id="eliminarDeposito"></form>
+                <form id="anularGasto"></form>
             </div>
         </div>
     </div>
 </div>
 {% endblock content %}
 {% block script %}
-<script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script> <!--carga los jquery de datatable-->
-<script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script> <!--carga los estilos de datatable-->
-
 <script type="text/javascript">
 
-    let $tabla = $("#depositos");
-    let $modal = $('#eliminarModal');
-    let botonesEliminar = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">No, Cancelar</button>
-                    <button id="confirmarEliminar" class="btn btn-danger" type="button">Sí, Eliminar</button>`;
-    let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarEliminar">Ok</button>`;
+    let $tabla = $("#gasto");
+    let $modal = $('#anularModal');
+    let botonesAnular = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">No, Cancelar</button>
+                    <button id="confirmarAnular" class="btn btn-danger" type="button">Sí, Anular</button>`;
+    let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">Ok</button>`;
 
     let alertOK = `<div class="alert alert-success aviso" role="alert">
-                    Registro eliminado exitosamente.
+                    Registro anulado exitosamente.
                 </div>`;
-    let botonesEditarYEliminar = (id) => {
-        return `<a href="/depositos/editar/${id}" class="btn btn-warning editar">Editar</a>
-                <button type="button" class="btn btn-danger eliminar" data-id="${id}"> Eliminar </button>`;
+    let botonesVerYAnular = (id) => {
+        return `<a href="/gastos/ver/${id}" class="btn btn-warning ver">Ver</a>
+                <button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
     }
 
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
@@ -68,12 +81,11 @@
             language: {
                 url: urlIdioma
             },
-        });
+        })
     }
-
     $(document).ready(function () {
         columnas = [
-        {
+            {
                 "className": 'details-control',
                 "orderable": false,
                 "data": null,
@@ -83,40 +95,59 @@
                 }
             },
             {
-                title: "ID",
-                data: 'iddeposito',
+                title: 'Fecha',
+                data: 'fecha',
+                render: function(data, type, row){
+                    if(type === "sort" || type === "type"){
+                        return data;
+                    }
+                    return moment(data).format("YYYY-MM-DD");
+                }
             },
             {
-                title: "Descripción",
-                data: 'descripcion',
+                title: 'N° Factura',
+                data: 'numero'
             },
             {
-                title: "Acciones",
+                title: 'N° Contrato',
+                data: 'contrato.nro',
+                defaultContent: '-'
+            },
+            {
+                title: 'Proveedor',
+                data: 'proveedor.descripcion'
+            },
+            {
+                title: 'Monto',
+                data: 'total_monto'
+            },
+            {
+                title: 'Acciones',
                 data: null,
-                orderable: false,
+                sortable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {
-                    return botonesEditarYEliminar(data.iddeposito);
+                    return botonesVerYAnular(data.idfactura_gasto);
                 }
             },
         ];
-        tablaDT = inicializarDataTable($tabla, '/depositos/todos', columnas, urlEspanholDT)
+        tablaDT = inicializarDataTable($tabla, '/gastos/todos', columnas, urlEspanholDT)
 
-        $tabla.on('click', '.btn-danger.eliminar', function (e) {
-            let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de whatever
+        $tabla.on('click', '.btn-danger.anular', function (e) {
+            let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de "whatever"
             $modal.data('id', id).modal('show');
         });
 
-        $('#depositos tbody').on('click', 'td.details-control', function(){
+
+        $('#gasto tbody').on('click', 'td.details-control', function () {
+
             function format(d) {
-                console.log(d)
                 // `d` es el objeto data original de la fila
 
                 let cadenaDetalles = "";
-                for (let i = 0; i < d.deposito_y_producto.length; i++) {
-                    console.log(d.deposito_y_producto[i])
-                    cadenaDetalles = cadenaDetalles + `<dd> Producto: ${d.deposito_y_producto[i].descripcion_producto}, Cantidad: ${d.deposito_y_producto[i].cantidad} </dd>`;
-                    console.log(cadenaDetalles)
+                for (let i = 0; i < d.detalles.length; i++) {
+                    console.log(d.detalles[i])
+                    cadenaDetalles = cadenaDetalles + `<dd> Producto: ${d.detalles[i].descripcion_producto}, Cantidad: ${d.detalles[i].cantidad} </dd>`;
                 }
 
                 return (
@@ -128,6 +159,7 @@
                     '</dl>'
                 );
             }
+
             let tr = $(this).closest('tr');
             let row = tablaDT.row(tr);
 
@@ -140,7 +172,7 @@
                 row.child(format(row.data())).show();
                 tr.addClass('shown');
             }
-        })
+        });
 
         agregarAlert = (accion, motivo) => {
             switch (accion) {
@@ -152,7 +184,7 @@
                             break;
                         }
                         case 'elim': {
-                            texto = 'Ocurrió un error al verificar si el registro fue eliminado correctamente. Verifique si los datos mostrados posteriormente son consistentes.';
+                            texto = 'Ocurrió un error al verificar si el registro fue anulado correctamente. Verifique si los datos mostrados posteriormente son consistentes.';
                             break;
                         }
                         default: {
@@ -160,13 +192,13 @@
                         }
                     }
                     let alertError = ` <div class="alert alert-danger aviso" role="alert">
-                        <button type="button" class="close close-alert" 
-                            data-dismiss="alert" aria-hidden="true">
-                            ×
-                        </button> ${texto}
-                    </div>`;
+                <button type="button" class="close close-alert" 
+                    data-dismiss="alert" aria-hidden="true">
+                    ×
+                </button> ${texto}
+            </div>`;
 
-                    $('.modal-body').append(alertError);
+                    $('.modal-body').append(alertOK);
                     break;
                 }
                 case 'ok': {
@@ -177,24 +209,24 @@
             }
         }
 
-        actualizarBotones = (accion) => {
-            $modal.find('#eliminarDeposito').children().remove();
-            switch (accion) {
+        actualizarBotones = (action) => {
+            $modal.find('#anularGasto').children().remove();
+            switch (action) {
                 case 'error': {
-                    $modal.find('#eliminarDeposito').append(botonesOK);
+                    $modal.find('#anularGasto').append(botonesOK);
                     break;
                 }
-                case 'eliminar': {
-                    $modal.find('#eliminarDeposito').append(botonesEliminar);
+                case 'anular': {
+                    $modal.find('#anularGasto').append(botonesAnular);
                     break;
                 }
-                default: $modal.find('#eliminarDeposito').append(botonesOK);
+                default: $modal.find('#anularGasto').append(botonesOK);
             }
         }
 
-        eliminarFila = (e) => {
-            let idEliminar = e.data.id;
-            url = `/depositos/borrar/${idEliminar}`;
+        anularFila = (e) => {
+            let idAnular = e.data.id;
+            url = `/gastos/anular/${idAnular}`;
             $.ajax({
                 url: url,
                 method: 'GET',
@@ -203,7 +235,7 @@
                     if (data.status_code == 200) {
                         agregarAlert('ok');
                         actualizarBotones('ok')
-                        tablaDT.ajax.reload(null, false); //recarga la tabla
+                        tablaDT.ajax.reload(null, false); //recaga la tabla
                     }
                     else if (data.status_code == 404) {
                         agregarAlert('error')
@@ -225,9 +257,9 @@
         }
 
         $modal.on('shown.bs.modal', function (e) {
-            // verificar si existe el id (por si tocan el html en el dom)
+            //verificar si existe el id (por si tocan el html en el dom)
             $.ajax({
-                url: `/depositos/ver/${$modal.data('id')}`,
+                url: `/gastos/ver/${$modal.data('id')}`,
                 method: 'GET',
                 dataType: 'json',
                 success: function (data, status, xhr) {
@@ -236,8 +268,8 @@
                         actualizarBotones('error')
                     }
                     else {
-                        actualizarBotones('eliminar')
-                        $("#confirmarEliminar").off('click').on('click', { id: $modal.data('id') }, eliminarFila);
+                        actualizarBotones('anular')
+                        $("#confirmarAnular").off('click').on('click', { id: $modal.data('id') }, anularFila);
                     }
                 },
                 error: function (e) {
@@ -250,9 +282,39 @@
 
         $modal.on('hidden.bs.modal', function (e) {
             $modal.removeData('id');
-            $modal.find('.aviso').remove();
-            $modal.find('#eliminarDeposito').children().remove()
-        });
-    });
+            $modal.find('aviso').remove();
+            $modal.find('anularGasto').children().remove
+        })
+
+        let minDate, maxDate;
+
+DataTable.ext.search.push(function (settings, data, dataIndex) {
+    let min = minDate.val();
+    let max = maxDate.val();
+    let date = new Date(data[1]); //data[1] es la columna de la fecha
+    if (
+        (min === null && max === null) ||
+        (min === null && date <= max) ||
+        (min <= date && max === null) ||
+        (min <= date && date <= max)
+    ) {
+        return true;
+    }
+    return false;
+});
+// Crear inputs de fecha
+minDate = new DateTime('#min', {
+    format: 'YYYY-MM-DD'
+});
+maxDate = new DateTime('#max', {
+    format: 'YYYY-MM-DD'
+});
+// Refiltrar la tabla
+document.querySelectorAll('#min, #max').forEach((el) => {
+    el.addEventListener('change', () => tablaDT.draw());
+});
+    })
+
 </script>
+
 {% endblock script %}

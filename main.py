@@ -14,7 +14,7 @@ from routers import (auditoria, auth, bancos, camiones,
                      carretas, choferes, ciudades, clientes, compras,
                      contratos, cuentas, departamentos, depositos, ivas,
                      marcas_camiones, marcas_carretas, productos, proveedores,
-                     remisiones, reportes, roles, usuarios, ventas)
+                     remisiones, reportes, roles, usuarios, ventas, gastos)
 from schemas import usuario as us
 
 app = FastAPI()
@@ -73,3 +73,4 @@ app.include_router(contratos.router)
 app.include_router(usuarios.router)
 app.include_router(ventas.router)
 app.include_router(cuentas.router)
+app.include_router(gastos.router)

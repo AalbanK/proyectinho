@@ -21,9 +21,11 @@
     <link href="{{ url_for('static', path='/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <!-- Custom styles for this page -->
     {% if datatables %}
-    <link href="{{ url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', path='/vendor/datatables/buttons.dataTables.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', path='/vendor/datatables/buttons.dataTables.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', path='/vendor/datatables/dataTables.dateTime.min.css') }}" rel="stylesheet">
     {% endif %}
+
 
 
 </head>
@@ -83,13 +85,26 @@
     <script src="{{url_for('static', path='/js/sb-admin-2.min.js')}}"></script>
     {% if datatables %}
     <script src="{{url_for('static', path='/vendor/datatables/jquery.dataTables.min.js')}}"></script>
-    <script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+    {% if filtro_fecha %}
+        <script src="{{url_for('static', path='/vendor/datatables/dataTables.js')}}"></script>
+        <script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.filtro_fecha.js')}}"></script>
+
+    {% else %}
+        <script src="{{url_for('static', path='/vendor/datatables/dataTables.bootstrap4.min.js')}}"></script>
+    {% endif %}
     <script src="{{url_for('static', path='/vendor/datatables/dataTables.buttons.min.js')}}"></script>
     <script src="{{url_for('static', path='/vendor/datatables/jszip.min.js')}}"></script>
     <script src="{{url_for('static', path='/vendor/datatables/pdfmake.min.js')}}"></script>
     <script src="{{url_for('static', path='/vendor/datatables/vfs_fonts.js')}}"></script>
     <script src="{{url_for('static', path='/vendor/datatables/buttons.html5.min.js')}}"></script>
     <script src="{{url_for('static', path='/vendor/datatables/buttons.print.min.js')}}"></script>
+    
+    <script src="{{url_for('static', path='/vendor/datatables/moment.min.js')}}"></script>
+    <script src="{{url_for('static', path='/vendor/datatables/dataTables.dateTime.min.js')}}"></script>
+    <script src="{{url_for('static', path='/vendor/datatables/popper.min.js')}}"></script>
+
+    
+
     {% endif %}
     <!-- Page level plugins -->
 

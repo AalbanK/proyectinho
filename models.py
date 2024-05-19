@@ -103,6 +103,7 @@ class Proveedor(Base):
     telefono = Column(String(45))
     # campo Hijo = relationship("NombreDelModeloHijo", back_populates="NombreDeLaVariableEnElOtroModelo")
     proveedorcompra = relationship("Factura_compra_cabecera", back_populates="proveedor") #relación cruzada para los campos afectados
+    proveedorgasto = relationship("Factura_gasto_cabecera", back_populates="proveedor") #relación cruzada para los campos afectados
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
@@ -191,6 +192,7 @@ class Contrato(Base):
     
     
     contratocompra = relationship("Factura_compra_cabecera", back_populates="contrato") #
+    contratogasto = relationship("Factura_gasto_cabecera", back_populates="contrato") #
     contratoventa = relationship("Factura_venta_cabecera", back_populates="contrato")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
@@ -211,7 +213,6 @@ class Cuenta(Base):
     #idcuentaprove=relationship("Contrato", back_populates="idcprove")
     #idcuentaclie=relationship("Contrato", back_populates="idcclie")
 
-
 class Producto(Base):
     __tablename__="producto"
     idproducto=Column(Integer, primary_key=True, index=True)
@@ -220,7 +221,8 @@ class Producto(Base):
     # campo Hijo = relationship("NombreDelModeloHijo", back_populates="NombreDeLaVariableEnElOtroModelo")
     productocompra = relationship("Factura_compra_detalle", back_populates="producto") #
     productoventa = relationship("Factura_venta_detalle", back_populates="producto")    
-    deposito_y_producto = relationship("Deposito_y_producto", back_populates="producto")
+    productogasto = relationship("Factura_gasto_detalle", back_populates="producto")
+    #producto_deposito_y_producto = relationship("Deposito_y_producto", back_populates="producto")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
@@ -287,7 +289,6 @@ class Factura_compra_detalle(Base):
     subtotal_iva = Column(Integer)
     detalle=relationship("Factura_compra_cabecera", back_populates="detalles")
 
-
 class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
     idfactura_venta = Column(Integer, primary_key=True, index=True)
@@ -319,15 +320,47 @@ class Factura_venta_detalle(Base):
     subtotal_iva = Column(Integer)
     subtotal = Column(Integer)
     detalle=relationship("Factura_venta_cabecera", back_populates="detalles")
-    
+
 class Deposito_y_producto(Base):
     __tablename__ = "deposito_y_producto"
     iddeposito  = Column(Integer, ForeignKey("deposito.iddeposito"), primary_key=True ) #debe ser relación cruzada "Mapper[Deposito_y_producto(deposito_y_producto)] could not assemble any primary key columns for mapped table 'deposito_y_producto'"
     deposito = relationship("Deposito", back_populates="deposito_y_producto")
     idproducto  = Column(Integer, ForeignKey("producto.idproducto"), primary_key=True )
-    producto = relationship("Producto", back_populates="deposito_y_producto")
+    #producto_deposito_y_producto = relationship("Producto", back_populates="producto_deposito_y_producto")
     cantidad = Column(Integer)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
-    
+
+class Factura_gasto_cabecera(Base):
+    __tablename__ = "factura_gasto_cabecera"
+    idfactura_gasto = Column(Integer, primary_key=True, index=True)
+    numero = Column(String(15))
+    timbrado = Column(Integer)
+    fecha = Column(DateTime(timezone=True), server_default=func.now())
+    idproveedor = Column(Integer, ForeignKey("proveedor.idproveedor")) #FK del proveedor
+    # campo Padre = relationship("NombreDelModeloPadre", back_populates="NombreDeLaVariableEnElOtroModelo")
+    proveedor = relationship("Proveedor", back_populates="proveedorgasto") #Relación cruzada en ambos modelos afectados
+    total_monto = Column(Integer)
+    idcontrato = Column(Integer, ForeignKey("contrato.idcontrato"))      #FK del cliente
+    contrato = relationship("Contrato", back_populates="contratogasto") #relación necesaria para que funcione el FK
+    # iddeposito = Column(Integer, ForeignKey("deposito.iddeposito"))
+    # deposito = relationship("Deposito", back_populates="depositocompra")
+    alta_usuario = Column(Integer)
+    alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
+    modif_usuario = Column(Integer)
+    detalles =  relationship("Factura_gasto_detalle", back_populates="detalle")
+
+class Factura_gasto_detalle(Base):
+    __tablename__ = "factura_gasto_detalle"
+    iddetalle=Column(Integer, primary_key=True, index=True)
+    idfactura_gasto = Column(Integer, ForeignKey("factura_gasto_cabecera.idfactura_gasto"))
+    idproducto = Column(Integer, ForeignKey("producto.idproducto"))
+    producto = relationship("Producto", back_populates="productogasto")
+    descripcion_producto = Column(String(300))
+    cantidad = Column(Integer)
+    precio = Column(Integer)
+    porcentaje_iva = Column(Integer)
+    subtotal = Column(Integer)
+    subtotal_iva = Column(Integer)
+    detalle=relationship("Factura_gasto_cabecera", back_populates="detalles")

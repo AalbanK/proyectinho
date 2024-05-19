@@ -71,7 +71,11 @@
     });
 
     $(document).ready(function(){
-        $("#chofer").DataTable();
+        $("#chofer").DataTable({
+            language: {
+                url: urlEspanholDT
+            }
+        });
 
         $modal.on('shown.bs.modal', function (e) {
             // verificar si existe el id (por si tocan el html en el dom)
