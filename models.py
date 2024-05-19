@@ -58,7 +58,7 @@ class Deposito(Base):
     iddeposito = Column(Integer, primary_key=True, index=True)
     descripcion = Column(String(45))
     # campo Hijo = relationship("NombreDelModeloHijo", back_populates="NombreDeLaVariableEnElOtroModelo")
-    deposito_y_producto = relationship("Deposito_y_producto", back_populates="deposito")
+    depo_producto = relationship("Deposito_y_producto", back_populates="deposito")
     depositocompra = relationship("Factura_compra_cabecera", back_populates="deposito")
     depositoventa = relationship("Factura_venta_cabecera", back_populates="deposito")
     alta_usuario = Column(Integer)
@@ -222,7 +222,7 @@ class Producto(Base):
     productocompra = relationship("Factura_compra_detalle", back_populates="producto") #
     productoventa = relationship("Factura_venta_detalle", back_populates="producto")    
     productogasto = relationship("Factura_gasto_detalle", back_populates="producto")
-    #producto_deposito_y_producto = relationship("Deposito_y_producto", back_populates="producto")
+    producto_deposito_y_producto = relationship("Deposito_y_producto", back_populates="producto")
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
@@ -324,9 +324,9 @@ class Factura_venta_detalle(Base):
 class Deposito_y_producto(Base):
     __tablename__ = "deposito_y_producto"
     iddeposito  = Column(Integer, ForeignKey("deposito.iddeposito"), primary_key=True ) #debe ser relación cruzada "Mapper[Deposito_y_producto(deposito_y_producto)] could not assemble any primary key columns for mapped table 'deposito_y_producto'"
-    deposito = relationship("Deposito", back_populates="deposito_y_producto")
+    deposito = relationship("Deposito", back_populates="depo_producto")
     idproducto  = Column(Integer, ForeignKey("producto.idproducto"), primary_key=True )
-    #producto_deposito_y_producto = relationship("Producto", back_populates="producto_deposito_y_producto")
+    producto = relationship("Producto", back_populates="producto_deposito_y_producto")
     cantidad = Column(Integer)
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())

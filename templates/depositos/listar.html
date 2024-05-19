@@ -1,13 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+<h1 class="h2 mb-1 text-gray-800">Depósitos</h1>
+<hr class="mb-4">
 <table id="depositos" class="table table-striped"> <!--table-striped es para colorear las filas de la tabla-->
     <thead> <!--cabecera de la tabla-->
         <tr>
-            <!-- 
-            <th scope="col">ID</th>
-            <th scope="col">Descripción</th>
-            <th scope="col">Acciones</th>
-            -->
         </tr>
     </thead>
     <tbody>
@@ -113,15 +110,15 @@
                 // `d` es el objeto data original de la fila
 
                 let cadenaDetalles = "";
-                for (let i = 0; i < d.deposito_y_producto.length; i++) {
-                    console.log(d.deposito_y_producto[i])
-                    cadenaDetalles = cadenaDetalles + `<dd> Producto: ${d.deposito_y_producto[i].descripcion_producto}, Cantidad: ${d.deposito_y_producto[i].cantidad} </dd>`;
+                for (let i = 0; i < d.depo_producto.length; i++) {
+                    console.log(d.depo_producto[i])
+                    cadenaDetalles = cadenaDetalles + `<dd> Producto: ${d.depo_producto[i].producto.descripcion}, Cantidad: ${d.depo_producto[i].cantidad} </dd>`;
                     console.log(cadenaDetalles)
                 }
 
                 return (
-                    '<dl>' +
-                    '<dt>Detalles:</dt>' +
+                    '<dl>' + 
+                    `<dt>${cadenaDetalles.length>0?'Detalles:':'El depósito (aún) no tiene productos'}</dt>` +
                     '<dd>' +
                     cadenaDetalles +
                     '</dd>' +
