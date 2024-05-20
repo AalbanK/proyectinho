@@ -1,13 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/depositos/nuevo/" method="POST"> <!--action es la direccion del ROUTER y el metodo post para insertar el registro-->
-            <div class="form-group">
-                <label for="depo_descri">Nombre Deposito</label>
-                <input type="text" class="form-control" id="depo_descri" name="descripcion">
-            </div>
-            <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
-    </div>
+<h1 class="h2 mb-1 text-gray-800">Crear Depósito</h1>
+<hr class="mb-4">
+<div>
+    <form action="/depositos/nuevo/" method="POST"> <!--action es la direccion del ROUTER y el metodo post para insertar el registro-->
+        <div class="form-group">
+            <label for="depo_descri">Nombre Deposito</label>
+            <input type="text" class="form-control" id="depo_descri" name="descripcion">
+        </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
 {% endblock content %}

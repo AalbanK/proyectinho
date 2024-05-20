@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div>
-        <form action="/ivas/nuevo/" method="POST">
-            <div class="form-group">
-                <label for="iva_porc">Porcentaje IVA</label>
-                <input type="text" class="form-control" id="iva_porc" name="iva_porc">
-                
-            </div>
-            <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </form>
-    </div>
+<h1 class="h2 mb-1 text-gray-800">Crear IVA</h1>
+<hr class="mb-4">
+<div>
+    <form action="/ivas/nuevo/" method="POST">
+        <div class="form-group">
+            <label for="iva_porc">Porcentaje IVA</label>
+            <input type="text" class="form-control" id="iva_porc" name="iva_porc">
+            
+        </div>
+        <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+    </form>
+</div>
 {% endblock content %}
