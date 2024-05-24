@@ -99,7 +99,11 @@
                 sortable: false,
                 searchable: false,
                 render: function (data, type, row, meta) {
-                    return botonesVerYAnular(data.idfactura_compra);
+                    if (data.anulado=='S') {
+                        return `<a href="/compras/ver/${data.idfactura_compra}" class="btn btn-warning ver">Ver</a>
+                <button type="button" class="btn btn-light" data-id="${data.idfactura_compra}" disabled> Anulado </button>`;
+                    }
+                    else return botonesVerYAnular(data.idfactura_compra);
                 }
             },
         ];
@@ -207,7 +211,7 @@
                     if (data.status_code == 200) {
                         agregarAlert('ok');
                         actualizarBotones('ok')
-                        tablaDT.ajax.reload(null, false); //recaga la tabla
+                        tablaDT.ajax.reload(null, false); //recarga la tabla
                     }
                     else if (data.status_code == 404) {
                         agregarAlert('error')

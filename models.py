@@ -274,6 +274,7 @@ class Factura_compra_cabecera(Base):
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
     detalles =  relationship("Factura_compra_detalle", back_populates="detalle")
+    anulado=Column(String(1),default='N')
 
 class Factura_compra_detalle(Base):
     __tablename__ = "factura_compra_detalle"
@@ -302,6 +303,7 @@ class Factura_venta_cabecera(Base):
     contrato = relationship("Contrato", back_populates="contratoventa")
     iddeposito = Column(Integer, ForeignKey("deposito.iddeposito"))
     deposito = relationship("Deposito", back_populates="depositoventa")
+    anulado=Column(String(1),default='N')
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)

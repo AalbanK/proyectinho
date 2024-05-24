@@ -1,4 +1,5 @@
 from typing import List
+import statistics
 
 from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
@@ -82,7 +83,7 @@ async def listar_compras(request: Request, usuario_actual: us.Usuario = Depends(
     respuesta = db.query(Factura_compra_cabecera).options(
             joinedload(Factura_compra_cabecera.detalles).load_only(Factura_compra_detalle.descripcion_producto, Factura_compra_detalle.cantidad),
             joinedload(Factura_compra_cabecera.proveedor).load_only(Proveedor.descripcion),
-            joinedload(Factura_compra_cabecera.contrato).load_only(Contrato.nro), load_only(Factura_compra_cabecera.idfactura_compra, Factura_compra_cabecera.fecha, Factura_compra_cabecera.numero, Factura_compra_cabecera.total_monto)
+            joinedload(Factura_compra_cabecera.contrato).load_only(Contrato.nro), load_only(Factura_compra_cabecera.idfactura_compra, Factura_compra_cabecera.fecha, Factura_compra_cabecera.numero, Factura_compra_cabecera.total_monto, Factura_compra_cabecera.anulado)
         )
     respuesta = respuesta.all()
     
@@ -95,3 +96,20 @@ async def listar_compras(request: Request, db: Session = Depends(get_database_se
     vent = db.query(Factura_compra_cabecera).all()
     respuesta = [Compra_cabecera_Vista.from_orm(p) for p in vent] # convierte los valores en una lista
     return JSONResponse(jsonable_encoder(respuesta))
+
+@router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
+    compra = db.query(Factura_compra_cabecera).get(id) #obtiene el registro del modelo Compra por su id
+    if(compra is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(compra)) #en caso de que exista el registro, lo devuelve en formato json
+    
+@router.get("/anular/{id}",response_class=JSONResponse)
+def anular(id : int, db: Session = Depends(get_database_session)):
+    compra= db.query(Factura_compra_cabecera).filter(Factura_compra_cabecera.idfactura_compra == id).first()
+    compra.anulado='S'
+    db.add(compra)
+    db.commit()
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro anulado correctamente.") #retorna el codigo http 200
+    return response
