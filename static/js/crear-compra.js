@@ -1,6 +1,8 @@
 let jsonProductos = null;
 let jsonCiudades = null;
 let selectProducto = null;
+let campoCantidad = null;
+let campoPrecio = null;
 
 async function obtenerContrato(idcontrato) {
     const response = await fetch(`/contratos/detalles/${idcontrato}`);
@@ -134,14 +136,14 @@ crearFila = (crearBotonEliminar) => {
 
     colAutoDiv = crearElemento("div", "", ["form-group", "col-12", "col-sm-4", "col-md-2", "col-lg-2", "d-flex", "flex-column", "justify-content-end"]);
     let labelCantidad = crearElemento("label", "", [], "Cantidad (en Kg)");
-    let campoCantidad = crearElemento("input", "cantidad[]", ["form-control"], "", "number", true);
+    campoCantidad = crearElemento("input", "cantidad[]", ["form-control"], "", "number", true, true);
     colAutoDiv.appendChild(labelCantidad);
     colAutoDiv.appendChild(campoCantidad);
     elementoDiv.appendChild(colAutoDiv);
 
     colAutoDiv = crearElemento("div", "", ["form-group", "col-12", "col-sm-4", "col-md-3", "col-lg-2", "d-flex", "flex-column", "justify-content-end"]);
     let labelPrecio = crearElemento("label", "", [], "Precio (en Gs)");
-    let campoPrecio = crearElemento("input", "precio[]", ["form-control"], "", "number", true);
+    campoPrecio = crearElemento("input", "precio[]", ["form-control"], "", "number", true, true);
     colAutoDiv.appendChild(labelPrecio);
     colAutoDiv.appendChild(campoPrecio);
     elementoDiv.appendChild(colAutoDiv);
@@ -155,7 +157,10 @@ crearFila = (crearBotonEliminar) => {
 
     selProducto.addEventListener("change", () => {
         campoPorcentajeIVA.value = selProducto.options[selProducto.selectedIndex].getAttribute('data-iva');
-        calcularSubtotales(campoCantidad, 
+        contratoSeleccionado = document.querySelector("#idContrato")
+        campoCantidad.value = contratoSeleccionado.options[contratoSeleccionado.selectedIndex].getAttribute(`data-cantidad`);
+        campoPrecio.value = contratoSeleccionado.options[contratoSeleccionado.selectedIndex].getAttribute(`data-preciocompra`);
+        calcularSubtotales(campoCantidad,
             campoPrecio, 
             campoSubtotal,
             campoSubtotal_iva,
@@ -211,7 +216,6 @@ crearFila = (crearBotonEliminar) => {
 
     divPadre.appendChild(elementoDiv);    
     return divPadre;
- 
 }
 
 window.addEventListener('DOMContentLoaded', async function () {
@@ -230,7 +234,6 @@ window.addEventListener('DOMContentLoaded', async function () {
         prductoForm=document.querySelector('[name="productos[]"]');
         if (idcontrato && idcontrato != "undefined") {
             let jsonContrato = await obtenerContrato(idcontrato);
-           
             let optionsArray = Array.from(proveedorForm.options); // Convierte en array los options
             let valorABuscar = jsonContrato.idproveedor
             let index = optionsArray.findIndex(option => option.value == valorABuscar);
@@ -242,6 +245,8 @@ window.addEventListener('DOMContentLoaded', async function () {
             prductoForm.setAttribute('readonly', 'readonly')
             prductoForm.setAttribute('disabled', 'disabled')
             prductoForm.dispatchEvent(new Event("change"));
+
+            
 
             }
         else {
