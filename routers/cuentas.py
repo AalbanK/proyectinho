@@ -101,7 +101,7 @@ async def editar_view(id:int,response:Response,request:Request,db: Session = Dep
     cue= cue._mapping
     print(cue)
     bancos= await bank.get_bancos(request, db, usuario_actual)
-    return templates.TemplateResponse("cuentas/editar.html", {"request": request, "Cuenta": cue, "Bancos": bancos})
+    return templates.TemplateResponse("cuentas/editar.html", {"request": request, "Cuenta": cue, "Bancos": bancos , "usuario_actual": usuario_actual})
 
 @router.post("/update",response_class=HTMLResponse)
 def editar(db: Session = Depends(get_database_session), idcuenta = Form(...), idBanco = Form(...), nro = Form(...), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):

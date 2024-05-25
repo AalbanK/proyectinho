@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session, aliased
+from sqlalchemy.sql import func as fn
 from starlette import status
 from starlette.responses import RedirectResponse
 
@@ -108,7 +109,7 @@ async def ver_contrato(idcontrato:int,request: Request, db: Session = Depends(ge
     banc_P=aliased(Banco)
     banc_C=aliased(Banco)
 
-    contra = db.query(Contrato.idcontrato, Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Proveedor.descripcion.label("desc_provee"), Proveedor.ruc.label("ruc_provee"),
+    contra = db.query(Contrato.idcontrato, Contrato.alta_fecha, Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Proveedor.descripcion.label("desc_provee"), Proveedor.ruc.label("ruc_provee"),
                       Cliente.descripcion.label("desc_clie"), Cliente.ruc.label("ruc_clie"), Contrato.idproducto, Producto.descripcion.label("desc_producto"), Contrato.cantidad,
                       Contrato.precio_compra, Contrato.precio_venta, Contrato.cuenta_proveedor, Contrato.cuenta_proveedor,
                       Contrato.origen,ciu_O.descripcion.label("desc_ciudad_origen"), depto_O.descripcion.label("desc_depto_origen"),
