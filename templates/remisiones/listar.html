@@ -5,6 +5,7 @@
 <table id="remisiones" class="table table-striped">
     <thead>
         <tr>
+            <th scope="col">ID</th>
             <th scope="col">Nro</th>
             <th scope="col">Fecha</th>
             <th scope="col">Contrato N°</th>
@@ -18,6 +19,7 @@
     <tbody>
         {% for remision in data %}
         <tr>
+            <td>{{ remision.idremision}}</td>
             <td>{{ remision.numero}}</td>
             <td>{{ remision.fecha_carga}}</td>
             <td>{{ remision.nro_contrato}}</td>

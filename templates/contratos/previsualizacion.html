@@ -36,7 +36,7 @@
               </tr>
               <tr>
                 <td></td>
-                <td>N° Cuenta: xxxxxxx  Banco: xxxxx</td>
+                <td>N° Cuenta: 123123003  Banco: SUDAMERIS</td>
               </tr>
               <tr>
                 <th scope="row">04 - El Comprador:</th>
@@ -48,7 +48,7 @@
               </tr>
               <tr>
                 <th scope="row">05- Objeto y Cantidad:</th>
-                <td>{{Contrato.desc_producto}}, {{Contrato.cantidad}} Kilogramos</td>
+                <td>{{Contrato.desc_producto}}: {{Contrato.cantidad}} Kilogramos</td>
               </tr>
               <tr>
                 <th scope="row">06- Precio:</th>
@@ -63,7 +63,7 @@
               </tr>
               <tr>
                 <th scope="row">07- Plazo de Entrega:</th>
-                <td>Siempre que las condiciones climáticas sean favorables.</td>
+                <td>{{Contrato.fecha_inicio | truncate(10, True, '', 0)}} hasta {{Contrato.fecha_fin | truncate(10, True, '', 0)}}. Siempre que las condiciones climáticas sean favorables.</td>
               </tr>
             </tbody>
           </table>
