@@ -7,10 +7,12 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from starlette import status
+
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import (Camion, Carreta, Chofer, Contrato, Producto, Proveedor, Deposito, Remision)
+from models import (Camion, Carreta, Chofer, Contrato, Producto, Deposito, Remision)
 from routers import auth
 from schemas import usuario as us
 
@@ -26,11 +28,15 @@ router = APIRouter(
 
 @router.get("/")
 async def read_remision(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    records = db.query(Remision.idremision, Remision.numero, Remision.fecha_carga, Contrato.nro.label('nro_contrato'), Remision.idchofer, Camion.camion_chapa.label('chapacamion'), Remision.idcarreta, Remision.neto
-                ).join(Contrato,Remision.idcontrato==Contrato.idcontrato
-                ).join(Camion, Remision.idcamion==Camion.idcamion
-                ).join(Deposito,Remision.iddeposito==Deposito.iddeposito
-                ).all()
+    records = db.query(Remision.idremision, Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Contrato.nro.label('nro_contrato'), Remision.idchofer
+                    , Camion.camion_chapa.label('chapacamion'), Carreta.carreta_chapa.label('chapacarreta'), Producto.descripcion.label('producto'), Remision.neto, Remision.netod, Remision.anulado,
+                    ).join(Contrato,Remision.idcontrato==Contrato.idcontrato
+                    ).join(Camion, Remision.idcamion==Camion.idcamion
+                    ).join(Carreta, Remision.idcarreta==Carreta.idcarreta
+                    ).join(Producto,Contrato.idproducto==Producto.idproducto
+                    ).join(Deposito,Remision.iddeposito==Deposito.iddeposito, isouter = True #es un left join
+                    ).group_by(Remision.idremision, Remision.numero, Remision.fecha_carga, Contrato.nro, Remision.idchofer, Camion.camion_chapa,
+                    Carreta.carreta_chapa, Remision.neto, Remision.anulado).all()
     return templates.TemplateResponse("remisiones/listar.html", {"request": request, "usuario_actual": usuario_actual, "data": records, "datatables": True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
@@ -55,57 +61,56 @@ async def create_remision(db: Session=Depends(get_database_session),usuario_actu
     response = RedirectResponse('/', status_code=303)
     return response
 
-@router.get("/{id}",response_class=HTMLResponse)
-def ver(id:int, response:Response,
-            request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    remi = db.query(Remision).get(id)
-    return templates.TemplateResponse("remisiones/listar.html", {"request": request, "Remision": remi, "usuario_actual": usuario_actual})
+# @router.get("/{id}",response_class=HTMLResponse)
+# def ver(id:int, response:Response,
+#             request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+#     remi = db.query(Remision).get(id)
+#     return templates.TemplateResponse("remisiones/listar.html", {"request": request, "Remision": remi, "usuario_actual": usuario_actual})
 
-@router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
-def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
-    remision = db.query(Remision).get(id) #obtiene el registro del modelo Remision por su id
-    if(Remision is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
-        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
-    else:
-        return JSONResponse(jsonable_encoder(remision)) #en caso de que exista el registro, lo devuelve en formato json
-    
-# @router.get("/todos")
-# async def listar_remisiones(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-
-#     return cue
-
-# Remision.idcuenta, Banco.descripcion.label('desc_banco'),
-#                     case((and_(Remision.idcliente.is_(None), Remision.idproveedor.is_not(None)),Proveedor.descripcion.label('desc_RazonSocial')),
-#                           (and_(Remision.idcliente.is_not(None), Remision.idproveedor.is_(None)),Remision.descripcion.label('desc_RazonSocial')),
-#                            else_= literal('Otros').label('desc_RazonSocial')).label('desc_RazonSocial'), Remision.nro
-#                     ).join(Banco, Remision.idbanco==Banco.idbanco
-#                     ).join(Remision, Remision.idcliente == Remision.idcliente, isouter = True).join(Proveedor, Remision.idproveedor == Proveedor.idproveedor, isouter = True
+@router.get("/ver/{id}")
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    remi= db.query(Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Remision.idcontrato).filter(Remision.idremision==id).first()
+    return templates.TemplateResponse("remisiones/ver.html", {"request": request, "usuario_actual": usuario_actual, "Remision":remi})
 
 
 @router.get("/editar/{id}",response_class=HTMLResponse)
 def editar_view(id:int,response:Response,request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     remi= db.query(Remision).get(id)
-    return templates.TemplateResponse("remisiones/editar.html", {"request": request, "Remision": remi, "usuario_actual": usuario_actual})
+    contras=db.query(Contrato).all()
+    chofes=db.query(Chofer).all()
+    camis=db.query(Camion).all()
+    carres=db.query(Carreta).all()
+    depos=db.query(Deposito).all()
+    return templates.TemplateResponse("remisiones/editar.html", {"request": request, "Remision": remi, "usuario_actual": usuario_actual, "Contratos_lista":contras, "Choferes_lista":chofes, "Camiones_lista":camis,"Carretas_lista":carres, "Depositos_lista":depos})
 
 @router.post("/update",response_class=HTMLResponse)
-def editar(db: Session = Depends(get_database_session), idremision = Form(...), numero = Form(...), fecha_carga  = Form(...), fecha_descarga = Form(...), idcontrato = Form(...), 
-           idchofer = Form(), idcamion = Form(), idcarreta = Form(), tara = Form(), bruto = Form(), neto = Form(), neto_descarga = Form(), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+def editar(db: Session = Depends(get_database_session), idremi = Form(...), fechadescarga = Form(...), tarad = Form(), brutod = Form(), netod= Form(), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
-    remi= db.query(Remision).get(idremision)
-    remi.numero
-    remi.fecha_carga
-    remi.fecha_descarga
-    remi.idcontrato
-    remi.idchofer
-    remi.idcamion
-    remi.idcarreta
-    remi.tara
-    remi.bruto
-    remi.neto
-    remi.neto_descarga
+    remi= db.query(Remision).get(idremi)
+    remi.fecha_descarga=fechadescarga
+    remi.tarad=tarad
+    remi.brutod=brutod
+    remi.netod=netod
     remi.modif_usuario = usu.idusuario
     db.add(remi)
     db.commit()
     db.refresh(remi)
-    response = RedirectResponse('/clientes/', status_code=303)
+    response = RedirectResponse('/remisiones/', status_code=303)
+    return response
+
+@router.get("/verificar/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
+    remision = db.query(Remision).get(id) #obtiene el registro del modelo Remision por su id
+    if(remision is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(remision)) #en caso de que exista el registro, lo devuelve en formato json
+
+@router.get("/anular/{id}",response_class=JSONResponse)
+def anular(id : int, db: Session = Depends(get_database_session)):
+    remi= db.query(Remision).filter(Remision.idremision == id).first()
+    remi.anulado='S'
+    db.add(remi)
+    db.commit()
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro anulado correctamente.") #retorna el codigo http 200
     return response

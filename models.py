@@ -234,12 +234,12 @@ class Remision(Base):
     fecha_carga=Column(DateTime(timezone=True), server_default=func.now())
     fecha_descarga=Column(DateTime(timezone=True), server_default=func.now())
     idcontrato=Column(Integer, ForeignKey("contrato.idcontrato"))
-    bruto=Column(Double)
-    tara=Column(Double)
-    neto=Column(Double)
-    brutod=Column(Double)
-    tarad=Column(Double)
-    netod=Column(Double)
+    bruto=Column(Integer)
+    tara=Column(Integer)
+    neto=Column(Integer)
+    brutod=Column(Integer)
+    tarad=Column(Integer)
+    netod=Column(Integer)
     idchofer=Column(Integer, ForeignKey("chofer.idchofer"))
     idcamion=Column(Integer, ForeignKey("camion.idcamion"))
     idcarreta=Column(Integer, ForeignKey("carreta.idcarreta"))
@@ -247,6 +247,7 @@ class Remision(Base):
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)
+    anulado=Column(String(1),default='N')
 
 class Usuario(Base):
     __tablename__="usuario"

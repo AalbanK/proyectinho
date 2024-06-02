@@ -7,15 +7,16 @@
         <div class="row d-flex align-items-end">
             <div class="col">
                 <div class="form-group">
+                    <input type="hidden" class="form-control" id="idremi" name="idremi" value="{{Remision.idremision}}">
                     <label class="control-label">*N° Remisión </label>
                     <input type="text" name="numero" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{7}" maxlength="15"
-                        placeholder="999-999-999999" autocomplete="off" required>
+                        placeholder="999-999-999999" autocomplete="off" value="{{Remision.numero}}" readonly>
                 </div>
             </div>
             <div class="col">
                 <div class="form-group">
                     <label for="fecha">*Fecha de Emisión: </label>
-                    <input type="date" class="form-control" id="fecha_carga" name="fechacarga">
+                    <input type="date" class="form-control" id="fecha_carga" name="fechacarga" value="{{Remision.fecha_carga.strftime('%Y-%m-%d')}}" readonly>
                 </div>
             </div>
             <div class="col">
@@ -32,10 +33,10 @@
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="idContrato">Contrato:</label>
                         </div>
-                        <select class="custom-select" id="idContrato" name="idcontrato">
+                        <select class="custom-select" id="idContrato" name="idcontrato" disabled>
                             <option value="" selected>Elegir...</option>
                             {% for Contrato in Contratos_lista %}
-                            <option value="{{Contrato.idcontrato}}">{{Contrato.nro}}</option>
+                            <option value="{{Contrato.idcontrato}}" {{"selected" if Contrato.idcontrato==Remision.idcontrato}}>{{Contrato.nro}}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -118,10 +119,9 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idChofer">Chofer:</label>
                     </div>
-                    <select class="custom-select" style="margin-right: 10px" id="idChofer" name="idchofer">
-                        <option value="0" selected>Elegir...</option>
+                    <select class="custom-select" style="margin-right: 10px" id="idChofer" name="idchofer" disabled>
                         {% for Chofer in Choferes_lista %}
-                        <option value="{{Chofer.idchofer}}">{{Chofer.ci}}</option>
+                        <option value="{{Chofer.idchofer}}" {{"selected" if Chofer.idchofer==Remision.idchofer}}>{{Chofer.ci}} - {{Chofer.nombre}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -131,10 +131,9 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCamion">Camión:</label>
                     </div>
-                    <select class="custom-select" style="margin-right: 10px" id="idCamion" name="idcamion">
-                        <option value="0" selected>Elegir...</option>
+                    <select class="custom-select" style="margin-right: 10px" id="idCamion" name="idcamion" disabled>
                         {% for Camion in Camiones_lista %}
-                        <option value="{{Camion.idcamion}}">{{Camion.camion_chapa}}</option>
+                        <option value="{{Camion.idcamion}}" {{"selected" if Camion.idcamion==Remision.idcamion}}>{{Camion.camion_chapa}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -144,10 +143,9 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCarreta">Carreta:</label>
                     </div>
-                    <select class="custom-select" style="margin-right: 10px" id="idCarreta" name="idcarreta">
-                        <option value="0" selected>Elegir...</option>
+                    <select class="custom-select" style="margin-right: 10px" id="idCarreta" name="idcarreta" disabled>
                         {% for Carreta in Carretas_lista %}
-                        <option value="{{Carreta.idcarreta}}">{{Carreta.carreta_chapa}}</option>
+                        <option value="{{Carreta.idcarreta}}" {{"selected" if Carreta.idcarreta==Remision.idcarreta}}>{{Carreta.carreta_chapa}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -164,40 +162,51 @@
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Bruto Origen: </label>
-                    <input type="number" name="bruto" class="form-control" pattern="[0-9]{4,5}" required>
+                    <input type="number" name="bruto" class="form-control" pattern="[0-9]{4,5}" value="{{Remision.bruto}}" readonly>
                 </div>
             </div>
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Tara Origen: </label>
-                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" required>
+                    <input type="number" name="tara" class="form-control" pattern="[0-9]{4,5}" value="{{Remision.tara}}" readonly>
                 </div>
             </div>
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Neto Origen: </label>
-                    <input type="number" name="neto" class="form-control" pattern="[0-9]{4,5}" readonly>
+                    <input type="number" name="neto" id="neto" class="form-control" pattern="[0-9]{4,5}" value="{{Remision.neto}}" readonly>
                 </div>
             </div>
         </div>
         <div class="row d-flex align-items-end">
-            <div class="col-xs-12 col-md-3"></div>
+            <div class="col-xs-12 col-md-3">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="iddeposito">*Depósito:</label>
+                    </div>
+                    <select class="custom-select" style="margin-right: 10px" id="iddeposito" name="iddeposito" disabled>
+                        {% for Deposito in Depositos_lista %}
+                        <option value="{{Deposito.iddeposito}}" {{"selected" if Deposito.iddeposito==Remision.iddeposito}}>{{Deposito.descripcion}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Bruto Destino: </label>
-                    <input type="number" name="brutod" class="form-control" pattern="[0-9]{4,5}" readonly>
+                    <input type="number" name="brutod" class="form-control" pattern="[0-9]{4,5}" required>
                 </div>
             </div>
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Tara Destino: </label>
-                    <input type="number" name="tarad" class="form-control" pattern="[0-9]{4,5}" readonly>
+                    <input type="number" name="tarad" class="form-control" pattern="[0-9]{4,5}" required>
                 </div>
             </div>
             <div class="col-xs-12 col-md-3">
                 <div class="form-group">
                     <label class="control-label">*Neto Destino: </label>
-                    <input type="number" name="netod" class="form-control" pattern="[0-9]{4,5}" readonly>
+                    <input type="number" name="netod" id="netod" class="form-control" pattern="[0-9]{4,5}" required readonly>
                 </div>
             </div>
         </div>

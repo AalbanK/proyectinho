@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1 class="h2 mb-1 text-gray-800">Listar Remisiones</h1>
-<hr class="mb-4">
 <table id="remisiones" class="table table-striped">
     <thead>
         <tr>
             <th scope="col">ID</th>
             <th scope="col">Nro</th>
-            <th scope="col">Fecha</th>
+            <th scope="col">Fecha Carga</th>
+            <th scope="col">Fecha Descarga</th>
             <th scope="col">Contrato N°</th>
             <th scope="col">Chofer</th>
             <th scope="col">Chapa Camion</th>
             <th scope="col">Chapa Carreta</th>
-            <th scope="col">KG Neto</th>
+            <th scope="col">Producto</th>
+            <th scope="col">KG Neto Carga</th>
+            <th scope="col">KG Neto Descarga</th>
             <th scope="col">Acciones</th>
         </tr>
     </thead>
@@ -21,15 +23,23 @@
         <tr>
             <td>{{ remision.idremision}}</td>
             <td>{{ remision.numero}}</td>
-            <td>{{ remision.fecha_carga}}</td>
+            <td>{{ remision.fecha_carga.strftime('%Y-%m-%d')}}</td>
+            <td>{{ remision.fecha_descarga.strftime('%Y-%m-%d') if remision.fecha_descarga else '--'}}</td>
             <td>{{ remision.nro_contrato}}</td>
             <td>{{ remision.idchofer}}</td>
             <td>{{ remision.chapacamion}}</td>
-            <td>{{ remision.idcarreta}}</td>
+            <td>{{ remision.chapacarreta}}</td>
+            <td>{{ remision.producto}}</td>
             <td>{{ remision.neto}}</td>
-            <td><a href="/remisiones/editar/{{- remision.idremision -}}" class="btn btn-warning editar">Editar</a>
-                <button type="button" class="btn btn-danger eliminar" data-toggle="modal" data-target="#eliminarModal"
-                    data-id="{{- remision.idremision -}}"> Eliminar </button>
+            <td>{{ remision.netod or '--' }}</td>
+            <td>
+                {% if remision.anulado == 'S' %}
+                <button type="button" class="btn btn-light" disabled> Anulado </button>
+                {% else %}
+                <a href="/remisiones/editar/{{- remision.idremision -}}" class="btn btn-warning editar">Seguimiento</a>
+                <button type="button" class="btn btn-danger anular" data-toggle="modal" data-target="#anularModal" 
+                data-id="{{- remision.idremision -}}"> Anular </button>
+                {% endif %}
             </td>
         </tr>
         {% endfor %}
@@ -38,6 +48,22 @@
 </table>
 <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
 
+<div class="modal fade" id="anularModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Anular Registro</h4>
+                <a href="#" class="close" data-dismiss="modal">&times;</a>
+            </div>
+            <div class="modal-body">
+                <h5> ¿Está seguro/a de anular este registro? </h5>
+            </div>
+            <div class="modal-footer">
+                <form id="anularRemision"></form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 
 {% block script %}
@@ -51,8 +77,139 @@
         $("#remisiones").DataTable({
             language: {
                 url: urlEspanholDT
-            }
+            },
+            columnDefs: [{ type:"num" , targets: 0}, { sortable: false, targets: 11 }],
         });
     });
+    let $tabla = $("#remisiones");
+    let $modal = $('#anularModal');
+    let botonesAnular = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">No, Cancelar</button>
+                    <button id="confirmarAnular" class="btn btn-danger" type="button">Sí, Anular</button>`;
+    let botonesOK = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">Ok</button>`;
+
+    let alertOK = `<div class="alert alert-success aviso" role="alert">
+                    Registro anulado exitosamente.
+                </div>`;
+    let botonesVerYAnular = (id) => {
+        return `<a href="/remisiones/ver/${id}" class="btn btn-info ver">Ver</a>
+                <button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
+    }
+
+    $tabla.on('click', '.btn-danger.anular', function (e) {
+            let id = $(e.target).data('id'); //data-"whatever" sirve para obtener el valor de "whatever"
+            $modal.data('id', id).modal('show');
+            console.log(id)
+        });
+
+    agregarAlert = (accion, motivo) => {
+            switch (accion) {
+                case 'error': {
+                    let texto = null;
+                    switch (motivo) {
+                        case 'verif': {
+                            texto = 'Ocurrió un error al verificar si existe el registro seleccionado.';
+                            break;
+                        }
+                        case 'elim': {
+                            texto = 'Ocurrió un error al verificar si el registro fue anulado correctamente. Verifique si los datos mostrados posteriormente son consistentes.';
+                            break;
+                        }
+                        default: {
+                            texto = 'Ha ocurrido un error desconocido. Verifique si los datos mostrados posteriormente son correctos.';
+                        }
+                    }
+                    let alertError = ` <div class="alert alert-danger aviso" role="alert">
+                <button type="button" class="close close-alert" 
+                    data-dismiss="alert" aria-hidden="true">
+                    ×
+                </button> ${texto}
+            </div>`;
+
+                    $('.modal-body').append(alertOK);
+                    break;
+                }
+                case 'ok': {
+                    $('.modal-body').append(alertOK);
+                    break;
+                }
+                default: break;
+            }
+        }
+
+        $modal.on('shown.bs.modal', function (e) {
+            //verificar si existe el id (por si tocan el html en el dom)
+            $.ajax({
+                url: `/remisiones/verificar/${$modal.data('id')}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 404) {
+                        agregarAlert('error', 'verif')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        actualizarBotones('anular')
+                        $("#confirmarAnular").off('click').on('click', { id: $modal.data('id') }, anularFila);
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        });
+
+        $modal.on('hidden.bs.modal', function (e) {
+            $modal.removeData('id');
+            $modal.find('aviso').remove();
+            $modal.find('#anularRemision').children().remove
+        })
+
+        actualizarBotones = (action) => {
+            $modal.find('#anularRemision').children().remove();
+            switch (action) {
+                case 'error': {
+                    $modal.find('#anularRemision').append(botonesOK);
+                    break;
+                }
+                case 'anular': {
+                    console.log($modal.find('#anularRemision'))
+                    $modal.find('#anularRemision').append(botonesAnular);
+                    break;
+                }
+                default: $modal.find('#anularRemision').append(botonesOK);
+            }
+        }
+
+        anularFila = (e) => {
+            let idAnular = e.data.id;
+            url = `/remisiones/anular/${idAnular}`;
+            $.ajax({
+                url: url,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data, status, xhr) {
+                    if (data.status_code == 200) {
+                        agregarAlert('ok');
+                        actualizarBotones('ok')
+                    }
+                    else if (data.status_code == 404) {
+                        agregarAlert('error')
+                        actualizarBotones('error')
+                    }
+                    else {
+                        agregarAlert('ok');
+                        actualizarBotones('ok')
+                        $modal.modal('hide');
+                    }
+                },
+                error: function (e) {
+                    agregarAlert('error', 'elim')
+                    actualizarBotones('error')
+                    console.log(e)
+                }
+            });
+        }
 </script>
 {% endblock script %}
