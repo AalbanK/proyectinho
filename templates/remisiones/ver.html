@@ -15,7 +15,7 @@
         <div class="row mx-auto">
             <div class="col">
                 <label for="fecha_emision">Fecha de emisión:</label>
-                <input type="text" id="fecha_emision" class="border-top-0 border-left-0 border-right-0">
+                <input type="text" id="fecha_emision" class="border-top-0 border-left-0 border-right-0" value="{{Remision.fecha_carga | truncate(10, True, '', 0)}}">
             </div>
         </div>
         <!--Destinatario Mercadería -->
