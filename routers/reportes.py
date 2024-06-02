@@ -20,6 +20,7 @@ from schemas import usuario as us
 from . import clientes as routerclientes
 from . import productos as routerproductos
 from . import proveedores as routerproveedores
+from . import depositos as routerdepositos
 
 app = FastAPI()
 
@@ -63,14 +64,14 @@ def mostrar_stock(request: Request, db: Session = Depends(get_database_session),
     ).join(Producto, Factura_venta_detalle.idproducto == Producto.idproducto
     ).group_by(Factura_venta_detalle.idproducto, Factura_venta_cabecera.fecha)
 
-    """
+    
     query_remisiones = db.query(
-        literal('Remisión').label('tipo_movimiento'),
+        literal('Remision').label('tipo_movimiento'),
         Remision.idproducto,
         func.sum(Remision.cantidad).label('cantidad'),
         Remision.fecha.label('fecha')
     ).group_by(Remision.idproducto, Remision.fecha)
-    """
+    
 
     fecha_desde = datetime.strptime(fecha_desde, '%Y-%m-%d') if fecha_desde else None
     fecha_hasta = datetime.strptime(fecha_hasta, '%Y-%m-%d') if fecha_hasta else None
@@ -193,4 +194,10 @@ def mostrar_compras(request: Request, db: Session = Depends(get_database_session
 
     respuesta = [reporte.ReporteComprasBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
     return JSONResponse(jsonable_encoder(respuesta))
-    return {}
+    
+@router.get("/depositos")
+async def mostrar_parametros_depositos(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    # proveedores = await routerproveedores.listado_proveedores(request=request, db=db)
+    productos = await routerproductos.listado_productos(request=request, db=db)
+    depositos= await routerdepositos.listado_depositos(request=request, db=db)
+    return templates.TemplateResponse("/reportes/depositos.html", {"request": request, "Productos": productos, "Depositos":depositos, "datatables": True, "usuario_actual": usuario_actual})

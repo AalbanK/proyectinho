@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<h1 class="h2 mb-1 text-gray-800">Movimientos de Productos</h1>
+<h1 class="h2 mb-1 text-gray-800">Movimientos de Depósitos</h1>
 <hr class="mb-4">
 
-<form id="parametros_stock">
+<form id="parametros_depositos">
 
   <fieldset class="form-group">
     <div class="row">
@@ -58,10 +58,10 @@
   <button type="submit" class="btn btn-primary">Buscar</button>
 </form>
 <hr>
-<table id="movimientos_stock" class="table table-striped">
+<table id="movimientos_depositos" class="table table-striped">
 </table>
 {% endblock content %}
 
 {% block script %}
-<script src="{{url_for('static', path='/js/reporte-stock.js')}}"></script>
+<script src="{{url_for('static', path='/js/reporte-depositos.js')}}"></script>
 {% endblock script %}

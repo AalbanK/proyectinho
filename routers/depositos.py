@@ -102,3 +102,9 @@ def eliminar(id : int, db: Session = Depends(get_database_session), usuario_actu
     db.commit()#confirma los cambios
     response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro eliminado correctamente.") #retorna el codigo http 200
     return response
+
+@router.get("/listar", name="listado_depositos") # se le da un name para que pueda ser accedido fácilmente desde otros routers
+async def listado_depositos(request: Request, db: Session = Depends(get_database_session)):
+    depositos = db.query(Deposito.iddeposito, Deposito.descripcion
+        ).order_by(Deposito.descripcion).all()
+    return depositos
