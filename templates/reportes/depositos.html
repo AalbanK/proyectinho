@@ -38,11 +38,11 @@
   </div>
   <div class="form-row">
     <div class="form-group col-md-6">
-      <label for="inputProducto">Producto</label>
-      <select id="inputProducto" class="form-control">
+      <label for="inputDeposito">Depósito</label>
+      <select id="inputDeposito" class="form-control">
         <option value="" selected>Todos</option>
-        {% for Producto in Productos %}
-        <option value="{{Producto.idproducto}}">{{Producto.descripcion}} ({{Producto.idproducto}})</option>
+        {% for Deposito in Depositos %}
+        <option value="{{Deposito.iddeposito}}">{{Deposito.descripcion}} ({{Deposito.iddeposito}})</option>
         {% endfor %}
       </select>
     </div>
@@ -54,6 +54,18 @@
         <option value="V">Ventas</option>
       </select>
     </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="inputProducto">Producto</label>
+      <select id="inputProducto" class="form-control">
+        <option value="" selected>Todos</option>
+        {% for Producto in Productos %}
+        <option value="{{Producto.idproducto}}">{{Producto.descripcion}} ({{Producto.idproducto}})</option>
+        {% endfor %}
+      </select>
+    </div>
+    
   </div>
   <button type="submit" class="btn btn-primary">Buscar</button>
 </form>

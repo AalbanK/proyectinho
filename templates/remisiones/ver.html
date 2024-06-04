@@ -31,11 +31,14 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="2">Nombre o Razón Social:</td>
-                    <td colspan="2">RUC o CI:</td>
+                    <td colspan="2">Nombre o Razón Social: 
+                        <input type="text" id="cliente" class="border-top-0 border-left-0 border-right-0" value="{{Remision.desc_clie}}" readonly></td>
+                    <td colspan="2">RUC o CI: 
+                        <input type="text" id="ruc_clie" class="border-top-0 border-left-0 border-right-0" value="" readonly></td>
                 </tr>
                 <tr>
-                    <td colspan="4">Domicilio:</td>
+                    <td colspan="4">Domicilio: 
+                        <input type="text" id="direccion_cliente" class="border-top-0 border-left-0 border-right-0" value="direccion_cliente" readonly></td> </td>
                 </tr>
             </tbody>
         </table>
@@ -48,8 +51,9 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="2">Motivo de Traslado:</td>
-                    <td colspan="2">Comprobante de Venta N°:</td>
+                    <td colspan="2">Motivo de Traslado: Venta</td>
+                    <td colspan="2">Comprobante de Venta N°:
+                        <input type="text" id="numero_factura_venta_cabecera" class="border-top-0 border-left-0 border-right-0" value="888" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="4"></td>
@@ -58,15 +62,19 @@
                     <td scope="col" colspan="4">Dirección de Punto de Partida:</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Ciudad: </td>
-                    <td colspan="2">Departamento: </td>
+                    <td colspan="2">Ciudad: 
+                        <input type="text" id="ciudad_origen" class="border-top-0 border-left-0 border-right-0" value="ciudadorigen" readonly></td>
+                    <td colspan="2">Departamento: 
+                        <input type="text" id="departamento_origen" class="border-top-0 border-left-0 border-right-0" value="departamentoorigen" readonly></td>
                 </tr>
                 <tr>
                     <td scope="col" colspan="4">Dirección de Punto de Llegada:</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Ciudad: </td>
-                    <td colspan="2">Departamento: </td>
+                    <td colspan="2">Ciudad: 
+                        <input type="text" id="ciudad_destino" class="border-top-0 border-left-0 border-right-0" value="ciudaddestino" readonly></td>
+                    <td colspan="2">Departamento: 
+                        <input type="text" id="departamento_destino" class="border-top-0 border-left-0 border-right-0" value="departamentodestino" readonly></td>
                 </tr>
             </tbody>
         </table>
@@ -79,13 +87,20 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="4">Marca de Vehículo:</td>
+                    <td colspan="4">Marca de Vehículo: 
+                        <input type="text" id="marca_camion" class="border-top-0 border-left-0 border-right-0" value="scania" readonly> </td>
                 </tr>
                 <tr>
-                    <td colspan="4">Número de Registro Único de Automotor (RUA):</td>
+                    <td colspan="4">Número de Registro Único de Automotor (RUA): 
+                        <input type="text" id="chapa_camion" class="border-top-0 border-left-0 border-right-0" value="AAA888" readonly> </td>
                 </tr>
                 <tr>
-                    <td colspan="4">Número de Registro Único de Automotor (RUA) del Remolque/Tracto/Semiremolque:</td>
+                    <td colspan="4">Marca de Carreta: 
+                        <input type="text" id="marca_carreta" class="border-top-0 border-left-0 border-right-0" value="randon" readonly> </td>
+                </tr>
+                <tr>
+                    <td colspan="4">Número de Registro Único de Automotor (RUA) del Remolque/Tracto/Semiremolque: 
+                        <input type="text" id="chapa_carreta" class="border-top-0 border-left-0 border-right-0" value="BBB999" readonly> </td>
                 </tr>
             </tbody>
         </table>
@@ -98,11 +113,12 @@
             </thead>
             <tbody>
                 <tr>
-                    <td colspan="4">Nombre o Razón Social:</td>
+                    <td colspan="4">Nombre o Razón Social: 
+                        <input type="text" id="chofer" class="border-top-0 border-left-0 border-right-0" value="nombre y apellido" readonly> </td>
                 </tr>
                 <tr>
-                    <td colspan="2">Domicilio:</td>
-                    <td colspan="2">RUC o CI:</td>
+                    <td colspan="2">RUC o CI: 
+                        <input type="text" id="ci_chofer" class="border-top-0 border-left-0 border-right-0" value="1231231" readonly> </td>
                 </tr>
             </tbody>
         </table>
@@ -112,9 +128,10 @@
                     <th scope="col">Cantidad</th>
                     <th scope="col">Unidad de Medida</th>
                     <th scope="col">Descripción de Mercadería</th>
-                </tr>
+                </tr>|||    
             </thead>
             <tbody>
+                
             </tbody>
         </table>
         <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
