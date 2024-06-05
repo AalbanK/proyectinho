@@ -12,7 +12,7 @@ from starlette import status
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import (Camion, Carreta, Chofer, Contrato, Producto, Deposito, Remision, Cliente,Factura_venta_cabecera)
+from models import (Camion, Marca_camion, Carreta, Marca_carreta, Chofer, Contrato, Producto, Deposito, Remision, Cliente,Factura_venta_cabecera, Ciudad, Departamento)
 from routers import auth
 from schemas import usuario as us
 
@@ -64,13 +64,32 @@ async def create_remision(db: Session=Depends(get_database_session),usuario_actu
 
 @router.get("/ver/{id}")
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    remi = db.query(Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Cliente.descripcion.label('desc_cliente'), Cliente.ruc.label('ruc_cliente')
-                    , Cliente.direccion.label('dir_cliente'), Factura_venta_cabecera.numero.label('numero_factura'),Remision.idchofer, Remision.idcamion
-                    , Remision.idcarreta,Remision.bruto, Remision.tara, Remision.neto, Remision.brutod, Remision.tarad, Remision.netod
+    depto_d=aliased(Departamento)
+    depto_o=aliased(Departamento)
+    ciudad_d=aliased(Ciudad)
+    ciudad_o=aliased(Ciudad)
+    
+    remi = db.query(Remision.idcontrato, Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Cliente.descripcion.label('desc_cliente'), Cliente.ruc.label('ruc_cliente')
+                    , Cliente.direccion.label('dir_cliente'), Factura_venta_cabecera.numero.label('numero_factura')
+                    , ciudad_o.descripcion.label('ciudadorigen'), depto_o.descripcion.label('departamentoorigen')
+                    , ciudad_d.descripcion.label('ciudaddestino'), depto_d.descripcion.label('departamentodestino')
+                    , Remision.idcamion, Marca_camion.descripcion.label('marcacamion'), Camion.camion_chapa, Marca_carreta.descripcion.label('marcacarreta'), Carreta.carreta_chapa
+                    , Chofer.nombre, Chofer.apellido, Chofer.ci, Remision.bruto, Remision.tara, Remision.neto, Remision.brutod, Remision.tarad, Remision.netod, Producto.descripcion.label('desc_producto')
                     ).join(Contrato, Remision.idcontrato==Contrato.idcontrato
                     ).join(Cliente, Contrato.idcliente==Cliente.idcliente, isouter=True
                     ).join(Factura_venta_cabecera, Remision.idcontrato==Factura_venta_cabecera.idcontrato, isouter=True
+                    ).join(ciudad_o, Contrato.origen==ciudad_o.idciudad
+                    ).join(depto_o, ciudad_o.iddepartamento==depto_o.iddepartamento
+                    ).join(ciudad_d, Contrato.destino==ciudad_d.idciudad
+                    ).join(depto_d, ciudad_d.iddepartamento==depto_d.iddepartamento
+                    ).join(Camion, Remision.idcamion==Camion.idcamion
+                    ).join(Marca_camion, Camion.idmarca_camion==Marca_camion.idmarca_camion
+                    ).join(Carreta, Remision.idcarreta==Carreta.idcarreta
+                    ).join(Marca_carreta, Carreta.idmarca_carreta==Marca_carreta.idmarca_carreta
+                    ).join(Chofer,Remision.idchofer==Chofer.idchofer
+                    ).join(Producto, Contrato.idproducto==Producto.idproducto
                     ).filter(Remision.idremision==id).first()
+    print(remi)
     return templates.TemplateResponse("remisiones/ver.html", {"request": request, "usuario_actual": usuario_actual, "Remision":remi})
 
 

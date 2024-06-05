@@ -37,6 +37,7 @@
                 <button type="button" class="btn btn-light" disabled> Anulado </button>
                 {% else %}
                 <a href="/remisiones/editar/{{- remision.idremision -}}" class="btn btn-warning editar">Seguimiento</a>
+                <a href="/remisiones/ver/{{- remision.idremision -}}" class="btn btn-info ver">Ver</a>
                 <button type="button" class="btn btn-danger anular" data-toggle="modal" data-target="#anularModal" 
                 data-id="{{- remision.idremision -}}"> Anular </button>
                 {% endif %}

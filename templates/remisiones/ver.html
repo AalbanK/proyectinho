@@ -52,8 +52,8 @@
             <tbody>
                 <tr>
                     <td colspan="2">Motivo de Traslado: Venta</td>
-                    <td colspan="2">Comprobante de Venta N°:
-                        <input type="text" id="numero_factura_venta_cabecera" class="border-top-0 border-left-0 border-right-0" value="{{Remision.numero_factura}}" readonly> </td>
+                    <td colspan="2">Comprobante de Venta N°: 
+                        <input type="text" id="numero_factura_venta_cabecera" class="border-top-0 border-left-0 border-right-0" value="{{Remision.numero_factura if Remision.numero_factura else '--'}}" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="4"></td>
@@ -63,18 +63,18 @@
                 </tr>
                 <tr>
                     <td colspan="2">Ciudad: 
-                        <input type="text" id="ciudad_origen" class="border-top-0 border-left-0 border-right-0" value="ciudadorigen" readonly></td>
+                        <input type="text" id="ciudad_origen" class="border-top-0 border-left-0 border-right-0" value="{{Remision.ciudadorigen}}" readonly></td>
                     <td colspan="2">Departamento: 
-                        <input type="text" id="departamento_origen" class="border-top-0 border-left-0 border-right-0" value="departamentoorigen" readonly></td>
+                        <input type="text" id="departamento_origen" class="border-top-0 border-left-0 border-right-0" value="{{Remision.departamentoorigen}}" readonly></td>
                 </tr>
                 <tr>
                     <td scope="col" colspan="4">Dirección de Punto de Llegada:</td>
                 </tr>
                 <tr>
                     <td colspan="2">Ciudad: 
-                        <input type="text" id="ciudad_destino" class="border-top-0 border-left-0 border-right-0" value="ciudaddestino" readonly></td>
+                        <input type="text" id="ciudad_destino" class="border-top-0 border-left-0 border-right-0" value="{{Remision.ciudaddestino}}" readonly></td>
                     <td colspan="2">Departamento: 
-                        <input type="text" id="departamento_destino" class="border-top-0 border-left-0 border-right-0" value="departamentodestino" readonly></td>
+                        <input type="text" id="departamento_destino" class="border-top-0 border-left-0 border-right-0" value="{{Remision.departamentodestino}}" readonly></td>
                 </tr>
             </tbody>
         </table>
@@ -88,19 +88,19 @@
             <tbody>
                 <tr>
                     <td colspan="4">Marca de Vehículo: 
-                        <input type="text" id="marca_camion" class="border-top-0 border-left-0 border-right-0" value="scania" readonly> </td>
+                        <input type="text" id="marca_camion" class="border-top-0 border-left-0 border-right-0" value="{{Remision.marcacamion}}" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="4">Número de Registro Único de Automotor (RUA): 
-                        <input type="text" id="chapa_camion" class="border-top-0 border-left-0 border-right-0" value="AAA888" readonly> </td>
+                        <input type="text" id="chapa_camion" class="border-top-0 border-left-0 border-right-0" value="{{Remision.camion_chapa}}" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="4">Marca de Carreta: 
-                        <input type="text" id="marca_carreta" class="border-top-0 border-left-0 border-right-0" value="randon" readonly> </td>
+                        <input type="text" id="marca_carreta" class="border-top-0 border-left-0 border-right-0" value="{{Remision.marcacarreta}}" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="4">Número de Registro Único de Automotor (RUA) del Remolque/Tracto/Semiremolque: 
-                        <input type="text" id="chapa_carreta" class="border-top-0 border-left-0 border-right-0" value="BBB999" readonly> </td>
+                        <input type="text" id="chapa_carreta" class="border-top-0 border-left-0 border-right-0" value="{{Remision.carreta_chapa}}" readonly> </td>
                 </tr>
             </tbody>
         </table>
@@ -114,11 +114,11 @@
             <tbody>
                 <tr>
                     <td colspan="4">Nombre o Razón Social: 
-                        <input type="text" id="chofer" class="border-top-0 border-left-0 border-right-0" value="Cliente.cliente" readonly> </td>
+                        <input type="text" id="chofer" class="border-top-0 border-left-0 border-right-0" value="{{Remision.nombre}} {{Remision.apellido}}" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="2">RUC o CI: 
-                        <input type="text" id="ci_chofer" class="border-top-0 border-left-0 border-right-0" value="1231231" readonly> </td>
+                        <input type="text" id="ci_chofer" class="border-top-0 border-left-0 border-right-0" value="{{Remision.ci}}" readonly> </td>
                 </tr>
             </tbody>
         </table>
@@ -128,10 +128,15 @@
                     <th scope="col">Cantidad</th>
                     <th scope="col">Unidad de Medida</th>
                     <th scope="col">Descripción de Mercadería</th>
-                </tr>|||    
+                </tr> 
             </thead>
             <tbody>
-                
+                <tr>
+                    <th scope="row">{{Remision.neto}}</th>
+                    <td>Kg</td>
+                    <td>{{Remision.desc_producto}}</td>
+                    <!-- <td>{{Remision.neto}}</td> -->
+                </tr>
             </tbody>
         </table>
         <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
