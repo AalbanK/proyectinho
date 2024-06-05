@@ -15,6 +15,7 @@ class Venta_detalle(BaseModel):
 class Venta_cabecera(BaseModel):
     idfactura_venta: Optional[int] = None
     numero : str
+    timbrado: str
     fecha : str
     idcliente: int
     iddeposito: int

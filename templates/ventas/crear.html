@@ -4,16 +4,20 @@
 <hr class="mb-4">
 <div id="factura_venta">
     <form id="facturaForm">
-        <div class="form-row mb-4">
-            <div class="form-group col-12 col-md-4">
+        <div class="form-row mb-3">
+            <div class="form-group col-12 col-md-3">
                 <label class="control-label">*Fecha</label>
                 <input type="date" class="form-control" name="fecha" min="2023-01-01" autocomplete="off" required>
             </div>
-            <div class="form-group col-12 col-md-4">
+            <div class="form-group col-12 col-md-3">
                 <label class="control-label">*N° Factura</label>
-                <input type="text" name="numero" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{7}" placeholder="999-999-999999" autocomplete="off" required>
+                <input type="text" name="numero" class="form-control" pattern="[0-9]{3}-[0-9]{3}-[0-9]{7}" placeholder="999-999-999999" minlength="15" maxlength="15" autocomplete="off" required>
             </div>
-            <div class="form-group col-12 col-md-4">
+            <div class="form-group col-12 col-md-3">
+                <label class="control-label">Timbrado: </label>
+                <input type="text" name="timbrado" class="form-control" placeholder="99999999" autocomplete="off" minlength="8" maxlength="8" required>
+            </div>
+            <div class="form-group col-12 col-md-3">
                 <label for="total">Total</label>
                 <input type="number" readonly class="form-control" id="total" name="total_monto" autocomplete="off">
             </div>
@@ -28,7 +32,7 @@
                     <select class="custom-select" id="idContrato" name="idcontrato">
                         <option value="" selected>Seleccione un contrato...</option>
                         {% for Contrato in Contratos %}
-                        <option value="{{Contrato.idcontrato}}">{{Contrato.idcontrato}} - {{Contrato.fecha_inicio}}</option>
+                        <option value="{{Contrato.idcontrato}}" data-cantidad="{{Contrato.cantidad}}" data-precioVenta="{{Contrato.precio_venta}}" >{{Contrato.idcontrato}} - {{Contrato.fecha_inicio}}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -38,7 +42,12 @@
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="idCliente">Cliente: </label>
                     </div>
-                    <input class="form-control" type="text" id="desc_cliente" readonly>
+                    <select class="custom-select" id="idCliente" name="idCliente" required>
+                        <option value="" selected>Seleccione un Cliente...</option>
+                        {% for Cliente in Clientes %}
+                        <option value="{{Cliente.idcliente}}">{{Cliente.descripcion}} - {{Cliente.ruc}}</option>
+                        {% endfor %}
+                    </select>
                 </div>
             </div>
             <!---->
@@ -61,6 +70,7 @@
         </div>
         <div class="form-row">
             <button class="btn btn-warning"><a href="/" style="color: white;">Volver al Inicio</a></button>
+            <button type="button" id="btnAgregarDetalle" class="btn btn-primary">Agregar Detalle</button>
             <button type="submit" class="btn btn-success px-4 mr-o">Enviar</button>
         </div>
     </form>

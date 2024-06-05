@@ -73,13 +73,6 @@ async def crear_compra(request: Request, cabecera: Compra_cabecera, db: Session 
 
 @router.get("/todos")
 async def listar_compras(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
-    """
-    vent = db.query(Factura_compra_cabecera.fecha, Factura_compra_cabecera.numero, Contrato.nro.label('nro_contrato'), Proveedor.descripcion.label('descripcion_proveedor'),
-                       Factura_compra_detalle.descripcion_producto, Factura_compra_detalle.cantidad, Factura_compra_cabecera.total_monto
-                       ).join(Contrato, Factura_compra_cabecera.idcontrato==Contrato.idcontrato).join(Proveedor,Factura_compra_cabecera.idproveedor==Proveedor.idproveedor
-                       ).join(Factura_compra_detalle,
-                       ).all()
-    """
     respuesta = db.query(Factura_compra_cabecera).options(
             joinedload(Factura_compra_cabecera.detalles).load_only(Factura_compra_detalle.descripcion_producto, Factura_compra_detalle.cantidad),
             joinedload(Factura_compra_cabecera.proveedor).load_only(Proveedor.descripcion),

@@ -1,6 +1,8 @@
 let jsonProductos = null;
 let jsonCiudades = null;
 let selectProducto = null;
+let campoCantidad = null;
+let campoPrecio = null;
 
 async function obtenerContrato(idcontrato) {
     const response = await fetch(`/contratos/detalles/${idcontrato}`);
@@ -134,14 +136,14 @@ crearFila = (crearBotonEliminar) => {
 
     colAutoDiv = crearElemento("div", "", ["form-group", "col-12", "col-sm-4", "col-md-2", "col-lg-2", "d-flex", "flex-column", "justify-content-end"]);
     let labelCantidad = crearElemento("label", "", [], "Cantidad (en Kg)");
-    let campoCantidad = crearElemento("input", "cantidad[]", ["form-control"], "", "number", true);
+    let campoCantidad = crearElemento("input", "cantidad[]", ["form-control"], "", "number", true, true); //primer cambio
     colAutoDiv.appendChild(labelCantidad);
     colAutoDiv.appendChild(campoCantidad);
     elementoDiv.appendChild(colAutoDiv);
 
     colAutoDiv = crearElemento("div", "", ["form-group", "col-12", "col-sm-4", "col-md-3", "col-lg-2", "d-flex", "flex-column", "justify-content-end"]);
     let labelPrecio = crearElemento("label", "", [], "Precio (en Gs)");
-    let campoPrecio = crearElemento("input", "precio[]", ["form-control"], "", "number", true);
+    let campoPrecio = crearElemento("input", "precio[]", ["form-control"], "", "number", true, true);
     colAutoDiv.appendChild(labelPrecio);
     colAutoDiv.appendChild(campoPrecio);
     elementoDiv.appendChild(colAutoDiv);
@@ -155,6 +157,9 @@ crearFila = (crearBotonEliminar) => {
 
     selProducto.addEventListener("change", () => {
         campoPorcentajeIVA.value = selProducto.options[selProducto.selectedIndex].getAttribute('data-iva');
+        contratoSeleccionado = document.querySelector("#idContrato")
+        campoCantidad.value = contratoSeleccionado.options[contratoSeleccionado.selectedIndex].getAttribute(`data-cantidad`);
+        campoPrecio.value = contratoSeleccionado.options[contratoSeleccionado.selectedIndex].getAttribute(`data-precioventa`);
         calcularSubtotales(campoCantidad, 
             campoPrecio, 
             campoSubtotal,
@@ -211,7 +216,6 @@ crearFila = (crearBotonEliminar) => {
 
     divPadre.appendChild(elementoDiv);    
     return divPadre;
- 
 }
 
 window.addEventListener('DOMContentLoaded', async function () {
@@ -219,27 +223,40 @@ window.addEventListener('DOMContentLoaded', async function () {
     await fetchCargarProductos();
     divDetalles = document.getElementById('detalles');
     divDetalles.appendChild(crearFila(false));
-    
+    botonAgregarFila = document.getElementById('btnAgregarDetalle');
+    botonAgregarFila.addEventListener("click", () => {
+        divDetalles.appendChild(crearFila(true));
+    });
     //cargar detalles de contrato
     const selectContrato = document.querySelector("#idContrato");
     selectContrato.addEventListener('change', async function (event) {
         let idcontrato = event.target.value; //  equivale al valor desde donde se está disparando el event
-        clienteForm=document.getElementById('desc_cliente');
+        clienteForm=document.getElementById('idCliente');
         prductoForm=document.querySelector('[name="productos[]"]');
         if (idcontrato && idcontrato != "undefined") {
             let jsonContrato = await obtenerContrato(idcontrato);
-            console.log(jsonContrato)
-            clienteForm.value= jsonContrato.desc_cliente;
-            clienteForm.setAttribute(`data-idcliente`, jsonContrato.idcliente);
+            let optionsArray = Array.from(clienteForm.options) // convierte en array los options
+            let valorABuscar= jsonContrato.idcliente;
+            let index = optionsArray.findIndex(option => option.value == valorABuscar)
+            clienteForm.selectedIndex = index
+            clienteForm.setAttribute('disabled', 'disabled');
+
             prductoForm.value= jsonContrato.idproducto;
+            botonAgregarFila.style.display = 'none'
+            prductoForm.setAttribute('readonly', 'readonly')
+            prductoForm.setAttribute('disabled', 'disabled')
             prductoForm.dispatchEvent(new Event("change"));
             }
         else {
-            clienteForm.value= "Primero seleccione un contrato";
-            prductoForm.selectedIndex= 0;
-    
+            clienteForm.selectedIndex= 0
+            clienteForm.removeAttribute('disabled')
+
+            prductoForm.removeAttribute('readonly')
+            prductoForm.removeAttribute('disabled')
+            prductoForm.selectedIndex= 0
+
+            botonAgregarFila.style.display = 'block'
         }
-        
     });
     selectContrato.dispatchEvent(new Event("change")); //para disparar el evento de cambio
     
@@ -247,14 +264,15 @@ window.addEventListener('DOMContentLoaded', async function () {
     facturaForm = document.getElementById('facturaForm');
     facturaForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-       
+    
         let factura = {};
         let formData = new FormData(event.target);
 
-        let idcli=document.querySelector('#desc_cliente').getAttribute('data-idcliente');
+        let idcli=document.querySelector('#idCliente').value;
         
         for (let pair of formData.entries()) {
             if(pair[0].substring(pair[0].length - 2) !== '[]') { // solo agregar si la clave no termina en "[]", ya que lo que es de array se agrega más abajo en "detalles"
+                
                 if(pair[1]){ // solo si el value no es null, undefined o vacío
                     factura[pair[0]] = pair[1]; // 0 para key (clave), 1 para value (valor)
                 }

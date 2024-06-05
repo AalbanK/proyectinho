@@ -219,6 +219,7 @@ crearFila = (crearBotonEliminar) => {
 }
 
 window.addEventListener('DOMContentLoaded', async function () {
+    //cargar linea del detalle
     await fetchCargarProductos();
     divDetalles = document.getElementById('detalles');
     divDetalles.appendChild(crearFila(false));
@@ -245,9 +246,6 @@ window.addEventListener('DOMContentLoaded', async function () {
             prductoForm.setAttribute('readonly', 'readonly')
             prductoForm.setAttribute('disabled', 'disabled')
             prductoForm.dispatchEvent(new Event("change"));
-
-            
-
             }
         else {
             proveedorForm.selectedIndex= 0
@@ -259,7 +257,6 @@ window.addEventListener('DOMContentLoaded', async function () {
 
             botonAgregarFila.style.display = 'block'
         }
-        
     });
     selectContrato.dispatchEvent(new Event("change")); //para disparar el evento de cambio
 
@@ -267,7 +264,7 @@ window.addEventListener('DOMContentLoaded', async function () {
     facturaForm = document.getElementById('facturaForm');
     facturaForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-       
+
         let factura = {};
         let formData = new FormData(event.target);
 

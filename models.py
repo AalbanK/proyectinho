@@ -299,6 +299,7 @@ class Factura_venta_cabecera(Base):
     __tablename__ = "factura_venta_cabecera"
     idfactura_venta = Column(Integer, primary_key=True, index=True)
     numero = Column(String)
+    timbrado = Column(Integer)
     fecha = Column(DateTime(timezone=True), server_default=func.now())
     idcliente = Column(Integer, ForeignKey("cliente.idcliente"))
     # campo Padre = relationship("NombreDelModeloPadre", back_populates="NombreDeLaVariableEnElOtroModelo")

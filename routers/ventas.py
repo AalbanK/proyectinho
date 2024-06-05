@@ -27,8 +27,8 @@ router = APIRouter(
 )
 
 #funcion para verificar si ya existe el número de factura y timbrado en la bd
-def buscar_nro(numero:str, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    fact_venta = db.query(Factura_venta_cabecera).filter_by(numero=numero).first()
+def buscar_nro(numero:str, timbrado:int, request:Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    fact_venta = db.query(Factura_venta_cabecera).filter_by(numero=numero, timbrado=timbrado).first()
     print(fact_venta)
     return fact_venta
 
@@ -45,20 +45,21 @@ async def create_venta(request: Request, db: Session = Depends(get_database_sess
 
 @router.post("/nuevo")
 async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    print(cabecera)
     usu = us.Usuario.from_orm(usuario_actual)
     try:
         cabecera_venta = Factura_venta_cabecera(**cabecera.dict(exclude={'detalles'})) # excluye "detalles" porque serán agregados más abajo
-        if buscar_nro(numero=cabecera_venta.numero, request=request, db=db, usuario_actual=usuario_actual) is None:
+        if buscar_nro(numero=cabecera_venta.numero, timbrado=cabecera_venta.timbrado, request=request, db=db, usuario_actual=usuario_actual) is None:
             cabecera_venta.alta_usuario = usu.idusuario
             detalles = [detalle.dict() for detalle in cabecera.detalles]
-            #print(detalles)
             for detalle in detalles:
                 det = Factura_venta_detalle(**detalle)
                 det.detalle = cabecera_venta #con esto se hace el FK a la cabecera
+                print(cabecera_venta.__dict__)
             db.add(cabecera_venta)
             db.commit()
         else:
-            response= JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"error":"El número de factura ingresado ya se utilizó."})
+            response= JSONResponse(status_code=status.HTTP_409_CONFLICT, content={"error":"El número de factura y timbrado ingresado ya se utilizó."})
             return response
     except Exception as e:
         response = JSONResponse(content={"error": str(e)}, status_code=500)
@@ -66,21 +67,9 @@ async def crear_venta(request: Request, cabecera: Venta_cabecera, db: Session = 
     else: # sin no hubo errores
         response = JSONResponse(content={"error": 'Ninguno.'}, status_code=200)
         return response
-    
-# @router.get("/todos")
-# async def listar_ventas(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
-#     vent = db.query(Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Contrato.nro.label('nro_contrato'), Cliente.descripcion.label('descripcion_cliente'),
-#                        Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad, Factura_venta_cabecera.total_monto
-#                        ).join(Contrato, Factura_venta_cabecera.idcontrato==Contrato.idcontrato).join(Cliente,Factura_venta_cabecera.idcliente==Cliente.idcliente
-#                        ).join(Factura_venta_detalle
-#                        ).all()
-#     respuesta = [dict(r._mapping) for r in vent]
-#     return JSONResponse(jsonable_encoder(respuesta))
 
 @router.get("/todos")
 async def listar_venta(request: Request, usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), db: Session = Depends(get_database_session)):
-
-    print('hola')
     respuesta = db.query(Factura_venta_cabecera).options(
             joinedload(Factura_venta_cabecera.detalles).load_only(Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad),
             joinedload(Factura_venta_cabecera.cliente).load_only(Cliente.descripcion),
@@ -91,11 +80,3 @@ async def listar_venta(request: Request, usuario_actual: us.Usuario = Depends(au
     print(jsonable_encoder(respuesta))
     #respuesta = [dict(r._mapping) for r in vent]
     return JSONResponse(jsonable_encoder(respuesta))
-
-    """
-    vent = db.query(Factura_compra_cabecera.fecha, Factura_compra_cabecera.numero, Contrato.nro.label('nro_contrato'), Proveedor.descripcion.label('descripcion_proveedor'),
-                       Factura_compra_detalle.descripcion_producto, Factura_compra_detalle.cantidad, Factura_compra_cabecera.total_monto
-                       ).join(Contrato, Factura_compra_cabecera.idcontrato==Contrato.idcontrato).join(Proveedor,Factura_compra_cabecera.idproveedor==Proveedor.idproveedor
-                       ).join(Factura_compra_detalle,
-                       ).all()
-    """
