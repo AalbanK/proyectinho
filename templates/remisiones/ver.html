@@ -15,7 +15,7 @@
         <div class="row mx-auto">
             <div class="col">
                 <label for="fecha_emision">Fecha de emisión:</label>
-                <input type="text" id="fecha_emision" class="border-top-0 border-left-0 border-right-0" value="{{Remision.fecha_carga.strftime('%Y-%m-%d')}}" readonly>
+                <input type="text" id="fecha_carga" name="fecha_carga" class="border-top-0 border-left-0 border-right-0" value="{{Remision.fecha_carga.strftime('%Y-%m-%d')}}" readonly>
             </div>
             <div class="col">
                 <label for="numero">N° Remisión: </label>
@@ -32,13 +32,13 @@
             <tbody>
                 <tr>
                     <td colspan="2">Nombre o Razón Social: 
-                        <input type="text" id="cliente" class="border-top-0 border-left-0 border-right-0" value="{{Remision.desc_clie}}" readonly></td>
+                        <input type="text" id="clie" name="clie" class="border-top-0 border-left-0 border-right-0" value="{{Remision.desc_cliente}}" readonly></td>
                     <td colspan="2">RUC o CI: 
-                        <input type="text" id="ruc_clie" class="border-top-0 border-left-0 border-right-0" value="" readonly></td>
+                        <input type="text" id="ruc_clie" class="border-top-0 border-left-0 border-right-0" value="{{Remision.ruc_cliente}}" readonly></td>
                 </tr>
                 <tr>
                     <td colspan="4">Domicilio: 
-                        <input type="text" id="direccion_cliente" class="border-top-0 border-left-0 border-right-0" value="direccion_cliente" readonly></td> </td>
+                        <input type="text" id="direccion_cliente" class="border-top-0 border-left-0 border-right-0" value="{{Remision.dir_cliente}}" readonly></td> </td>
                 </tr>
             </tbody>
         </table>
@@ -53,7 +53,7 @@
                 <tr>
                     <td colspan="2">Motivo de Traslado: Venta</td>
                     <td colspan="2">Comprobante de Venta N°:
-                        <input type="text" id="numero_factura_venta_cabecera" class="border-top-0 border-left-0 border-right-0" value="888" readonly> </td>
+                        <input type="text" id="numero_factura_venta_cabecera" class="border-top-0 border-left-0 border-right-0" value="{{Remision.numero_factura}}" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="4"></td>
@@ -114,7 +114,7 @@
             <tbody>
                 <tr>
                     <td colspan="4">Nombre o Razón Social: 
-                        <input type="text" id="chofer" class="border-top-0 border-left-0 border-right-0" value="nombre y apellido" readonly> </td>
+                        <input type="text" id="chofer" class="border-top-0 border-left-0 border-right-0" value="Cliente.cliente" readonly> </td>
                 </tr>
                 <tr>
                     <td colspan="2">RUC o CI: 

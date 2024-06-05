@@ -6,13 +6,13 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from starlette import status
 
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import (Camion, Carreta, Chofer, Contrato, Producto, Deposito, Remision, Cliente)
+from models import (Camion, Carreta, Chofer, Contrato, Producto, Deposito, Remision, Cliente,Factura_venta_cabecera)
 from routers import auth
 from schemas import usuario as us
 
@@ -51,7 +51,7 @@ async def create_remision(request: Request, db: Session = Depends(get_database_s
 @router.post("/nuevo")
 async def create_remision(db: Session=Depends(get_database_session),usuario_actual: us.Usuario = Depends(auth.get_usuario_actual),numero=Form(...),fechacarga=Form(...),
                           idcontrato=Form(...), idchofer=Form(...), idcamion=Form(...), idcarreta=Form(...),bruto=Form(...), tara=Form(...),neto=Form(...), iddeposito=Form(...)):
-    
+
     usu = us.Usuario.from_orm(usuario_actual)
     remi = Remision(numero=numero, fecha_carga=fechacarga, idcontrato=idcontrato, idchofer = idchofer,idcamion=idcamion, idcarreta=idcarreta, iddeposito=iddeposito,
                     bruto=bruto, tara=tara,neto=neto, alta_usuario = usu.idusuario)
@@ -64,15 +64,13 @@ async def create_remision(db: Session=Depends(get_database_session),usuario_actu
 
 @router.get("/ver/{id}")
 def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    print(Request.body)
-    
-    remi= db.query(Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Remision.idcontrato, Cliente.descripcion.label('cliente'), Remision.idchofer, Remision.idcamion, Remision.idcarreta,
-                    Remision.bruto, Remision.tara, Remision.neto, Remision.brutod, Remision.tarad, Remision.netod).join(Contrato,Remision.idcontrato==Contrato.idcontrato).join(Cliente, Contrato.idcontrato==Cliente.idcliente).filter(Remision.idremision==id).first()
-
-    print(remi)
-    
-
-
+    remi = db.query(Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Cliente.descripcion.label('desc_cliente'), Cliente.ruc.label('ruc_cliente')
+                    , Cliente.direccion.label('dir_cliente'), Factura_venta_cabecera.numero.label('numero_factura'),Remision.idchofer, Remision.idcamion
+                    , Remision.idcarreta,Remision.bruto, Remision.tara, Remision.neto, Remision.brutod, Remision.tarad, Remision.netod
+                    ).join(Contrato, Remision.idcontrato==Contrato.idcontrato
+                    ).join(Cliente, Contrato.idcliente==Cliente.idcliente, isouter=True
+                    ).join(Factura_venta_cabecera, Remision.idcontrato==Factura_venta_cabecera.idcontrato, isouter=True
+                    ).filter(Remision.idremision==id).first()
     return templates.TemplateResponse("remisiones/ver.html", {"request": request, "usuario_actual": usuario_actual, "Remision":remi})
 
 
