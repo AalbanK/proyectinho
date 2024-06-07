@@ -8,7 +8,7 @@ let fechaHaceDosSemanasCadena = fechaHaceDosSemanas.toISOString().substr(0, 10)
 let tablaStock, tablaDT = null;
 let datos = [];
 let urlEspanholDT = '/static/vendor/datatables/es-ES.json';
-const urlInformeStock = '/informes/compras';
+const urlInformeStock = '/reportes/compras';
 const titulo_reporte = 'Compras según Proveedor / Producto'
 
 inicializarDataTable = (tabla, datos, columnas, urlIdioma, parametros, titulo_reporte) => {

@@ -137,11 +137,11 @@ async def listar_contratos(request: Request, usuario_actual: us.Usuario = Depend
     ciu_D=aliased(Ciudad)
 
     contr = db.query(Contrato.idcontrato,Contrato.nro, Contrato.fecha_inicio, Contrato.fecha_fin, Contrato.idproducto, Proveedor.descripcion.label('descripcion_proveedor'),
-                     Cliente.descripcion.label('descripcion_cliente'), ciu_O.descripcion.label('ciudad_o'), ciu_D.descripcion.label('ciudad_d'), Producto.descripcion.label('descripcion_producto'),
-                     Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta, Contrato.anulado 
-                     ).join(Proveedor, Contrato.idproveedor==Proveedor.idproveedor).join(Cliente, Contrato.idcliente==Cliente.idcliente).join(ciu_O, Contrato.origen==ciu_O.idciudad
-                     ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto 
-                     ).all()
+                    Cliente.descripcion.label('descripcion_cliente'), ciu_O.descripcion.label('ciudad_o'), ciu_D.descripcion.label('ciudad_d'), Producto.descripcion.label('descripcion_producto'),
+                    Contrato.cantidad, Contrato.precio_compra, Contrato.precio_venta, Contrato.anulado 
+                    ).join(Proveedor, Contrato.idproveedor==Proveedor.idproveedor).join(Cliente, Contrato.idcliente==Cliente.idcliente).join(ciu_O, Contrato.origen==ciu_O.idciudad
+                    ).join(ciu_D, Contrato.destino==ciu_D.idciudad).join(Producto, Contrato.idproducto==Producto.idproducto 
+                    ).all()
     respuesta = [dict(r._mapping) for r in contr]
     return JSONResponse(jsonable_encoder(respuesta))
 

@@ -28,8 +28,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 router = APIRouter(
-    prefix="/informes",
-    tags=["informes"]
+    prefix="/reportes",
+    tags=["reportes"]
 )
 
 @router.get("/")

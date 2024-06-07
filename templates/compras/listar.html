@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 {% block content %}
 <h1 class="h2 mb-1 text-gray-800">Lista de Facturas Compra</h1>
+<table border="0"  cellspacing="5" cellpadding="5">
+    <tbody><tr>
+        <td>Desde:</td>
+        <td><input type="text" id="min" name="min"></td>
+        <td>Hasta:</td>
+        <td><input type="text" id="max" name="max"></td>
+    </tr>
+    </tbody>
+</table>
 <hr class="mb-4"><table id="compra" class="table table-striped">
     <thead>
         <tr></tr>
@@ -261,6 +270,34 @@
             $modal.find('aviso').remove();
             $modal.find('anularCompra').children().remove
         })
+
+let minDate, maxDate;
+
+DataTable.ext.search.push(function (settings, data, dataIndex) {
+let min = minDate.val();
+let max = maxDate.val();
+let date = new Date(data[1]); //data[1] es la columna de la fecha
+if (
+(min === null && max === null) ||
+(min === null && date <= max) ||
+(min <= date && max === null) ||
+(min <= date && date <= max)
+) {
+return true;
+}
+return false;
+});
+// Crear inputs de fecha
+minDate = new DateTime('#min', {
+format: 'YYYY-MM-DD'
+});
+maxDate = new DateTime('#max', {
+format: 'YYYY-MM-DD'
+});
+// Refiltrar la tabla
+document.querySelectorAll('#min, #max').forEach((el) => {
+el.addEventListener('change', () => tablaDT.draw());
+});
     })
 
 </script>

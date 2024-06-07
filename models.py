@@ -352,8 +352,7 @@ class Factura_gasto_cabecera(Base):
     total_monto = Column(Integer)
     idcontrato = Column(Integer, ForeignKey("contrato.idcontrato"))      #FK del cliente
     contrato = relationship("Contrato", back_populates="contratogasto") #relación necesaria para que funcione el FK
-    # iddeposito = Column(Integer, ForeignKey("deposito.iddeposito"))
-    # deposito = relationship("Deposito", back_populates="depositocompra")
+    anulado=Column(String(1),default='N')
     alta_usuario = Column(Integer)
     alta_fecha = Column(DateTime(), server_default=func.now(), default=func.now())
     modif_usuario = Column(Integer)

@@ -78,21 +78,52 @@
 {% endblock content %}
 
 {% block script %}
-<script src="{{url_for('static', path='/datatables/jquery.dataTables.min.js')}}"></script>
-<script src="{{url_for('static', path='/datatables/dataTables.bootstrap4.min.js')}}"></script>
 
 <script type="text/javascript">
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
-    
+        let $tabla = $("#remisiones");
+        let tablaDT = null
+
+
     $(document).ready(function () {
-        $("#remisiones").DataTable({
+        tablaDT = $("#remisiones").DataTable({
             language: {
                 url: urlEspanholDT
             },
             columnDefs: [{ type:"num" , targets: 0}, { sortable: false, targets: 11 }],
         });
+
+        let minDate, maxDate;
+
+        DataTable.ext.search.push(function (settings, data, dataIndex) {
+            let min = minDate.val();
+            let max = maxDate.val();
+            let date = new Date(data[2]); //data[2] es la columna de la fecha carga
+            if (
+                (min === null && max === null) ||
+                (min === null && date <= max) ||
+                (min <= date && max === null) ||
+                (min <= date && date <= max)
+            ) {
+                return true;
+            }
+            return false;
+        });
+        // Crear inputs de fecha
+        minDate = new DateTime('#min', {
+            format: 'YYYY-MM-DD'
+        });
+        maxDate = new DateTime('#max', {
+            format: 'YYYY-MM-DD'
+        });
+        // Refiltrar la tabla
+        document.querySelectorAll('#min, #max').forEach((el) => {
+            el.addEventListener('change', () => tablaDT.draw());
+        });
     });
-    let $tabla = $("#remisiones");
+
+
+
     let $modal = $('#anularModal');
     let botonesAnular = `<button data-dismiss="modal" type="button" class="btn btn-default" id="cancelarAnular">No, Cancelar</button>
                     <button id="confirmarAnular" class="btn btn-danger" type="button">Sí, Anular</button>`;
@@ -222,5 +253,7 @@
                 }
             });
         }
+
+
 </script>
 {% endblock script %}

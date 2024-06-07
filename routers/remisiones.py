@@ -37,7 +37,7 @@ async def read_remision(request: Request, db: Session = Depends(get_database_ses
                     ).join(Deposito,Remision.iddeposito==Deposito.iddeposito, isouter = True #es un left join
                     ).group_by(Remision.idremision, Remision.numero, Remision.fecha_carga, Contrato.nro, Remision.idchofer, Camion.camion_chapa,
                     Carreta.carreta_chapa, Remision.neto, Remision.anulado).all()
-    return templates.TemplateResponse("remisiones/listar.html", {"request": request, "usuario_actual": usuario_actual, "data": records, "datatables": True})
+    return templates.TemplateResponse("remisiones/listar.html", {"request": request, "usuario_actual": usuario_actual, "data": records, "datatables": True, "filtro_fecha":True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_remision(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
