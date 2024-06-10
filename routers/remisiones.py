@@ -134,3 +134,11 @@ def anular(id : int, db: Session = Depends(get_database_session)):
     db.commit()
     response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro anulado correctamente.") #retorna el codigo http 200
     return response
+
+@router.get("/listar", name="listado_remisiones") # se le da un name para que pueda ser accedido fácilmente desde otros routers
+async def listado_remisiones(request: Request, db: Session = Depends(get_database_session)):
+    remisiones = db.query(Remision.idremision, Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Remision.idcontrato,
+        Remision.idchofer, Remision.idcamion, Remision.idcarreta, Remision.tara, Remision.bruto, Remision.neto, Remision.iddeposito,
+        Remision.brutod, Remision.tarad, Remision.netod, Remision.anulado
+        ).order_by(Remision.numero).all()
+    return remisiones

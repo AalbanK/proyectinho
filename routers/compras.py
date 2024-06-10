@@ -99,9 +99,11 @@ def ver(id:int, response:Response, request:Request,db: Session = Depends(get_dat
         return JSONResponse(jsonable_encoder(compra)) #en caso de que exista el registro, lo devuelve en formato json
     
 @router.get("/anular/{id}",response_class=JSONResponse)
-def anular(id : int, db: Session = Depends(get_database_session)):
+def anular(id : int, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
     compra= db.query(Factura_compra_cabecera).filter(Factura_compra_cabecera.idfactura_compra == id).first()
     compra.anulado='S'
+    compra.modif_usuario = usu.idusuario
     db.add(compra)
     db.commit()
     response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro anulado correctamente.") #retorna el codigo http 200

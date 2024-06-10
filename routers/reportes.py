@@ -6,13 +6,13 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import and_, cast, func, label, literal, or_, union_all
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, aliased
 from starlette.responses import RedirectResponse
 
 from db.misc import get_database_session
-from models import (IVA, Cliente, Factura_compra_cabecera,
+from models import (IVA, Camion, Carreta, Chofer, Ciudad, Cliente, Contrato, Departamento, Factura_compra_cabecera,
                     Factura_compra_detalle, Factura_venta_cabecera,
-                    Factura_venta_detalle, Producto, Proveedor, Remision)
+                    Factura_venta_detalle, Marca_camion, Marca_carreta, Producto, Proveedor, Remision)
 from routers import auth
 from schemas import reporte
 from schemas import usuario as us
@@ -21,6 +21,7 @@ from . import clientes as routerclientes
 from . import productos as routerproductos
 from . import proveedores as routerproveedores
 from . import depositos as routerdepositos
+from . import remisiones as routerremisiones
 
 app = FastAPI()
 
@@ -269,3 +270,75 @@ def mostrar_depositos(request: Request, db: Session = Depends(get_database_sessi
     respuesta = [reporte.ReporteStockBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
     #print(jsonable_encoder(respuesta))
     return JSONResponse(jsonable_encoder(respuesta))
+
+
+@router.get("/remisiones")
+async def mostrar_parametros_remisiones(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    remisiones = await routerremisiones.listado_remisiones(request=request, db=db)
+    productos = await routerproductos.listado_productos(request=request, db=db)
+    return templates.TemplateResponse("/reportes/remisiones.html", {"request": request, "Remisiones": remisiones, "Productos": productos, "datatables": True, "usuario_actual": usuario_actual})
+
+@router.post("/remisiones")
+def mostrar_remisiones(request: Request, db: Session = Depends(get_database_session), fecha_desde = Body(), fecha_hasta = Body(), producto=Body()):#, producto = Body(), remision = Body()):
+    depto_d=aliased(Departamento)
+    depto_o=aliased(Departamento)
+    ciudad_d=aliased(Ciudad)
+    ciudad_o=aliased(Ciudad)
+
+    consulta = db.query(Remision.idremision, Remision.numero, Remision.fecha_carga, Remision.fecha_descarga,  Contrato.nro.label('nro_contrato'), Cliente.descripcion.label('desc_cliente')
+                        , ciudad_d.descripcion.label('ciudaddestino'), Camion.camion_chapa.label('chapacamion'), Carreta.carreta_chapa.label('chapacarreta'), Chofer.nombre, Chofer.apellido
+                        , Producto.descripcion.label('producto'), Remision.neto, Remision.netod
+                        ).join(Contrato, Remision.idcontrato==Contrato.idcontrato
+                        ).join(Cliente, Contrato.idcliente==Cliente.idcliente, isouter=True
+                        ).join(ciudad_d, Contrato.destino==ciudad_d.idciudad
+                        ).join(Camion, Remision.idcamion==Camion.idcamion
+                        ).join(Carreta, Remision.idcarreta==Carreta.idcarreta
+                        ).join(Chofer,Remision.idchofer==Chofer.idchofer
+                        ).join(Producto,Contrato.idproducto==Producto.idproducto
+                        ).group_by(Remision.idremision, Remision.fecha_carga,
+                        ).order_by(Remision.idremision, Remision.fecha_carga,)
+    
+    consulta_filtrada = consulta.filter(
+        and_(
+            or_(func.date(Remision.fecha_carga) >= fecha_desde if fecha_desde else True), # se convierte en true = 1 si fecha_desde es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+            or_(func.date(Remision.fecha_carga) <= fecha_hasta if fecha_hasta else True), # se convierte en true = 1 si fecha_hasta es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+            or_(Contrato.idproducto == producto if producto else True),
+        )
+    )
+    respuesta = [dict(r._asdict()) for r in consulta_filtrada]
+    return JSONResponse(jsonable_encoder(respuesta))
+
+    # resultado = consulta_filtrada.all()
+    # respuesta = [reporte.ReporteComprasBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
+    # return JSONResponse(jsonable_encoder(respuesta))
+
+
+    #                 , Remision.idcontrato, Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Cliente.descripcion.label('desc_cliente'), Cliente.ruc.label('ruc_cliente')
+    #                 , Cliente.direccion.label('dir_cliente'), Factura_venta_cabecera.numero.label('numero_factura')
+    #                 , ciudad_o.descripcion.label('ciudadorigen'), depto_o.descripcion.label('departamentoorigen')
+    #                 , ciudad_d.descripcion.label('ciudaddestino'), depto_d.descripcion.label('departamentodestino')
+    #                 , Remision.idcamion, Marca_camion.descripcion.label('marcacamion'), Camion.camion_chapa, Marca_carreta.descripcion.label('marcacarreta'), Carreta.carreta_chapa
+    #                 , Chofer.nombre, Chofer.apellido, Chofer.ci, Remision.bruto, Remision.tara, Remision.neto, Remision.brutod, Remision.tarad, Remision.netod, Producto.descripcion.label('desc_producto')
+    #                 ).join(Contrato, Remision.idcontrato==Contrato.idcontrato
+    #                 ).join(Cliente, Contrato.idcliente==Cliente.idcliente, isouter=True
+    #                 ).join(Factura_venta_cabecera, Remision.idcontrato==Factura_venta_cabecera.idcontrato, isouter=True
+    #                 ).join(ciudad_o, Contrato.origen==ciudad_o.idciudad
+    #                 ).join(depto_o, ciudad_o.iddepartamento==depto_o.iddepartamento
+    #                 ).join(ciudad_d, Contrato.destino==ciudad_d.idciudad
+    #                 ).join(depto_d, ciudad_d.iddepartamento==depto_d.iddepartamento
+    #                 ).join(Camion, Remision.idcamion==Camion.idcamion
+    #                 ).join(Marca_camion, Camion.idmarca_camion==Marca_camion.idmarca_camion
+    #                 ).join(Carreta, Remision.idcarreta==Carreta.idcarreta
+    #                 ).join(Marca_carreta, Carreta.idmarca_carreta==Marca_carreta.idmarca_carreta
+    #                 ).join(Chofer,Remision.idchofer==Chofer.idchofer
+    #                 ).join(Producto, Contrato.idproducto==Producto.idproducto
+    #                 ).group_by(Remision.idremision, Remision.fecha_carga
+    #                 ).order_by(Remision.idremision, Remision.fecha_carga.desc(), Remision.numero)
+    
+    # consulta_filtrada = consulta.filter(
+    #     and_(
+    #         or_(func.date(Remision.fecha) >= fecha_desde if fecha_desde else True), # se convierte en true = 1 si fecha_desde es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+    #         or_(func.date(Remision.fecha) <= fecha_hasta if fecha_hasta else True), # se convierte en true = 1 si fecha_hasta es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+    #         or_(Remision.idproducto == producto if producto else True),
+    #     )
+    # )

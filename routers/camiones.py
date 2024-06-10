@@ -64,8 +64,8 @@ def editar(db: Session = Depends(get_database_session), idcamion = Form(...), ca
     cami= db.query(Camion).get(idcamion) #obtiene el registro del modelo Camion por su id
     cami.camion_chapa = camion_chapa # cambia el valor actual de name del objeto usu por lo que recibe en el parametro 'name'
     cami.idmarca_camion = idmarca_camion
-    cami.modif_usuario = usu.idusuario
-    db.add(cami) #agrega el objeto usu a la base de datos
+    cami.modif_usuario = usu.idusuario #agrega el objeto usu a la base de datos
+    db.add(cami) 
     db.commit() #confirma los cambios
     db.refresh(cami) #actualiza el objeto usu
     response = RedirectResponse('/camiones/', status_code=303)
