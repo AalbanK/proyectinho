@@ -50,8 +50,7 @@
                     Registro anulado exitosamente.
                 </div>`;
     let botonesVerYAnular = (id) => {
-        return `<a href="/compras/ver/${id}" class="btn btn-warning ver">Ver</a>
-                <button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
+        return `<button type="button" class="btn btn-danger anular" data-id="${id}"> Anular </button>`;
     }
 
     let urlEspanholDT = '{{url_for("static", path="/vendor/datatables/es-ES.json")}}';
@@ -109,8 +108,7 @@
                 searchable: false,
                 render: function (data, type, row, meta) {
                     if (data.anulado=='S') {
-                        return `<a href="/compras/ver/${data.idfactura_compra}" class="btn btn-warning ver">Ver</a>
-                <button type="button" class="btn btn-light" data-id="${data.idfactura_compra}" disabled> Anulado </button>`;
+                        return `<button type="button" class="btn btn-light" data-id="${data.idfactura_compra}" disabled> Anulado </button>`;
                     }
                     else return botonesVerYAnular(data.idfactura_compra);
                 }

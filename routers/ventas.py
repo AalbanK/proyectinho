@@ -1,6 +1,7 @@
+import statistics
 from typing import List
 
-from fastapi import APIRouter, Depends, FastAPI, Form, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, Form, HTTPException, Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -34,7 +35,7 @@ def buscar_nro(numero:str, timbrado:int, request:Request, db: Session = Depends(
 
 @router.get("/", name="listado_ventas")
 async def read_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("ventas/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True})
+    return templates.TemplateResponse("ventas/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True, "filtro_fecha":True})
 
 @router.get("/nuevo", response_class=HTMLResponse)
 async def create_venta(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -73,10 +74,32 @@ async def listar_venta(request: Request, usuario_actual: us.Usuario = Depends(au
     respuesta = db.query(Factura_venta_cabecera).options(
             joinedload(Factura_venta_cabecera.detalles).load_only(Factura_venta_detalle.descripcion_producto, Factura_venta_detalle.cantidad),
             joinedload(Factura_venta_cabecera.cliente).load_only(Cliente.descripcion),
-            joinedload(Factura_venta_cabecera.contrato).load_only(Contrato.nro), load_only(Factura_venta_cabecera.idfactura_venta, Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Factura_venta_cabecera.total_monto)
+            joinedload(Factura_venta_cabecera.contrato).load_only(Contrato.nro), load_only(Factura_venta_cabecera.idfactura_venta, Factura_venta_cabecera.fecha, Factura_venta_cabecera.numero, Factura_venta_cabecera.total_monto, Factura_venta_cabecera.anulado)
         )
     respuesta = respuesta.all()
     
     print(jsonable_encoder(respuesta))
     #respuesta = [dict(r._mapping) for r in vent]
     return JSONResponse(jsonable_encoder(respuesta))
+
+@router.get("/ver/{id}",response_class=JSONResponse) #esta ruta es para la funcion que se utiliza en el Datatable para verificar si el registro a ser eliminado realmente existe en la base de datos
+def ver(id:int, response:Response, request:Request,db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)): #se definen los parametros para la funcion
+    venta = db.query(Factura_venta_cabecera).get(id) #obtiene el registro del modelo venta por su id
+    if(venta is None): #en caso de que no exista el registro correpondiente al id recibido como parametro devuelve el siguiente error
+        return HTTPException(status_code=statistics.HTTP_404_NOT_FOUND,detail="Registro no encontrado.")
+    else:
+        return JSONResponse(jsonable_encoder(venta)) #en caso de que exista el registro, lo devuelve en formato json
+    
+@router.get("/anular/{id}",response_class=JSONResponse)
+def anular(id : int, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    usu = us.Usuario.from_orm(usuario_actual)
+    venta= db.query(Factura_venta_cabecera).filter(Factura_venta_cabecera.idfactura_venta == id)
+    print(venta)
+    venta=venta.first()
+    
+    venta.anulado='S'
+    venta.modif_usuario = usu.idusuario
+    db.add(venta)
+    db.commit()
+    response = HTTPException(status_code=status.HTTP_200_OK, detail="Registro anulado correctamente.") #retorna el codigo http 200
+    return response

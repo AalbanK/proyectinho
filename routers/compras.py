@@ -35,7 +35,7 @@ def buscar_nro(numero:str, timbrado:int, request:Request,db: Session = Depends(g
 
 @router.get("/", name="listado_compras")
 async def read_compra(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    return templates.TemplateResponse("compras/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True})
+    return templates.TemplateResponse("compras/listar.html", {"request": request, "usuario_actual": usuario_actual, "datatables":True, "filtro_fecha":True})
 
 
 @router.get("/nuevo", response_class=HTMLResponse)
