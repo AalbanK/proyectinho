@@ -12,7 +12,7 @@ from starlette.responses import RedirectResponse
 from db.misc import get_database_session
 from models import (IVA, Camion, Carreta, Chofer, Ciudad, Cliente, Contrato, Departamento, Factura_compra_cabecera,
                     Factura_compra_detalle, Factura_venta_cabecera,
-                    Factura_venta_detalle, Marca_camion, Marca_carreta, Producto, Proveedor, Remision)
+                    Factura_venta_detalle, Marca_camion, Marca_carreta, Producto, Proveedor, Remision, Deposito)
 from routers import auth
 from schemas import reporte
 from schemas import usuario as us
@@ -195,82 +195,6 @@ def mostrar_compras(request: Request, db: Session = Depends(get_database_session
 
     respuesta = [reporte.ReporteComprasBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
     return JSONResponse(jsonable_encoder(respuesta))
-    
-@router.get("/depositos")
-async def mostrar_parametros_depositos(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
-    # proveedores = await routerproveedores.listado_proveedores(request=request, db=db)
-    depositos= await routerdepositos.listado_depositos(request=request, db=db)
-    productos = await routerproductos.listado_productos(request=request, db=db)
-    return templates.TemplateResponse("/reportes/depositos.html", {"request": request, "Depositos":depositos, "Productos": productos, "datatables": True, "usuario_actual": usuario_actual})
-
-@router.post("/depositos")
-def mostrar_depositos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), fecha_desde = Body(), fecha_hasta = Body(), deposito = Body(), producto = Body(), tipo_movimiento = Body()):    
-    # join con gastos:unir con contrato en el join
-
-    
-    query_compras = db.query(
-        Producto.descripcion.label('descripcion'),
-        literal('Compra').label('tipo_movimiento'),
-        Factura_compra_detalle.idproducto.label('idproducto'),
-        func.sum(Factura_compra_detalle.cantidad).label('cantidad'),
-        Factura_compra_cabecera.fecha.label('fecha'),
-        Factura_compra_cabecera.deposito.label('deposito')
-    ).join(Factura_compra_cabecera, Factura_compra_detalle.idcabecera_compra == Factura_compra_cabecera.idfactura_compra
-    ).join(Producto, Factura_compra_detalle.idproducto == Producto.idproducto
-    ).group_by(Factura_compra_detalle.idproducto, Factura_compra_cabecera.fecha)
-
-    query_ventas = db.query(
-        Producto.descripcion.label('descripcion'),
-        literal('Venta').label('tipo_movimiento'),
-        Factura_venta_detalle.idproducto.label('idproducto'),
-        -(func.sum(Factura_venta_detalle.cantidad)).label('cantidad'),
-        Factura_venta_cabecera.fecha.label('fecha'),
-        Factura_venta_cabecera.deposito.label('deposito')
-    ).join(Factura_venta_cabecera, Factura_venta_detalle.idcabecera_venta == Factura_venta_cabecera.idfactura_venta
-    ).join(Producto, Factura_venta_detalle.idproducto == Producto.idproducto
-    ).group_by(Factura_venta_detalle.idproducto, Factura_venta_cabecera.fecha)
-
-    
-    query_remisiones = db.query(
-        literal('Remisión').label('tipo_movimiento'),
-        Remision.idproducto,
-        func.sum(Remision.cantidad).label('cantidad'),
-        Remision.fecha.label('fecha')
-    ).group_by(Remision.idproducto, Remision.fecha)
-
-    fecha_desde = datetime.strptime(fecha_desde, '%Y-%m-%d') if fecha_desde else None
-    fecha_hasta = datetime.strptime(fecha_hasta, '%Y-%m-%d') if fecha_hasta else None
-
-    # combinar las consultas con union all
-    subconsulta = union_all(query_compras, query_ventas).alias('subconsulta')
-
-    # filtrar según parámetros
-    consulta_final = db.query(
-        subconsulta.c.descripcion,
-        subconsulta.c.tipo_movimiento,
-        subconsulta.c.idproducto,
-        subconsulta.c.cantidad,
-        subconsulta.c.fecha
-    ).filter(
-        and_(
-            or_(func.date(subconsulta.c.fecha) >= fecha_desde if fecha_desde else True), # se convierte en true = 1 si fecha_desde es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
-            or_(func.date(subconsulta.c.fecha) <= fecha_hasta if fecha_hasta else True), # se convierte en true = 1 si fecha_hasta es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
-            or_(subconsulta.c.idproducto == producto if producto else True),
-            or_(
-                not tipo_movimiento, # para que devuelva "True" en caso de que tipo_movimiento sea nulo
-                tipo_movimiento == 'C' and subconsulta.c.tipo_movimiento == 'Compra',
-                tipo_movimiento == 'V' and subconsulta.c.tipo_movimiento == 'Venta',
-                tipo_movimiento == 'R' and subconsulta.c.tipo_movimiento == 'Remisión',
-            )
-        )
-    )
-
-    # Ejecutar la consulta combinada
-    resultado = consulta_final.all()
-    respuesta = [reporte.ReporteStockBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
-    #print(jsonable_encoder(respuesta))
-    return JSONResponse(jsonable_encoder(respuesta))
-
 
 @router.get("/remisiones")
 async def mostrar_parametros_remisiones(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
@@ -308,37 +232,104 @@ def mostrar_remisiones(request: Request, db: Session = Depends(get_database_sess
     respuesta = [dict(r._asdict()) for r in consulta_filtrada]
     return JSONResponse(jsonable_encoder(respuesta))
 
-    # resultado = consulta_filtrada.all()
-    # respuesta = [reporte.ReporteComprasBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
-    # return JSONResponse(jsonable_encoder(respuesta))
+@router.get("/depositos")
+async def mostrar_parametros_depositos(request: Request, db: Session = Depends(get_database_session), superusuario = Depends(auth.verificar_si_usuario_es_superusuario), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual)):
+    depositos= await routerdepositos.listado_depositos(request=request, db=db)
+    productos = await routerproductos.listado_productos(request=request, db=db)
+    proveedores = await routerproveedores.listado_proveedores(request=request, db=db)
+    clientes = await routerclientes.listado_clientes(request=request, db=db)
+    return templates.TemplateResponse("/reportes/depositos.html", {"request": request, "Depositos":depositos, "Productos": productos, "Proveedores": proveedores, "Clientes": clientes, "datatables": True, "usuario_actual": usuario_actual})
 
+@router.post("/depositos")
+def mostrar_depositos(request: Request, db: Session = Depends(get_database_session), usuario_actual: us.Usuario = Depends(auth.get_usuario_actual), fecha_desde = Body(), fecha_hasta = Body(), deposito = Body(), producto = Body(), tipo_movimiento = Body()):    
 
-    #                 , Remision.idcontrato, Remision.numero, Remision.fecha_carga, Remision.fecha_descarga, Cliente.descripcion.label('desc_cliente'), Cliente.ruc.label('ruc_cliente')
-    #                 , Cliente.direccion.label('dir_cliente'), Factura_venta_cabecera.numero.label('numero_factura')
-    #                 , ciudad_o.descripcion.label('ciudadorigen'), depto_o.descripcion.label('departamentoorigen')
-    #                 , ciudad_d.descripcion.label('ciudaddestino'), depto_d.descripcion.label('departamentodestino')
-    #                 , Remision.idcamion, Marca_camion.descripcion.label('marcacamion'), Camion.camion_chapa, Marca_carreta.descripcion.label('marcacarreta'), Carreta.carreta_chapa
-    #                 , Chofer.nombre, Chofer.apellido, Chofer.ci, Remision.bruto, Remision.tara, Remision.neto, Remision.brutod, Remision.tarad, Remision.netod, Producto.descripcion.label('desc_producto')
-    #                 ).join(Contrato, Remision.idcontrato==Contrato.idcontrato
-    #                 ).join(Cliente, Contrato.idcliente==Cliente.idcliente, isouter=True
-    #                 ).join(Factura_venta_cabecera, Remision.idcontrato==Factura_venta_cabecera.idcontrato, isouter=True
-    #                 ).join(ciudad_o, Contrato.origen==ciudad_o.idciudad
-    #                 ).join(depto_o, ciudad_o.iddepartamento==depto_o.iddepartamento
-    #                 ).join(ciudad_d, Contrato.destino==ciudad_d.idciudad
-    #                 ).join(depto_d, ciudad_d.iddepartamento==depto_d.iddepartamento
-    #                 ).join(Camion, Remision.idcamion==Camion.idcamion
-    #                 ).join(Marca_camion, Camion.idmarca_camion==Marca_camion.idmarca_camion
-    #                 ).join(Carreta, Remision.idcarreta==Carreta.idcarreta
-    #                 ).join(Marca_carreta, Carreta.idmarca_carreta==Marca_carreta.idmarca_carreta
-    #                 ).join(Chofer,Remision.idchofer==Chofer.idchofer
-    #                 ).join(Producto, Contrato.idproducto==Producto.idproducto
-    #                 ).group_by(Remision.idremision, Remision.fecha_carga
-    #                 ).order_by(Remision.idremision, Remision.fecha_carga.desc(), Remision.numero)
+    deposito_o=aliased(Deposito)
+    deposito_d=aliased(Deposito)
+
+    query_compras = db.query(
+        Producto.descripcion.label('descripcion'),
+        literal('Compra').label('tipo_movimiento'),
+        Factura_compra_cabecera.numero.label('numero_doc'),
+        Factura_compra_detalle.idproducto.label('idproducto'),
+        func.sum(Factura_compra_detalle.cantidad).label('cantidad'),
+        Factura_compra_cabecera.fecha.label('fecha'),
+        literal('').label('deposito_origen'),
+        deposito_d.descripcion.label('deposito_destino'),
+    ).join(Factura_compra_cabecera, Factura_compra_detalle.idcabecera_compra == Factura_compra_cabecera.idfactura_compra
+    ).join(Producto, Factura_compra_detalle.idproducto == Producto.idproducto
+    ).join(deposito_d, Factura_compra_cabecera.iddeposito == deposito_d.iddeposito
+    ).group_by(Factura_compra_cabecera.iddeposito, Factura_compra_detalle.idproducto, Factura_compra_cabecera.fecha
+    ).order_by(Factura_compra_cabecera.iddeposito, Factura_compra_detalle.idproducto, Factura_compra_cabecera.fecha)
+
+    query_ventas = db.query(
+        Producto.descripcion.label('descripcion'),
+        literal('Venta').label('tipo_movimiento'),
+        Factura_venta_cabecera.numero.label('numero_doc'),
+        Factura_venta_detalle.idproducto.label('idproducto'),
+        (func.sum(Factura_venta_detalle.cantidad)).label('cantidad'),
+        Factura_venta_cabecera.fecha.label('fecha'),
+        deposito_o.descripcion.label('deposito_origen'),
+        deposito_d.descripcion.label('deposito_destino'),
+    ).join(Factura_venta_cabecera, Factura_venta_detalle.idcabecera_venta == Factura_venta_cabecera.idfactura_venta
+    ).join(Producto, Factura_venta_detalle.idproducto == Producto.idproducto
+    ).join(deposito_o, Factura_venta_cabecera.iddeposito == deposito_o.iddeposito
+    ).join(Factura_compra_cabecera, Factura_venta_cabecera.idcontrato == Factura_compra_cabecera.idcontrato
+    ).join(deposito_d, Factura_venta_cabecera.iddeposito == deposito_d.iddeposito
+    ).group_by(Factura_venta_cabecera.iddeposito, Factura_venta_detalle.idproducto, Factura_venta_cabecera.fecha
+    ).order_by(Factura_venta_cabecera.iddeposito, Factura_venta_detalle.idproducto, Factura_venta_cabecera.fecha)
+
     
-    # consulta_filtrada = consulta.filter(
-    #     and_(
-    #         or_(func.date(Remision.fecha) >= fecha_desde if fecha_desde else True), # se convierte en true = 1 si fecha_desde es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
-    #         or_(func.date(Remision.fecha) <= fecha_hasta if fecha_hasta else True), # se convierte en true = 1 si fecha_hasta es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
-    #         or_(Remision.idproducto == producto if producto else True),
-    #     )
-    # )
+    query_remisiones = db.query(
+        Producto.descripcion.label('descripcion'),
+        literal('Remisión').label('tipo_movimiento'),
+        Remision.numero.label('numero_doc'),
+        Contrato.idproducto.label('idproducto'),
+        Remision.neto.label('cantidad'),
+        Remision.fecha_carga.label('fecha'),
+        deposito_o.descripcion.label('deposito_origen'),
+        literal('').label('deposito_destino')
+    ).join(Contrato, Remision.idcontrato==Contrato.idcontrato
+    ).join(Producto, Contrato.idproducto==Producto.idproducto
+    ).join(deposito_o, Remision.iddeposito == deposito_o.iddeposito
+    ).filter(Remision.anulado != 'S'
+    ).order_by(Remision.iddeposito, Contrato.idproducto, Remision.fecha_carga)
+    
+
+    print(query_remisiones)
+    fecha_desde = datetime.strptime(fecha_desde, '%Y-%m-%d') if fecha_desde else None
+    fecha_hasta = datetime.strptime(fecha_hasta, '%Y-%m-%d') if fecha_hasta else None
+
+    # combinar las consultas con union all
+    subconsulta = union_all(query_compras , query_ventas, query_remisiones).alias('subconsulta')
+
+    # filtrar según parámetros
+    consulta_final = db.query(
+        subconsulta.c.descripcion,
+        subconsulta.c.tipo_movimiento,
+        subconsulta.c.numero_doc,
+        subconsulta.c.idproducto,
+        subconsulta.c.cantidad,
+        subconsulta.c.fecha,
+        subconsulta.c.deposito_origen,
+        subconsulta.c.deposito_destino,
+    ).filter(
+        and_(
+            or_(func.date(subconsulta.c.fecha) >= fecha_desde if fecha_desde else True), # se convierte en true = 1 si fecha_desde es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+            or_(func.date(subconsulta.c.fecha) <= fecha_hasta if fecha_hasta else True), # se convierte en true = 1 si fecha_hasta es None (else True), o sea, no compara; se parsea como date para que solo tome la fecha, no la hora
+            or_(subconsulta.c.deposito == deposito if deposito else True),
+            or_(subconsulta.c.idproducto == producto if producto else True),
+            or_(
+                not tipo_movimiento, # para que devuelva "True" en caso de que tipo_movimiento sea nulo
+                tipo_movimiento == 'C' and subconsulta.c.tipo_movimiento == 'Compra',
+                tipo_movimiento == 'V' and subconsulta.c.tipo_movimiento == 'Venta',
+                tipo_movimiento == 'R' and subconsulta.c.tipo_movimiento == 'Remisión',
+            )
+        )
+    )
+
+    # Ejecutar la consulta combinada
+    resultado = consulta_final.all()
+    respuesta = [reporte.ReporteStockBase.from_orm(fila) for fila in resultado] # convierte los valores en una lista
+    #print(jsonable_encoder(respuesta))
+    return JSONResponse(jsonable_encoder(respuesta))
+

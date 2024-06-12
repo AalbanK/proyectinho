@@ -1,39 +1,48 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 
 <h1 class="h2 mb-1 text-gray-800">Remisiones según Producto</h1>
-<hr class="mb-4">
+<hr class="mb-4" />
 
 <form id="parametros_remision">
-
   <fieldset class="form-group">
     <div class="row">
       <legend class="col-form-label col-2 pt-0">Filtrar fecha:</legend>
       <div class="col-10">
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="gridRadios" value="esQuince">
+          <input
+            class="form-check-input"
+            type="radio"
+            name="gridRadios"
+            value="esQuince"
+          />
           <label class="form-check-label" for="esQuince">
             Últimos 15 días
           </label>
         </div>
         <div class="form-check">
-          <input class="form-check-input" type="radio" name="gridRadios" value="esPersonalizado" checked>
+          <input
+            class="form-check-input"
+            type="radio"
+            name="gridRadios"
+            value="esPersonalizado"
+            checked
+          />
           <label class="form-check-label" for="esPersonalizado">
             Personalizado
           </label>
         </div>
-        </div>
       </div>
+    </div>
   </fieldset>
 
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="inputDesde">Desde</label>
-      <input type="date" class="form-control" id="inputDesde">
+      <input type="date" class="form-control" id="inputDesde" />
     </div>
     <div class="form-group col-md-6">
       <label for="inputHasta">Hasta</label>
-      <input type="date" class="form-control" id="inputHasta">
+      <input type="date" class="form-control" id="inputHasta" />
     </div>
   </div>
   <div class="form-row">
@@ -42,18 +51,17 @@
       <select id="inputProducto" class="form-control">
         <option value="" selected>Todos</option>
         {% for Producto in Productos %}
-        <option value="{{Producto.idproducto}}">{{Producto.descripcion}} ({{Producto.idproducto}})</option>
+        <option value="{{Producto.idproducto}}">
+          {{Producto.descripcion}} ({{Producto.idproducto}})
+        </option>
         {% endfor %}
       </select>
     </div>
   </div>
   <button type="submit" class="btn btn-primary">Buscar</button>
 </form>
-<hr>
-<table id="productos_remision" class="table table-striped">
-</table>
-{% endblock content %}
-
-{% block script %}
+<hr />
+<table id="productos_remision" class="table table-striped"></table>
+{% endblock content %} {% block script %}
 <script src="{{url_for('static', path='/js/reporte-remision.js')}}"></script>
 {% endblock script %}

@@ -43,16 +43,17 @@ async def create_contrato(request: Request, db: Session = Depends(get_database_s
                                                                 "Proveedores_lista":proves, "Clientes_lista":clies, "Cuentas_lista":cues, "usuario_actual": usuario_actual})
 
 @router.post("/nuevo")
-async def create_contrato(db: Session=Depends(get_database_session), nro=Form(...), FechaInicio=Form(...),FechaFin=Form(...),idProducto=Form(...), cantidad=Form(...),
-                          precioCompra=Form(...), precioVenta=Form(...), idProveedor=Form(...),idcuentaC=Form(None), nroCuentaP=Form(None), ciudad_O=Form(...),
-                          idCliente=Form(...),idcuentaP=Form(None), nroCuentaC=Form(None),ciudad_D=Form(...), usuario_actual: us.Usuario=Depends(auth.get_usuario_actual)):
+async def create_contrato(db: Session=Depends(get_database_session), nro=Form(...), FechaInicio=Form(...),FechaFin=Form(...),idProducto=Form(...), convertir_kilos = Form(), cantidad=Form(...),
+                        precioCompra=Form(...), precioVenta=Form(...), idProveedor=Form(...),idcuentaC=Form(None), nroCuentaP=Form(None), ciudad_O=Form(...),
+                        idCliente=Form(...),idcuentaP=Form(None), nroCuentaC=Form(None),ciudad_D=Form(...), usuario_actual: us.Usuario=Depends(auth.get_usuario_actual)):
     usu = us.Usuario.from_orm(usuario_actual)
+    print(cantidad)
+    print(convertir_kilos)
     campos_a_agregar = {
         "nro": nro,
         "fecha_inicio": FechaInicio,
         "fecha_fin": FechaFin,
         "idproducto": idProducto,
-        "cantidad": cantidad,
         "precio_compra": precioCompra,
         "precio_venta": precioVenta,
         "idproveedor": idProveedor,
@@ -60,6 +61,13 @@ async def create_contrato(db: Session=Depends(get_database_session), nro=Form(..
         "idcliente": idCliente,
         "destino": ciudad_D
     }
+    if convertir_kilos == 'on':
+        campos_a_agregar["cantidad"] =  int(cantidad) * 1000
+        print(cantidad)
+        print(campos_a_agregar["cantidad"])
+    else:
+        campos_a_agregar["cantidad"] = cantidad
+
     if idCliente is not None and idCliente != '0':
         campos_a_agregar["cuenta_cliente"] = nroCuentaC
         campos_a_agregar["idcuentaC"] = idcuentaC

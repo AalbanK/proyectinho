@@ -19,6 +19,7 @@ inicializarDataTable = (tabla, datos, columnas, urlIdioma, parametros, titulo_re
         data: datos,
         dataSrc: '',
         columns: columnas,
+        scrollX: true,
         language: {
             url: urlIdioma
         },
@@ -41,6 +42,7 @@ inicializarDataTable = (tabla, datos, columnas, urlIdioma, parametros, titulo_re
             {
                 extend: 'pdf', // extensión del plugin
                 text: 'PDF', //texto del botón
+                orientation:'landscape',
                 title: titulo_reporte,
                 filename: `${titulo_reporte} - ${fechaHoy.toISOString()}`, // título con fecha + hora actuales
                 messageTop: function () { // va entre el título y la tabla
@@ -115,12 +117,21 @@ $(document).ready(function(){
             console.log(datos);
             columnas = [
                 { title: "Número", data: "numero" },
-                { title: "Fecha Carga", data: "fecha_carga" },
-                { title: "Fecha Descarga", data: "fecha_descarga" },
+                { title: "Fecha Carga", data: "fecha_carga", render: function(data, type, row){
+                    if(type === "sort" || type === "type"){
+                        return data;
+                    }
+                    return moment(data).format("YYYY-MM-DD");
+                } },
+                { title: "Fecha Descarga", data: "fecha_descarga", render: function(data, type, row){
+                    if(type === "sort" || type === "type"){
+                        return data;
+                    }
+                    return data ? moment(data).format("YYYY-MM-DD") : "--";
+                } },
                 { title: "Contrato N°", data: "nro_contrato" },
                 { title: "Cliente", data: "desc_cliente" },
                 { title: "Destino", data: "ciudaddestino" },
-                // { title: "Chofer", data: "" },
                 { title: "Chofer Nombre", data: "nombre" },
                 { title: "Apellido", data: "apellido" },
                 { title: "Chapa 1", data: "chapacamion" },

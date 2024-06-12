@@ -3,10 +3,13 @@ from datetime import datetime
 
 class ReporteStockBase(BaseModel):
     tipo_movimiento: str = None
+    numero_doc: str = None
     idproducto: str = None
     descripcion: str = None
     fecha: datetime = None
     cantidad: int = None
+    deposito_origen: str = None
+    deposito_destino: str = None
 
     class Config:
         orm_mode = True
